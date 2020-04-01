@@ -27,7 +27,7 @@ const browserHistory = createBrowserHistory();
 const cache = new InMemoryCache();
 const client = new ApolloClient({
   cache,
-  uri: 'http://localhost:5000/graphql',
+  uri: 'https://eventmgmt-deploy-testing.herokuapp.com/graphql',
 });
 
 
