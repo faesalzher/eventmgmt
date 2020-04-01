@@ -95,7 +95,7 @@ const useStyles = makeStyles(theme => ({
 const dataRoadmap = [
   { _id: '0', event_id: "0", roadmap_name: "Persiapan Tiket", start_date: "04/11/2020", end_date: '04/18/2020', color: randomColor({ luminosity: 'dark' }), },
   { _id: '1', event_id: '0', roadmap_name: "Jersey", start_date: "04/12/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
-  { _id: '2', event_id: '0', roadmap_name: "Sponshorship", start_date: "04/18/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
+  { _id: '2', event_id: '0', roadmap_name: "Sponshorships", start_date: "04/18/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
 ]
 export default function EventDetail() {
   const classes = useStyles();
