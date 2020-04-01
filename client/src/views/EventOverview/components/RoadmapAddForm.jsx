@@ -101,7 +101,7 @@ export default function RoadmapAddForm(props) {
             />
             <Divider />
             <div style={
-              props.xs ? {} : { display: 'flex' ,justifyContent:'space-between'}
+              props.xs ? {} : {}
             }>
               <div>
                 {dateIsNull ?
