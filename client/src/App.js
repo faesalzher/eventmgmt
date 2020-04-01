@@ -24,9 +24,9 @@ const browserHistory = createBrowserHistory();
 //   ...validate.validators,
 //   ...validators
 // };
-const cache = new InMemoryCache();
+// const cache = new InMemoryCache();
 const client = new ApolloClient({
-  cache,
+  // cache,
   uri: 'https://eventmgmt-deploy.herokuapp.com/graphql',
 });
 
