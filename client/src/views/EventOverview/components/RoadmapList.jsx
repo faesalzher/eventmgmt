@@ -41,6 +41,7 @@ export default function RoadmapList(props) {
         </div>
         <RoadmapAddForm
           xs={props.xs}
+          event_id={props.event_id}
           addRoadmapForm={addRoadmapForm}
           setAddRoadmapForm={setAddRoadmapForm}
           handleSaveButton={handleSaveButton}

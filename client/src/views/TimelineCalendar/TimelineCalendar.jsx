@@ -22,6 +22,7 @@ export default function TimelineCalendar(props) {
       end: new Date(e.end_date + " 23:59"),
     };
   };
+
   return (
     <Paper style={{ height: '100%' }}>
       <div style={{ padding: 8 }}>
