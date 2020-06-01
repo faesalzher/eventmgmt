@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Tabs, Tab, AppBar, Box, Typography } from '@material-ui/core';
@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import { createBrowserHistory } from 'history';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+// import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import {
   IconButton,
@@ -18,17 +18,37 @@ import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 import {
   ProjectEventList,
   ProjectComitee,
+  ProjectOverview,
 } from 'views';
+
+import {
+  ProjectEditModal
+} from './components';
 
 const PROJECT_QUERY = gql`
   query project($project_id: String!){
     project(_id:$project_id) {
       _id
       project_name
+      project_description
+      cancel
+      project_start_date
+      project_end_date
+      picture
+      organization_id
     }
   }
 `;
 
+const DIVISIONSBYPROJECT_QUERY = gql`
+  query divisionsByProject($project_id: String!){
+    divisionsByProject(project_id:$project_id) {
+      _id
+      division_name
+      project_id
+    }
+  }
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -82,15 +102,14 @@ export default function ProjectDetail() {
   const browserHistory = createBrowserHistory();
   let { project_id } = useParams();
   const [value, setValue] = React.useState(0);
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  // const handleChangeIndex = index => {
-  //   setValue(index);
-  // };
   const [project, setProject] = React.useState([]);
+  const [divisions, setDivisions] = useState([]);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   const { data } = useQuery(PROJECT_QUERY,
     {
@@ -99,13 +118,66 @@ export default function ProjectDetail() {
         setProject(data.project)
       }
     });
-  // console.log(_id)
+
+  const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
+    variables: { project_id: project_id },
+    onCompleted: () => {
+      setDivisions(
+        divisionsData.divisionsByProject
+      )
+    }
+  }
+  );
+  
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    divisionsRefetch();
+  };
+
+  const handleOpenEditModal = () => {
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+  };
+
+  const handleSaveEditProjectButton = (e) => {
+    setProject(e)
+  };
+
+  const handleSaveDivisionButton = (e) => {
+    setDivisions([...divisions, e])
+  };
+
+  const handleSaveEditDivisionButton = (e) => {
+    const temp = [...divisions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setDivisions(temp)
+  };
+
+  const handleDeleteDivision = (e) => {
+    const temp = [...divisions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setDivisions(temp);
+    // setTimeout(() => {
+    //   handleOpenSnackbar();
+    // }, 700);
+  };
 
   const breadcrumb_item = [
     { name: 'Project List', link: '/project' },
     { name: project.project_name, link: '/project' }
   ]
-
   return (
     <div className={classes.tabs_root}>
       <AppBar position="static" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} elevation={1} color="default">
@@ -113,11 +185,6 @@ export default function ProjectDetail() {
           <IconButton className={classes.iconbutton} style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
             <ArrowBackIcon />
           </IconButton>
-          {matches ?
-            <div ></div> : <div style={{ width: 200 }}><Typography noWrap style={{ fontWeight: 500, paddingTop: 11, paddingLeft: 10 }}>
-              {project.project_name}
-            </Typography></div>
-          }
         </div>
         {/* <div style={{ justifyContent: 'center', display: 'flex' }}> */}
         <Tabs
@@ -136,11 +203,16 @@ export default function ProjectDetail() {
         </Tabs>
         {/* </div> */}
         <div style={{ display: "flex", flexDirection: "row" }}>
-          {matches ? <div > </div> : <div style={{ width: 200 }}></div>
-          }
-          <IconButton className={classes.iconbutton}>
+          <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
             <SettingsIcon />
           </IconButton>
+          <ProjectEditModal
+            open={openEditModal}
+            divisions={divisions}
+            close={handleCloseEditModal}
+            handleSaveEditButton={handleSaveEditProjectButton}
+            project={project}
+          />
         </div>
       </AppBar>
       <div className={classes.root}>
@@ -148,19 +220,22 @@ export default function ProjectDetail() {
           <BreadCrumbs breadcrumb_item={breadcrumb_item} />
         </div>
         <div style={{ overflowX: 'auto', }}>
-          <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px', display: 'flex', justifyContent: 'center' }}>
-            <div style={{ height: 424, width: 'max-content' }}>
-              <ProjectComitee />
-            </div>
+          <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px', paddingBottom: 10 }}>
+            <ProjectComitee
+              project_id={project_id}
+              divisions={divisions}
+              handleSaveEditButton={handleSaveEditDivisionButton}
+              handleSaveButton={handleSaveDivisionButton}
+              handleDeleteDivision={handleDeleteDivision}
+            />
           </TabPanel>
         </div>
         <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px' }}>
           <ProjectEventList project={project} />
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction} style={{ padding: '0px 30px' }} >
-          {/* <ProjectOverview/> */}
-            Overview Project
-          </TabPanel>
+          <ProjectOverview project={project} />
+        </TabPanel>
       </div>
     </div>
   );

@@ -231,7 +231,6 @@ export default function EventAgenda() {
                       return null;
                     })
                   }
-
                 </TableBody>
               </Table>
             </TableContainer>

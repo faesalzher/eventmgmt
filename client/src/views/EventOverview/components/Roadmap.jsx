@@ -1,4 +1,4 @@
-import React,{forwardRef} from "react";
+import React, { forwardRef } from "react";
 import { NavLink as RouterLink } from 'react-router-dom';
 
 // import "./styles.css";
@@ -55,41 +55,49 @@ export default function Roadmap(props) {
 
   const shadowStyles = useSoftRiseShadowStyles();
   const classes = useStyles();
-  console.log(props.project_id,props.event_id)
+  console.log(props.project_id, props.event_id)
   return (
-      <div className={clsx(shadowStyles.root)}>
-        <div style={{ display: 'flex' }}>
-          <div style={{ backgroundColor: props.roadmap.color, width: '2%' }} />
-          <ListItem button style={{ padding: 0, display: 'flex', backgroundColor: 'white' }}
-            component={CustomRouterLink}
-            to={`/project/${props.project_id}/${props.event_id}/${props.roadmap._id}`}
-          >
-            <div style={{ padding: "5px 13px", width: '100%' }}>
+    <div className={clsx(shadowStyles.root)}>
+      <div style={{ display: 'flex' }}>
+        <div style={{ backgroundColor: props.roadmap.color, width: '1%' }} />
+        <ListItem button style={{ padding: 0, display: 'flex', backgroundColor: 'white' }}
+          component={CustomRouterLink}
+          to={`/project/${props.project_id}/${props.event_id}/${props.roadmap._id}`}
+        >
+          <div style={{ padding: "10px 13px", width: '100%', display:'flex'}}>
+            <div style={
+              props.xs?
+              { width:'90%' }
+              :
+              { display: 'flex', justifyContent: 'space-between',width:'90%',marginRight:30  }}>
               <Typography variant="subtitle2">
                 {props.roadmap.roadmap_name}
               </Typography>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex' }}>
-                  <DateRangeIcon className={classes.icon} />
-                  <Typography className={classes.info}>
-                    {new Date(props.roadmap.start_date).toString().slice(0, 16)}
-                  </Typography>
-                  <RemoveIcon className={classes.icon} />
-                  <Typography className={classes.info}>
-                    {new Date(props.roadmap.end_date).toString().slice(0, 16)}
-                  </Typography>
-                </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+              <div style={{ display: 'flex' }}>
+                <DateRangeIcon className={classes.icon} />
+                <Typography className={classes.info}>
+                  {new Date(props.roadmap.start_date).toString().slice(0, 16)}
+                </Typography>
+                <RemoveIcon className={classes.icon} />
+                <Typography className={classes.info}>
+                  {new Date(props.roadmap.end_date).toString().slice(0, 16)}
+                </Typography>
+              </div>
+            </div>
+            </div>  
+            <div style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}>
+                <ColorLinearProgress col={props.roadmap.color} thickness={1} style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }} variant="determinate" value={19} />
                 <div>
                   <Typography className={classes.info} style={{ color: 'black' }}>
                     Completed 15 %
                   </Typography>
                 </div>
-              </div>
-              <ColorLinearProgress col={props.roadmap.color} thickness={1} style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }} variant="determinate" value={19} />
-            </div>
-          </ListItem>
-        </div>
-        <Divider />
+              </div>       
+          </div>
+        </ListItem>
       </div>
+      <Divider />
+    </div>
   );
 }

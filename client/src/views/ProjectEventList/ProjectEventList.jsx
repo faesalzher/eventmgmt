@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {
-   Grid, 
+  Grid,
   // Fade, 
   // Typography
- } from '@material-ui/core';
+} from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -21,9 +21,13 @@ const EVENTS_QUERY = gql`
   events{
     _id
     event_name
-    status
+    event_description
+    event_location
+    cancel
     event_start_date
     event_end_date
+    picture
+    project_id
   }
 }
 `;
@@ -36,7 +40,6 @@ mutation deleteEvent ($_id: String!) {
 }
 `;
 
-// const mongoose = require('mongoose');
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,32 +53,6 @@ const useStyles = makeStyles(theme => ({
 
 const EventList = (props) => {
   const classes = useStyles();
-
-  const statusColor = [
-    { id: '6', status: 'No Status', color: "white" },
-    { id: '1', status: 'Planned', color: 'Yellow' },
-    { id: '2', status: 'Active', color: '#6cba47' },
-    { id: '3', status: 'Completed', color: '#3dc5d1' },
-    { id: '4', status: 'On Hold', color: "#d8dce3" },
-    { id: '5', status: 'Cancelled', color: "#d8dce3" },
-  ]
-
-  // const dt = [
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-  //   {_id: mongoose.Types.ObjectId(),event_name:"aaaaaaaaaaaaaaaa", status: "Active", project_start_date:"11111aaaaaaaaaaaaaaa1111111111111", project_end_date:"11111aaaaaaaaaaaaaaa1111111111111",organization:"aaaa"},
-
-  // ]
 
   const [events, setEvents] = useState([]);
 
@@ -98,7 +75,7 @@ const EventList = (props) => {
     }
   }, [loading, data, error]);
 
-  
+
   const refresh = () => {
     refetch();
   };
@@ -114,9 +91,6 @@ const EventList = (props) => {
     deleteEvent({ variables: { _id: e, } });
   }
 
-  if (error) return <p>Error :(</p>;
-  // console.log(props.project_id);
- 
   return (
     <div>
       {
@@ -126,7 +100,7 @@ const EventList = (props) => {
             spacing={2}
           >
 
-            <AddEventCard addEvent={addEvent} sc={statusColor} />
+            <AddEventCard addEvent={addEvent} project_id={props.project._id} />
             {
               events.slice().reverse().map((event, index) => {
                 if (events.length === 0) {
@@ -139,7 +113,6 @@ const EventList = (props) => {
                       project={props.project}
                       key={event._id}
                       event={event}
-                      sc={statusColor}
                       handleDelete={handleDelete}
                     />
                   )

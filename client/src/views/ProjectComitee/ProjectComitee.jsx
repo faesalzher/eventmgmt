@@ -1,125 +1,255 @@
-import React, {
-  //  useEffect
-   } from 'react';
-// import { useQuery, useMutation } from '@apollo/react-hooks';
-// import { gql } from 'apollo-boost';
-// import CircularProgress from '@material-ui/core/CircularProgress';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { 
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
   Paper,
-  // Button, 
-  Divider, 
-  Avatar, 
-  // Card, 
-  // Tabs, 
-  // Tab, 
-  // Box, 
-  Typography 
+  Snackbar,
+  CircularProgress
+  // Tooltip,
+  // IconButton,
 } from '@material-ui/core';
-// import { Tree, TreeNode } from 'react-organizational-chart'
+
+import MuiAlert from '@material-ui/lab/Alert';
+
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+import {
+  Comitees,
+  Divisions,
+} from './components';
+
+// import mockDataComitee from './dataComitee';
+// import mockDataPosition from './dataPosition.js';
+// import mockDataDivision from './dataDivision.js';
 
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    // minWidth: 275,
-    display: 'flex',
-    justifyContent: 'center',
-    // padding: theme.spacing(4),
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  titleContent: {
-    fontSize: 20,
-    fontWeight: 450
-  },
-  paper: {
-    display: 'inline-block',
-    padding: 10,
-    width: 200,
-  },
-  division: {
-    width: 200,
+const COMITEESBYPROJECT_QUERY = gql`
+  query comiteesByProject($project_id: String!){
+     comiteesByProject(project_id:$project_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
   }
-}));
+`;
 
-export default function ProjectComitee() {
-  const classes = useStyles();
+const STAFFS_QUERY = gql`
+{
+  staffs{
+      _id
+      staff_name
+      position_name
+      email
+      phone_number
+      password
+      picture
+      departement_id
+  }
+}
+`;
+
+
+const POSITIONS_QUERY = gql`
+{
+  positions{
+      _id
+      position_name
+      core
+  }
+}
+`;
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
   return (
-    <div className={classes.root}>
-      {/* <Tree lineWidth={"1px"} label={
-        <Paper className={classes.paper}>
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-            </div>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="h6" style={{ fontSize: 14 }}>Faesal Herlambang</Typography>
-              <Divider style={{ background: 'black' }} />
-              <Typography variant='subtitle1' style={{ fontSize: 11 }}>Head Of Project</Typography>
-            </div>
-          </div>
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={0}>{children}</Box>}
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `vertical-tab-${index}`,
+    'aria-controls': `vertical-tabpanel-${index}`,
+  };
+}
+
+const useStyles = makeStyles((theme) => ({
+  tabs_root: {
+    flexGrow: 1,
+  },
+  tabs: {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+}));
+
+export default function ProjectComitee(props) {
+  const classes = useStyles();
+  const [value, setValue] = React.useState(0);
+  const [comitees, setComitees] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [staffs, setStaffs] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const handleOpenSnackbar = () => {
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
+    variables: { project_id: props.project_id },
+    onCompleted: () => {
+      setComitees(
+        comiteesData.comiteesByProject
+      )
+    }
+  }
+  );
+
+  const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
+    onCompleted: () => {
+      setStaffs(
+        staffsData.staffs
+      )
+    }
+  }
+  );
+
+
+  const { loading: positionsLoading, data: positionsData, refetch: positionsRefetch } = useQuery(POSITIONS_QUERY, {
+    onCompleted: () => {
+      setPositions(
+        positionsData.positions
+      )
+    }
+  }
+  );
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    staffsRefetch();
+    comiteesRefetch();
+    positionsRefetch();
+  };
+
+
+  const handleSaveEditComiteeButton = (e) => {
+    const temp = [...comitees];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setComitees(temp)
+  };
+
+
+
+  const handleDeleteComitee = (e) => {
+    const temp = [...comitees];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setComitees(temp);
+    setTimeout(() => {
+      handleOpenSnackbar();
+    }, 700);
+  };
+
+  const handleSaveComiteeButton = (e) => {
+    setComitees([...comitees, e])
+  };
+
+  return (
+    <div>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}>
+        <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
+          Succes!
+         </MuiAlert>
+      </Snackbar>
+      <Paper>
+        <Paper elevation={0} style={{ backgroundColor: 'orange' }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            centered
+            style={{ color: 'white' }}
+            aria-label="project comitee tabs"
+            className={classes.tabs}
+          >
+            <Tab label="Comitee" {...a11yProps(0)} />
+            <Tab label="Division" {...a11yProps(1)} />
+          </Tabs>
         </Paper>
-      }>
-        <TreeNode label={<Paper className={classes.paper}>
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
+          {staffsLoading || positionsLoading ?
+            <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
+              <CircularProgress size={100} />
             </div>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="h6" style={{ fontSize: 14 }}>Bambang</Typography>
-              <Divider style={{ background: 'black' }} />
-              <Typography variant='subtitle1' style={{ fontSize: 11 }}>Kadiv Konsmusi</Typography>
-            </div>
-          </div>
-        </Paper>}>
-          <TreeNode label={<Paper className={classes.paper} elevation={0} style={{padding:0}}>
-            <Typography variant="h6" style={{ fontSize: 14 }}>Staff Konsumsi</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-          </Paper>}></TreeNode>
-        </TreeNode>
-        <TreeNode label={<Paper className={classes.paper}>
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-            </div>
-            <div style={{ display: 'flex', textAlign: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="h6" style={{ fontSize: 14 }}>Arif</Typography>
-              <Divider style={{ background: 'black' }} />
-              <Typography variant='subtitle1' style={{ fontSize: 11 }}>Kadiv Perlengkapan</Typography>
-            </div>
-          </div>
-        </Paper>}>
-          <TreeNode label={<Paper className={classes.paper} elevation={0} style={{padding:0}}>
-            <Typography variant="h6" style={{ fontSize: 14 }}>Staff Perlengkapan</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-            <div style={{ height: 6, backgroundColor: '#d8dce3' }}></div>
-            <Typography variant='subtitle1' style={{ fontSize: 11 }}>Andi setyo</Typography>
-          </Paper>}></TreeNode>
-        </TreeNode>
-      </Tree> */}
+            :
+            <Comitees
+              project_id={props.project_id}
+              divisions={props.divisions}
+              comitees={comitees}
+              staffs={staffs}
+              positions={positions}
+              handleSaveButton={handleSaveComiteeButton}
+              handleSaveEditButton={handleSaveEditComiteeButton}
+              handleDeleteComitee={handleDeleteComitee}
+            />
+          }
+        </TabPanel>
+        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
+          <Divisions
+            divisions={props.divisions}
+            project_id={props.project_id}
+            handleSaveEditButton={props.handleSaveEditButton}
+            handleSaveButton={props.handleSaveButton}
+            handleDeleteDivision={props.handleDeleteDivision}
+          />
+        </TabPanel>
+      </Paper>
     </div>
   );
 }

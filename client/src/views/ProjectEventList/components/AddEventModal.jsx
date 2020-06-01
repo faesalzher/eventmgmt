@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/styles';
@@ -16,26 +14,53 @@ import {
   IconButton,
 } from '@material-ui/core';
 
-import { useMutation} from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
+// import MenuItem from '@material-ui/core/MenuItem';
 import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
+
+import uuid from 'uuid/v1';
+
 const ADD_EVENT = gql`
-  mutation addEvent($_id: String!,$event_name: String!,$event_start_date: String!,$event_end_date: String!) {
-    addEvent(_id: $_id,event_name: $event_name,event_start_date:$event_start_date,event_end_date:$event_end_date) {
+  mutation addEvent(
+    $_id: String!,
+    $event_name: String!,
+    $event_description: String!,
+    $event_location: String!,
+    $cancel: String!,
+    $event_start_date: String!,
+    $event_end_date: String!,
+    $picture:String!,
+    $project_id:String!
+    ) {
+    addEvent(
+      _id: $_id,
+      event_name: $event_name,
+      event_description: $event_description,
+      event_location: $event_location,
+      cancel:$cancel,
+      event_start_date:$event_start_date,
+      event_end_date:$event_end_date,
+      picture:$picture,
+      project_id:$project_id
+      ) {
       _id
       event_name
+      event_description
+      event_location
+      cancel
       event_start_date
       event_end_date
+      picture
+      project_id
     }
   }
 `;
 
-const mongoose = require('mongoose');
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -103,19 +128,22 @@ const DialogActions = withStyles(theme => ({
 
 
 
-export default function AddEventModal(props){
+export default function AddEventModal(props) {
   const classes = useStyles();
   const initialFormState =
   {
-    _id: mongoose.Types.ObjectId(),
-    status: "No Status",
+    _id: uuid(),
     event_name: "",
-    description:"",
+    event_description: "",
+    event_location: "",
+    cancel: "false",
     event_start_date: new Date().toString(),
     event_end_date: new Date().toString(),
+    picture: "",
+    project_id: props.project_id,
   };
 
-  const [events, setEvents] = useState(initialFormState);
+  const [eventForm, setEventForm] = useState(initialFormState);
 
   const [date, setDate] = useState([
     {
@@ -125,43 +153,40 @@ export default function AddEventModal(props){
     }
   ]);
 
- 
+
   // console.log(data);
   const handleDate = e => {
     setDate([e.selection])
-    events.event_start_date = e.selection.startDate.toString();
-    events.event_end_date = e.selection.endDate.toString();
+    eventForm.event_start_date = e.selection.startDate.toString();
+    eventForm.event_end_date = e.selection.endDate.toString();
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setEvents({ ...events, [id]: value });
+    setEventForm({ ...eventForm, [id]: value });
   };
-  // console.log(events);
-  // const handleSelectStatus = e => {
-  //   events.status = e.target.value;
-  //   setEvents({ ...events, status: events.status });
-  // }
 
   const [addEvent] = useMutation(ADD_EVENT);
   const handleButton = e => {
-    console.log('aa');
     props.onCloseListener();
-    e.preventDefault();
-    props.addEvent(events);
+    props.addEvent(eventForm);
     addEvent(
       {
         variables:
         {
-          _id: events._id,
-          event_name: events.event_name,
-          // status: events.status,
-          event_start_date: events.event_start_date,
-          event_end_date: events.event_end_date,
+          _id: eventForm._id,
+          event_name: eventForm.event_name,
+          event_description: eventForm.event_description,
+          event_location: eventForm.event_location,
+          cancel: eventForm.cancel,
+          event_start_date: eventForm.event_start_date,
+          event_end_date: eventForm.event_end_date,
+          picture: eventForm.picture,
+          project_id: eventForm.project_id,
         }
       });
-    setEvents(initialFormState);
+    setEventForm(initialFormState);
+    console.log(eventForm)
   };
-
 
   return (
     <Dialog
@@ -188,62 +213,32 @@ export default function AddEventModal(props){
                 label="Event Name"
                 type="text"
                 variant="outlined"
-                value={events.event_name}
+                value={eventForm.event_name}
                 onChange={handleInputChange}
               />
-                  <TextField
+              <TextField
                 autoFocus
                 margin="dense"
-                id="description"
+                id="event_description"
+                multiline
+                rowsMax={9}
                 label="Description"
                 type="text"
                 variant="outlined"
-                value={events.description}
+                value={eventForm.event_description}
+                onChange={handleInputChange}
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="event_location"
+                label="Location"
+                type="text"
+                variant="outlined"
+                value={eventForm.event_location}
                 onChange={handleInputChange}
               />
             </FormControl>
-            {/* <FormControl className={classes.formControl}>
-              <TextField
-                select
-                margin="dense"
-                label="Status"
-                id="status"
-                variant="outlined"
-                value={events.status}
-                onChange={handleSelectStatus}
-              >
-                {props.sc.map((color, index) => (
-                  <MenuItem
-                    key={color.id}
-                    value={color.status}
-                  >
-                    {color.status}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl> */}
-            {/* <FormControl className={classes.formControl}>
-              <TextField
-                select
-                margin="dense"
-                label="Organization"
-                id="organization"
-                variant="outlined"
-                required
-                value={events.organization}
-                onChange={handleSelectOrganization}
-              >
-                {organizations.map((organization, index) => (
-                  <MenuItem
-                    margin="dense"
-                    key={organization._id}
-                    value={organization.organization_name}
-                  >
-                    {organization.organization_name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl> */}
           </div>
           <div>
             <FormControl className={classes.formDate}>
@@ -268,6 +263,3 @@ export default function AddEventModal(props){
 AddEventModal.propTypes = {
   className: PropTypes.string
 };
-
-
-

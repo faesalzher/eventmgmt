@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -14,10 +14,10 @@ import {
   Typography,
   IconButton,
 } from '@material-ui/core';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
+// import MenuItem from '@material-ui/core/MenuItem';
 import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
@@ -25,27 +25,58 @@ import { DateRange } from 'react-date-range';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
+import uuid from 'uuid/v1';
+
 const ADD_PROJECT = gql`
-  mutation addProject($_id: String!,$project_name: String!,$status: String!,$project_start_date: String!,$project_end_date: String!,$head_of_project_id:String!) {
-    addProject(_id: $_id,project_name: $project_name,status:$status,project_start_date:$project_start_date,project_end_date:$project_end_date,head_of_project_id:$head_of_project_id) {
+  mutation addProject(
+    $_id: String!,
+    $project_name: String!,
+    $project_description: String!,
+    $cancel: String!,
+    $project_start_date: String!,
+    $project_end_date: String!,
+    $picture:String!,
+    $organization_id:String!
+    ) {
+    addProject(
+      _id: $_id,
+      project_name: $project_name,
+      project_description: $project_description,
+      cancel:$cancel,
+      project_start_date:$project_start_date,
+      project_end_date:$project_end_date,
+      picture:$picture,
+      organization_id:$organization_id
+      ) {
       _id
       project_name
-      status
+      project_description
+      cancel
       project_start_date
       project_end_date
-      head_of_project_id
+      picture
+      organization_id
     }
   }
 `;
-const STAFFS_QUERY = gql`
-{
-  staffs{
-    _id
-    staff_name
+
+const ADD_DIVISION = gql`
+  mutation addDivision(
+    $_id: String!,
+    $division_name: String!,
+    $project_id: String!
+    ) {
+    addDivision(
+      _id: $_id,
+      division_name: $division_name,
+      project_id: $project_id
+      ) {
+      _id
+      division_name
+      project_id
+    }
   }
-}
 `;
-const mongoose = require('mongoose');
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -115,19 +146,20 @@ const DialogActions = withStyles(theme => ({
 
 
 
-export default function AddProjectModal (props){
+export default function AddProjectModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const initialFormState =
   {
-    _id: mongoose.Types.ObjectId(),
-    status: "No Status",
+    _id: uuid(),
     project_name: "",
-    description:"",
+    project_description: "",
+    cancel: "false",
     project_start_date: new Date().toString(),
     project_end_date: new Date().toString(),
-    head_of_project_id: ""
+    picture: "",
+    organization_id: "",
   };
 
   const [projects, setProjects] = useState(initialFormState);
@@ -141,25 +173,7 @@ export default function AddProjectModal (props){
   ]);
 
   const [save, setSave] = useState(false)
-  const [staffs, setStaffs] = useState([]);
-  useEffect(() => {
-    refresh();
-  });
-  const { loading, error, data, refetch } = useQuery(STAFFS_QUERY);
-  useEffect(() => {
-    const onCompleted = (data) => { setStaffs(data.staffs) };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !loading && !error) {
-        onCompleted(data);
-      } else if (onError && !loading && error) {
-        onError(error);
-      }
-    }
-  }, [loading, data, error]);
-  const refresh = () => {
-    refetch();
-  };
+  
   // console.log(data);
   const handleDate = e => {
     setDate([e.selection])
@@ -171,25 +185,9 @@ export default function AddProjectModal (props){
     setProjects({ ...projects, [id]: value });
   };
 
-  const handleSelectStatus = e => {
-    projects.status = e.target.value;
-    setProjects({ ...projects, status: projects.status });
-  }
-
-  const handleSelectStaff = e => {
-    projects.head_of_project_id = e.target.value;
-    setProjects({ ...projects, head_of_project_id: projects.head_of_project_id });
-  }
-  const timer = React.useRef();
-  console.log(projects)
-  React.useEffect(() => {
-    const clear = () => {
-      clearTimeout(timer.current);
-    }
-    return clear();
-  }, []);
-
   const [addProject] = useMutation(ADD_PROJECT);
+  const [addDivision] = useMutation(ADD_DIVISION);
+
   const handleButton = e => {
     setSave(true)
     setTimeout(() => {
@@ -203,10 +201,21 @@ export default function AddProjectModal (props){
           {
             _id: projects._id,
             project_name: projects.project_name,
-            status: projects.status,
+            project_description: projects.project_description,
+            cancel: projects.cancel,
             project_start_date: projects.project_start_date,
             project_end_date: projects.project_end_date,
-            head_of_project_id: projects.head_of_project_id
+            picture: projects.picture,
+            organization_id: projects.organization_id,
+          }
+        });
+      addDivision(
+        {
+          variables:
+          {
+            _id: uuid(),
+            division_name: "Core",
+            project_id: projects._id,
           }
         });
       setProjects(initialFormState);
@@ -216,7 +225,6 @@ export default function AddProjectModal (props){
     }, 400);
 
   };
-
 
   return (
     <Dialog
@@ -252,55 +260,15 @@ export default function AddProjectModal (props){
               <TextField
                 autoFocus
                 margin="dense"
-                id="description"
+                id="project_description"
                 label="Description"
                 type="text"
                 variant="outlined"
-                value={projects.description}
+                multiline
+                rowsMax={9}
+                value={projects.project_description}
                 onChange={handleInputChange}
               />
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <TextField
-                select
-                margin="dense"
-                label="Status"
-                id="status"
-                variant="outlined"
-                value={projects.status}
-                onChange={handleSelectStatus}
-              >
-                {props.sc.map((color, index) => (
-                  <MenuItem
-                    key={color.id}
-                    value={color.status}
-                  >
-                    {color.status}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <TextField
-                select
-                margin="dense"
-                label="Head of the project"
-                id="head_of_project_id"
-                variant="outlined"
-                required
-                value={projects.head_of_project_id}
-                onChange={handleSelectStaff}
-              >
-                {staffs.map((staff, index) => (
-                  <MenuItem
-                    margin="dense"
-                    key={staff._id}
-                    value={staff._id}
-                  >
-                    {staff.staff_name}
-                  </MenuItem>
-                ))}
-              </TextField>
             </FormControl>
           </div>
           <div>

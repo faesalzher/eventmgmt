@@ -7,7 +7,7 @@ import { Route } from 'react-router-dom';
 
 import {
   Dashboard as DashboardView,
-  Departement as DepartementView,
+  DepartementList as DepartementView,
   // UserList as UserListView,
   // Typography as TypographyView,
   // Icons as IconsView,
@@ -24,8 +24,7 @@ import {
 } from './views';
 
 const Routes = props => {
-  console.log("disini" + props);
-
+  
   return (
     <Switch>
       <Redirect

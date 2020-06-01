@@ -3,11 +3,10 @@ import React from 'react';
 // import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
-  Card,
-  CardContent,
-  CardActions,
+  Paper,
+  // CardActions,
   Typography,
-  Divider,
+  // Divider,
   // IconButton
 } from '@material-ui/core';
 
@@ -15,7 +14,8 @@ import EventIcon from '@material-ui/icons/Event';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 const useStyles = makeStyles(() => ({
   root: {
-    height: '100%'
+    height: '100%',
+    padding: '0px 12px'
   },
   content: {
     padding: "4px 0px"
@@ -36,19 +36,13 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export default function ProjectOverview() {
+export default function EventDetails(props) {
   const classes = useStyles();
 
   return (
-    <Card
-      // {...rest}
+    <Paper
       className={(classes.root)}
     >
-      <div style={{ padding: "0px 14px" }}>
-
-      </div>
-      {/* <Divider /> */}
-      <CardContent>
         <div className={classes.content}>
           <Typography variant="h6">
             Fun Bike
@@ -83,42 +77,6 @@ export default function ProjectOverview() {
             </div>
           </div>
         </div>
-        {/* <List>
-          {products.map((product, i) => (
-            <ListItem
-              divider={i < products.length - 1}
-              key={product.id}
-            >
-              <ListItemAvatar>
-                <img
-                  alt="Product"
-                  className={classes.image}
-                  src={product.imageUrl}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={product.name}
-                secondary={`Updated ${product.updatedAt.fromNow()}`}
-              />
-              <IconButton
-                edge="end"
-                size="small"
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </ListItem>
-          ))}
-        </List> */}
-      </CardContent>
-      {/* <CardActions className={classes.actions}>
-         <Button
-          color="primary"
-          size="small"
-          variant="text"
-        >
-          View all <ArrowRightIcon />
-        </Button> 
-      </CardActions> */}
-    </Card>
+    </Paper>
   );
 }

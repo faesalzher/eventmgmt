@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { 
-  Grid, 
+import {
+  Grid,
   // Fade, 
-  Typography } from '@material-ui/core';
+  Typography
+} from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -27,10 +28,12 @@ const PROJECTS_QUERY = gql`
   projects{
     _id
     project_name
-    status
+    project_description
+    cancel
     project_start_date
     project_end_date
-    head_of_project_id
+    picture
+    organization_id
   }
 }
 `;
@@ -60,16 +63,7 @@ function Alert(props) {
 const ProjectList = () => {
   const classes = useStyles();
 
-  const statusColor = [
-    { id: '6', status: 'No Status', color: "white" },
-    { id: '1', status: 'Planned', color: 'Yellow' },
-    { id: '2', status: 'Active', color: '#6cba47' },
-    { id: '3', status: 'Completed', color: '#3dc5d1' },
-    { id: '4', status: 'On Hold', color: "#d8dce3" },
-    { id: '5', status: 'Cancelled', color: "#d8dce3" },
-  ]
-
-  const [open, setOpen] = React.useState(false);
+   const [open, setOpen] = React.useState(false);
 
   const handleSucces = () => {
     setOpen(true);
@@ -130,9 +124,9 @@ const ProjectList = () => {
 
   return (
     <div>
-      <Paper style={{ display: "flex", height:48, flexDirection: "row", justifyContent: "center" }}>
-       <Typography color='textSecondary' variant="button"
-       style={{ display: "flex", flexDirection: "column", justifyContent: "center" ,textTransform:'uppercase'}}>Project List</Typography>
+      <Paper style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
+        <Typography color='textSecondary' variant="button"
+          style={{ display: "flex", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>Project List</Typography>
       </Paper>
       <div className={classes.root}>
         {
@@ -154,7 +148,7 @@ const ProjectList = () => {
                     Succes!
                </Alert>
                 </Snackbar>
-                <AddProjectCard addProject={addProject} sc={statusColor} />
+                <AddProjectCard addProject={addProject} />
                 {
                   projects.slice().reverse().map((project, index) => {
                     if (projects.length === 0) {
@@ -166,7 +160,6 @@ const ProjectList = () => {
                         <ProjectCard
                           key={project._id}
                           project={project}
-                          sc={statusColor}
                           handleDelete={handleDelete}
                         />
                       )

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { useParams } from "react-router-dom";
@@ -26,10 +26,14 @@ import randomColor from 'randomcolor';
 
 import {
   EventOverview,
+  EventExternal,
+  EventRoadmapList,
   EventAgenda,
-  TimelineCalendar
 } from 'views';
 
+import {
+  EventEditModal
+} from './components';
 const PROJECT_QUERY = gql`
   query project($project_id: String!){
     project(_id:$project_id) {
@@ -43,6 +47,13 @@ const EVENT_QUERY = gql`
     event(_id:$event_id) {
       _id
       event_name
+      event_description
+      event_location
+      cancel
+      event_start_date
+      event_end_date
+      picture
+      project_id
     }
   }
 `;
@@ -104,13 +115,13 @@ export default function EventDetail() {
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   let { project_id, event_id } = useParams();
   const [value, setValue] = React.useState(0);
-  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  // const matches = useMediaQuery(theme.breakpoints.up('sm'));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   const [event, setEvent] = React.useState([]);
-  const { data: eventData } = useQuery(EVENT_QUERY,
+  const { data: eventData, refetch: eventRefetch } = useQuery(EVENT_QUERY,
     {
       variables: { event_id: event_id },
       onCompleted: () => {
@@ -118,6 +129,13 @@ export default function EventDetail() {
       }
     });
 
+  React.useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    eventRefetch();
+  };
   const [project, setProject] = React.useState([]);
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {
@@ -128,6 +146,7 @@ export default function EventDetail() {
     });
 
   const [roadmaps, setRoadmaps] = useState(dataRoadmap);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   const breadcrumb_item = [
     { name: 'Project List', link: '/project' },
@@ -138,6 +157,18 @@ export default function EventDetail() {
     setRoadmaps([...roadmaps, e])
   }
 
+  const handleOpenEditModal = () => {
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+  };
+
+  const handleSaveEditEventButton = (e) => {
+    setEvent(e)
+  };
+
   return (
     <div className={classes.tabs_root}>
       <Paper className={classes.tabs_root} style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -146,13 +177,6 @@ export default function EventDetail() {
             <IconButton className={classes.iconbutton} style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
               <ArrowBackIcon />
             </IconButton>
-            {matches ?
-              <div style={{ width: 200 }}>
-                <Typography noWrap style={{ fontWeight: 500, paddingTop: 11, paddingLeft: 10 }}>
-                  {event.event_name}
-                </Typography>
-              </div> : <div></div>
-            }
           </div>
         </div>
         <Tabs
@@ -163,18 +187,22 @@ export default function EventDetail() {
           variant="scrollable"
           aria-label="full width tabs example"
         >
-          <Tab label="Calendar" {...a11yProps(0)} />
-          <Tab label="Event Overview" {...a11yProps(1)} />
-          <Tab label="Agenda" {...a11yProps(2)} />
+          <Tab label="Roadmap" {...a11yProps(0)} />
+          <Tab label="External" {...a11yProps(1)} />
+          <Tab label="Rundown" {...a11yProps(2)} />
+          <Tab label="Event Overview" {...a11yProps(3)} />
         </Tabs>
         <div style={{ display: "flex", flexDirection: "row" }}>
-          {matches ?
-            <div style={{ width: 200 }}>
-            </div> : <div></div>
-          }
-          <IconButton className={classes.iconbutton}>
+          <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
             <SettingsIcon />
           </IconButton>
+          <EventEditModal
+            open={openEditModal}
+            project_id={project_id}
+            close={handleCloseEditModal}
+            handleSaveEditButton={handleSaveEditEventButton}
+            event={event}
+          />
         </div>
       </Paper>
       <div className={classes.root}>
@@ -183,28 +211,24 @@ export default function EventDetail() {
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           }
         </div>
-        {/* <div style={{ overflowX: 'auto' }}>
-          <TabPanel value={value} index={2} style={{ padding: '0px 30px' }} >
-            <div style={{ display: 'flex', flexDirection: 'row', height: 424, width: (divisionData.length * 315) }}>
-              {divisionData.map((division, index) => (
-                <EventTaskList division={division} key={division._id} />
-              ))}
-            </div>
-          </TabPanel>
-        </div> */}
         <TabPanel value={value} index={0} style={{ padding: '0px 30px' }}>
-          {/* <EventRoadmap  /> */}
-          <TimelineCalendar roadmaps={roadmaps} />
-        </TabPanel>
-        <TabPanel value={value} index={1} style={{ padding: '0px 30px' }}>
-          <EventOverview
+          <EventRoadmapList
             event_id={event_id}
             project_id={project_id}
             roadmaps={roadmaps}
+            xs={fullScreen}
             handleSaveButton={handleSaveButton} />
+        </TabPanel>
+        <TabPanel value={value} index={1} style={{ padding: '0px 30px' }}>
+          <EventExternal
+            event_id={event_id}
+          />
         </TabPanel>
         <TabPanel value={value} index={2} style={{ padding: '0px 30px' }}>
           <EventAgenda />
+        </TabPanel>
+        <TabPanel value={value} index={3} style={{ padding: '0px 30px' }}>
+          <EventOverview />
         </TabPanel>
       </div>
     </div>

@@ -13,7 +13,7 @@ import './assets/scss/index.scss';
 import Routes from './Routes';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+// import { InMemoryCache } from 'apollo-cache-inmemory';
 
 const browserHistory = createBrowserHistory();
 // Chart.helpers.extend(Chart.elements.Rectangle.prototype, {
@@ -27,7 +27,7 @@ const browserHistory = createBrowserHistory();
 // const cache = new InMemoryCache();
 const client = new ApolloClient({
   // cache,
-  uri: 'https://eventmgmt-deploy.herokuapp.com/graphql',
+  uri: 'http://localhost:5000/graphql',
 });
 
 

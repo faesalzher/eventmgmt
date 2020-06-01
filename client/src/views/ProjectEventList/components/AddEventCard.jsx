@@ -47,7 +47,7 @@ export default function AddEventCard(props){
   return (
     <Grid
       item
-      lg={4}
+      lg={3}
       sm={6}
       xl={3}
       xs={12}
@@ -64,9 +64,9 @@ export default function AddEventCard(props){
           openListener={open}
           onCloseListener={handleClose}
           closeAfterTransition
+          project_id={props.project_id}
           style={{ minWidth: 420 }}
           addEvent={addEvent}
-          sc={props.sc}
         />
         <CardActionArea className={classes.root} onClick={()=>handleOpen()}>
           <CardContent className={classes.root}

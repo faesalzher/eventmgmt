@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import {
   Roadmap,
@@ -23,7 +24,7 @@ export default function RoadmapList(props) {
   }
 
   return (
-    <Card style={{ maxHeight: "100%" }} elevation={0} >
+    <Card style={{ maxHeight: "100%", width: '100%' }} elevation={0} >
       <div
         style={{
           backgroundColor: 'orange',
@@ -33,11 +34,18 @@ export default function RoadmapList(props) {
       >
         <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
           Roadmap List
+          <div style={{ display: 'flex' }}>
+            <Tooltip title="Show Roadmap Calendar" arrow>
+              <IconButton style={{ padding: 0 }} >
+                <CalendarTodayIcon style={{ fontSize: 20, }} />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Add New Roadmap" arrow>
-            <IconButton style={{ padding: 0 }} onClick={() => setAddRoadmapForm(true)}>
-              <AddIcon style={{ fontSize: 20, }} />
-            </IconButton>
-          </Tooltip>
+              <IconButton style={{ padding: 0 }} onClick={() => setAddRoadmapForm(true)}>
+                <AddIcon style={{ fontSize: 20, }} />
+              </IconButton>
+            </Tooltip>
+          </div>
         </div>
         <RoadmapAddForm
           xs={props.xs}
@@ -55,6 +63,7 @@ export default function RoadmapList(props) {
           { padding: 0, backgroundColor: "rgba(0, 0, 0, 0.12)", overflowY: "auto", maxHeight: 490 }} >
         {props.roadmaps.map((roadmap, index) => (
           <Roadmap
+            xs={props.xs}
             key={index}
             roadmap={roadmap}
             project_id={props.project_id}
@@ -62,7 +71,7 @@ export default function RoadmapList(props) {
           />
         ))}
       </CardContent>
-      <div
+      {/* <div
         style={{
           backgroundColor: 'orange',
           color: 'white',
@@ -71,7 +80,7 @@ export default function RoadmapList(props) {
           paddingRight: 10,
         }}
       >
-      </div>
+      </div> */}
     </Card >
   );
 }
