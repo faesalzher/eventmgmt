@@ -62,8 +62,8 @@ const Sidebar = props => {
       icon: <EventIcon />
     },
     {
-      title: 'Departement',
-      href: '/departement',
+      title: 'Organization',
+      href: '/organization',
       icon: <PeopleIcon />
     },
     {

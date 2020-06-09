@@ -92,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ProjectComitee() {
+export default function Organization() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
   const [departements, setDepartements] = useState([]);
@@ -228,6 +228,7 @@ export default function ProjectComitee() {
           >
             <Tab label="Staff" {...a11yProps(0)} />
             <Tab label="Departement" {...a11yProps(1)} />
+            <Tab label="Organization" {...a11yProps(2)} />
           </Tabs>
         </Paper>
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
@@ -252,6 +253,9 @@ export default function ProjectComitee() {
             handleSaveButton={handleSaveDepartementButton}
             handleDeleteDepartement={handleDeleteDepartement}
           />
+        </TabPanel>
+        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
+       
         </TabPanel>
       </Paper>
     </div>

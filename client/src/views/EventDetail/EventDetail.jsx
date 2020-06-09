@@ -228,7 +228,9 @@ export default function EventDetail() {
           <EventAgenda />
         </TabPanel>
         <TabPanel value={value} index={3} style={{ padding: '0px 30px' }}>
-          <EventOverview />
+          <EventOverview
+            event={event}
+          />
         </TabPanel>
       </div>
     </div>

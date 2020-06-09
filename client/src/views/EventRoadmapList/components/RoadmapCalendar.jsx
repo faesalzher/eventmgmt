@@ -1,4 +1,4 @@
-import React, {} from 'react';
+import React, { } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
 import Dialog from '@material-ui/core/Dialog';
@@ -13,6 +13,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
+import '@fullcalendar/core/main.css';
+import '@fullcalendar/daygrid/main.css';
 
 const styles = theme => ({
   root: {
@@ -84,23 +86,20 @@ export default function RoadamapCalendar(props) {
         fullScreen ?
           { backgroundColor: "#e6e8eb" } :
           { backgroundColor: "#e6e8eb", flexDirection: 'row', display: 'flex' }}>
-       <div style={{}}>
-        <FullCalendar
-          defaultView="dayGridMonth"
-          header={{
-            left: "title",
-            right: "prev,next"
-          }}
-          plugins={[dayGridPlugin]}
-          ref={calendarComponentRef}
-          weekends={true}
-          events={calendarRoadmaps}
-          eventDataTransform={roadmapDataTransform}
-        // dateClick={handleDateClick}
-        // editable={true}
-        // eventClick={(e) => handleEventClick(e)}
-        />
-      </div>
+        <div style={{}}>
+          <FullCalendar
+            defaultView="dayGridMonth"
+            header={{
+              left: "title",
+              right: "prev,next"
+            }}
+            plugins={[dayGridPlugin]}
+            ref={calendarComponentRef}
+            weekends={true}
+            events={calendarRoadmaps}
+            eventDataTransform={roadmapDataTransform}
+          />
+        </div>
       </DialogContent  >
     </Dialog >
   );

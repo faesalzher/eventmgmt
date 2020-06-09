@@ -23,7 +23,6 @@ import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
-import uuid from 'uuid/v1';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -89,7 +88,7 @@ const DialogActions = withStyles(theme => ({
 }))(MuiDialogActions);
 
 
-export default function AddAgendaModal(props) {
+export default function EditAgendaModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -98,12 +97,12 @@ export default function AddAgendaModal(props) {
 
   const initialFormState =
   {
-    _id: uuid(),
-    agenda_name: "",
-    details: "",
-    date: "",
-    start_time: "00:00",
-    end_time: "00:00",
+    _id: props.agenda._id,
+    agenda_name: props.agenda.agenda_name,
+    details: props.agenda.details,
+    date: props.agenda.date,
+    start_time: props.agenda.start_time,
+    end_time: props.agenda.end_time,
   };
   const [agendaForm, setAgendaForm] = useState(initialFormState)
 
@@ -121,7 +120,7 @@ export default function AddAgendaModal(props) {
   };
 
   const handleSaveButton = () => {
-    props.handleSaveAgendaButton(agendaForm)
+    props.handleSaveEditButton(agendaForm)
     handleClose();
   };
 
@@ -178,7 +177,7 @@ export default function AddAgendaModal(props) {
       maxWidth={'sm'}
     >
       <DialogTitle id="customized-dialog-title" onClose={handleClose} style={{ textAlign: 'center' }}>
-        Add New Agenda
+        Edit Agenda
       </DialogTitle>
       <DialogContent dividers style={
         fullScreen ?
@@ -246,7 +245,7 @@ export default function AddAgendaModal(props) {
 
       </DialogContent  >
       <DialogActions>
-        {(agendaForm.agenda_name === "" || agendaForm.details === "" || agendaForm.date === "") || validateTime===false ?
+        {(agendaForm.agenda_name === "" || agendaForm.details === "" || agendaForm.date === "") || validateTime === false ?
           < Button size="small" className={classes.iconbutton} disabled >Save</Button>
           :
           < Button size="small" color="primary" onClick={() => handleSaveButton()}>Save</Button>

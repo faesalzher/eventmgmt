@@ -2,7 +2,7 @@
 export { default as Dashboard } from './Dashboard/Dashboard.jsx';
 // export { default as Icons } from './Icons';
 export { default as NotFound } from './NotFound/NotFound.jsx';
-export { default as DepartementList } from './DepartementList/DepartementList.jsx';
+export { default as Organization } from './Organization/Organization.jsx';
 export { default as RoadmapTaskList } from './RoadmapTaskList/RoadmapTaskList.jsx';
 export { default as ProjectList } from './ProjectList/ProjectList.jsx';
 export { default as ProjectComitee } from './ProjectComitee/ProjectComitee.jsx';

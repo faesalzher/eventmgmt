@@ -7,7 +7,7 @@ import { Route } from 'react-router-dom';
 
 import {
   Dashboard as DashboardView,
-  DepartementList as DepartementView,
+  Organization as OrganizationView,
   // UserList as UserListView,
   // Typography as TypographyView,
   // Icons as IconsView,
@@ -39,10 +39,10 @@ const Routes = props => {
         path="/dashboard"
       />
       <RouteWithLayout
-        component={DepartementView}
+        component={OrganizationView}
         exact
         layout={MainLayout}
-        path="/departement"
+        path="/organization"
       />
       <RouteWithLayout
         component={ProjectListView}
