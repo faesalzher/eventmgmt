@@ -1,14 +1,18 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
   Paper,
   Tabs,
   Tab,
   Typography,
   Box,
+  Snackbar
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
+
 import PropTypes from 'prop-types';
 
-import { Sponsors, Volunteers, Guests } from './components';
+import { Externals } from './components';
+import mockData from './dataExternal';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -45,8 +49,60 @@ export default function EventExternal(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  const [externals, setExternals] = useState(mockData);
+
+  const handleSaveButton = (e) => {
+    setExternals([...externals, e])
+  };
+
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const handleOpenSnackbar = () => {
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
+  const handleSaveEditButton = (e) => {
+    const temp = [...externals];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setExternals(temp)
+  };
+
+  const handleDelete = (e) => {
+    const temp = [...externals];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setExternals(temp);
+    setTimeout(() => {
+      handleOpenSnackbar();
+    }, 700);
+  };
+
   return (
     <Paper style={{ backgroundColor: 'orange' }}>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}>
+        <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
+          Succes!
+         </MuiAlert>
+      </Snackbar>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -59,15 +115,47 @@ export default function EventExternal(props) {
         <Tab style={{ textTransform: "none" }} label="Sponsors" {...a11yProps(0)} />
         <Tab style={{ textTransform: "none" }} label="Volunteer" {...a11yProps(1)} />
         <Tab style={{ textTransform: "none" }} label="Guests" {...a11yProps(2)} />
+        <Tab style={{ textTransform: "none" }} label="Media Partners" {...a11yProps(3)} />
       </Tabs>
       <TabPanel value={value} index={0} style={{ padding: 0 }}>
-        <Sponsors event_id={props.event_id} />
+        <Externals
+          event_id={props.event_id}
+          externals={externals}
+          type="Sponsor"
+          handleSaveButton={handleSaveButton}
+          handleDelete={handleDelete}
+          handleSaveEditButton={handleSaveEditButton}
+        />
       </TabPanel>
       <TabPanel value={value} index={1} style={{ padding: 0 }}>
-        <Volunteers event_id={props.event_id} />
+        <Externals
+          event_id={props.event_id}
+          externals={externals}
+          type="Volunteer"
+          handleDelete={handleDelete}
+          handleSaveButton={handleSaveButton}
+          handleSaveEditButton={handleSaveEditButton}
+        />
       </TabPanel>
       <TabPanel value={value} index={2} style={{ padding: 0 }}>
-        <Guests event_id={props.event_id} />
+        <Externals
+          event_id={props.event_id}
+          externals={externals}
+          type="Guest"
+          handleSaveButton={handleSaveButton}
+          handleDelete={handleDelete}
+          handleSaveEditButton={handleSaveEditButton}
+        />
+      </TabPanel>
+      <TabPanel value={value} index={3} style={{ padding: 0 }}>
+        <Externals
+          event_id={props.event_id}
+          externals={externals}
+          type="Media Partner"
+          handleSaveButton={handleSaveButton}
+          handleDelete={handleDelete}
+          handleSaveEditButton={handleSaveEditButton}
+        />
       </TabPanel>
     </Paper>
   );

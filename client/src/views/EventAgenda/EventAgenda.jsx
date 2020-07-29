@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React, { } from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,14 +11,17 @@ import {
   Chip,
   Paper,
   // IconButton,
+  Snackbar,
   Button
 } from '@material-ui/core';
+
+import MuiAlert from '@material-ui/lab/Alert';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import {
   AgendaByDate,
   AddAgendaModal,
 } from './components';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 
 const dataAgenda = [
@@ -74,6 +77,32 @@ export default function EventAgenda() {
     setAgendas(temp)
   }
 
+  const handleDelete = (e) => {
+    const temp = [...agendas];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setAgendas(temp);
+    setTimeout(() => {
+      handleOpenSnackbar();
+    }, 700);
+  };
+
+
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const handleOpenSnackbar = () => {
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
   const sortedAgendas = (agendas.slice().sort((a, b) => new Date(new Date().toString().slice(0, 16) + a.start_time) - new Date(new Date().toString().slice(0, 16) + b.start_time)));
 
   const groupByDate = sortedAgendas.reduce((groupByDate, agenda) => {
@@ -96,6 +125,18 @@ export default function EventAgenda() {
 
   return (
     <div>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}>
+        <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
+          Succes!
+         </MuiAlert>
+      </Snackbar>
       {
         sortedGroupAgendas.map((rundownDate, index) => (
           <div style={{ padding: "7px 0px" }} key={index}>
@@ -126,6 +167,7 @@ export default function EventAgenda() {
                         rundownDate={rundownDate}
                         agenda={agenda}
                         index={index}
+                        handleDelete={handleDelete}
                         handleSaveEditButton={handleSaveEditButton}
                       />
                     })

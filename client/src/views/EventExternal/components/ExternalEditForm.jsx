@@ -15,7 +15,10 @@ import {
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import uuid from 'uuid/v1';
+
+import {
+  DeleteForm
+} from 'components';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -85,30 +88,46 @@ const DialogActions = withStyles(theme => ({
 
 
 
-export default function VolunteerEditForm(props) {
+export default function ExternalEditForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
-  // const [anchorEl, setAnchorEl] = React.useState(null);
   const intitialFormState = {
-    _id: uuid(),
-    volunteer_name: props.volunteer.volunteer_name,
-    event_id: props.volunteer.event_id,
-    contact_person: props.volunteer.contact_person,
-    info: props.volunteer.info,
-    imageUrl: props.volunteer.imageUrl,
+    _id: props.external._id,
+    external_name: props.external.external_name,
+    external_type: props.external.external_type,
+    event_id: props.external.event_id,
+    email: props.external.email,
+    phone_number: props.external.phone_number,
+    details: props.external.phone_number,
+    picture: props.external.picture,
   }
-  const [volunteerForm, setVolunteerForm] = useState(intitialFormState);
+  const [externalForm, setExternalForm] = useState(intitialFormState);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(volunteerForm, props.index)
-    // setVolunteerForm(intitialFormState);
+    props.handleSaveEditButton(externalForm)
+    // setExternalForm(intitialFormState);
     props.close();
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setVolunteerForm({ ...volunteerForm, [id]: value })
+    setExternalForm({ ...externalForm, [id]: value })
+  }
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  }
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleDelete = () => {
+    props.handleDelete(props.external._id);
+    props.close();
+    // deleteComitee({ variables: { _id: props.comitee._id, } });
   }
 
   return (
@@ -121,8 +140,8 @@ export default function VolunteerEditForm(props) {
       maxWidth={'xs'}
     >
       <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Edit Volunteer
-        </DialogTitle>
+        Edit {props.type}
+      </DialogTitle>
       <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
         <form noValidate >
           <div >
@@ -130,11 +149,11 @@ export default function VolunteerEditForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="volunteer_name"
-                label="Volunteer Name"
+                id="external_name"
+                label={props.type + " Name"}
                 type="text"
                 variant="outlined"
-                value={volunteerForm.volunteer_name}
+                value={externalForm.external_name}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -142,11 +161,11 @@ export default function VolunteerEditForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="contact_person"
-                label="Contact Person"
+                id="email"
+                label="Email"
                 type="text"
                 variant="outlined"
-                value={volunteerForm.contact_person}
+                value={externalForm.email}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -154,11 +173,23 @@ export default function VolunteerEditForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="info"
-                label="Info"
+                id="phone_number"
+                label="Phone Number"
                 type="text"
                 variant="outlined"
-                value={volunteerForm.info}
+                value={externalForm.phone_number}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField
+                style={{ backgroundColor: 'white' }}
+                margin="dense"
+                id="details"
+                label="Details"
+                type="text"
+                variant="outlined"
+                value={externalForm.details}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -166,10 +197,18 @@ export default function VolunteerEditForm(props) {
         </form>
       </DialogContent>
       <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="outlined" size="small" color="secondary">
-          Delete
+        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
+          Delete {props.type}
         </Button>
-        {(volunteerForm.volunteer_name === "" || volunteerForm.contact_person === "" || volunteerForm.info === "") ?
+        <DeleteForm
+          open={openDeleteModal}
+          handleDelete={handleDelete}
+          close={handleCloseDeleteModal}
+        />
+        {(externalForm.external_name === "" ||
+          externalForm.email === "" ||
+          externalForm.phone_number === "" ||
+          externalForm.details === "") ?
           < Button size="small" className={classes.iconbutton} disabled >Save</Button>
           :
           < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveEditButton()}>Save</Button>

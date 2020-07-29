@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // import PropTypes from 'prop-types';
 // // import SwipeableViews from 'react-swipeable-views';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -13,8 +13,8 @@ import { createBrowserHistory } from 'history';
 // // import ScrollContainer from 'react-indiana-drag-scroll'
 // import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 import { useParams } from "react-router-dom";
-// import { useQuery } from '@apollo/react-hooks';
-// import { gql } from 'apollo-boost';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import {
@@ -27,6 +27,18 @@ import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 import {
   TaskList
 } from './components';
+
+
+const DIVISIONSBYPROJECT_QUERY = gql`
+  query divisionsByProject($project_id: String!){
+    divisionsByProject(project_id:$project_id) {
+      _id
+      division_name
+      project_id
+    }
+  }
+`;
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -52,14 +64,33 @@ export default function RoadamapTaskList() {
   let { project_id, event_id, roadmap_id } = useParams();
   // const [value, setValue] = React.useState(0);
   // const matches = useMediaQuery(theme.breakpoints.up('sm'));
-  const [divisionData,
-    // setDivisionData
-  ] = React.useState([
-    { _id: 0, name: 'Konsumsi', roadmap_id: '0' },
-    { _id: 1, name: 'Perlengkapan', roadmap_id: '0' },
-    { _id: 2, name: 'Humas', roadmap_id: '0' },
-    { _id: 3, name: 'Kemanan', roadmap_id: '0' },
-  ]);
+  const [divisions, setDivisions] = useState([]);
+
+  // const [divisionData,
+  //   // setDivisionData
+  // ] = React.useState([
+  //   { _id: 0, name: 'Konsumsi', roadmap_id: '0' },
+  //   { _id: 1, name: 'Perlengkapan', roadmap_id: '0' },
+  //   { _id: 2, name: 'Humas', roadmap_id: '0' },
+  //   { _id: 3, name: 'Kemanan', roadmap_id: '0' },
+  // ]);
+  const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
+    variables: { project_id: project_id },
+    onCompleted: () => {
+      setDivisions(
+        divisionsData.divisionsByProject
+      )
+    }
+  }
+  );
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    divisionsRefetch();
+  };
 
   const breadcrumb_item = [
     { name: 'Project List', link: '/project' },
@@ -67,7 +98,7 @@ export default function RoadamapTaskList() {
     { name: 'Fun Bike', link: `/project/${project_id}/${event_id}` },
     { name: 'Jersey', link: `/` }
   ]
-
+  console.log(divisions)
   return (
     <div className={classes.tabs_root}>
       <Paper className={classes.tabs_root} style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -94,11 +125,14 @@ export default function RoadamapTaskList() {
         </div>
         <div style={{ overflowX: 'auto' }}>
           <div style={{ padding: '0px 30px' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', height: 424, width: (divisionData.length * 315) }}>
-              {divisionData.map((division, index) => {
-                if (roadmap_id === division.roadmap_id) {
-                  return <TaskList division={division} key={division._id} />
-                } return null
+            <div style={{ display: 'flex', flexDirection: 'row', height: 424, width: (divisions.length * 315) }}>
+              {divisions.map((division, index) => {
+                return <TaskList
+                  division={division}
+                  roadmap_id={roadmap_id}
+                  key={division._id}
+                  project_id={project_id}
+                />
               })}
             </div>
           </div>

@@ -121,8 +121,8 @@ export default function TaskProperties(props) {
         <EscapeOutside onEscapeOutside={onEscapeOutside}>
           <TextareaAutosize autoFocus aria-label="empty textarea"
             onKeyDown={onPressEnter}
-            value={taskForm.description}
-            id="description"
+            value={taskForm.task_description}
+            id="task_description"
             onChange={handleChangeTask}
             placeholder="Add A Description"
             style={{ width: "-webkit-fill-available", minHeight: 27, fontSize: 15, }} />
@@ -135,13 +135,13 @@ export default function TaskProperties(props) {
           onMouseEnter={() => setShowEditIcon(true)}
           onMouseLeave={() => setShowEditIcon(false)}
           style={{ justifyContent: "space-between", display: 'flex', textTransform: "none", marginBottom: 10, width: "-webkit-fill-available" }}>
-          {taskForm.description === "" ?
+          {taskForm.task_description === "" ?
             <Typography variant="body2" style={{ color: 'blue' }}>
               Add a Description
             </Typography>
             :
             <Typography variant="body2" style={{ textAlign: 'left' }}>
-              {taskForm.description}
+              {taskForm.task_description}
             </Typography>
           }
           {showEditIcon ? <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

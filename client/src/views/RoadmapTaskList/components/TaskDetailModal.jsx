@@ -301,8 +301,8 @@ export default function TaskDetailModal(props) {
             <EscapeOutside onEscapeOutside={onEscapeOutside}>
               <TextareaAutosize autoFocus aria-label="empty textarea"
                 onKeyDown={onPressEnter}
-                value={task.name}
-                id="name"
+                value={task.task_name}
+                id="task_name"
                 onChange={handleChangeTaskName}
                 placeholder="Add Task Name"
                 style={{ textAlign: 'center', width: "80%", minHeight: 27, fontSize: 18, fontWeight: 600 }} />
@@ -324,7 +324,7 @@ export default function TaskDetailModal(props) {
                 onClick={handleOpenTaskNameForm}
                 style={{ textAlign: 'center', textTransform: 'none', flexGrow: 3, width: "80%" }} >
                 <Typography variant="h6" style={{ textAlign: 'center' }}>
-                  {task.name}
+                  {task.task_name}
                 </Typography>
               </Button>
               {showEditIcon ? <div style={{ width: "10%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}><EditIcon /></div> : <div style={{ width: "10%" }}></div>}

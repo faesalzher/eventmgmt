@@ -140,6 +140,7 @@ export default function ComiteeEditForm(props) {
     division_id: props.comitee.division_id,
     project_id: props.comitee.project_id,
   }
+  
   const [comiteeForm, setComiteeForm] = useState(intitialFormState);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteComitee] = useMutation(DELETE_COMITEE);
@@ -175,6 +176,7 @@ export default function ComiteeEditForm(props) {
     props.close();
     deleteComitee({ variables: { _id: props.comitee._id, } });
   }
+  
   const handleChangeDivision = (event) => {
     comiteeForm.division_id = event.target.value;
     setDivision_id(event.target.value);

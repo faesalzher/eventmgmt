@@ -15,6 +15,8 @@ export { default as EventRoadmapList } from './EventRoadmapList/EventRoadmapList
 export { default as EventAgenda } from './EventAgenda/EventAgenda.jsx';
 export { default as ProjectOverview } from './ProjectOverview/ProjectOverview.jsx';
 export { default as LandingPage } from './LandingPage/LandingPage.js';
+export { default as AccountProfile } from './AccountProfile/AccountProfile.jsx';
+
 
 
 

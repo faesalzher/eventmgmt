@@ -16,7 +16,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import {
-  GuestEditForm
+  ExternalEditForm
 } from '.';
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -37,9 +37,9 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
-export default function Guest(props) {
+export default function External(props) {
   // const classes = useStyles();
-  // console.log(props.guest.imageUrl)
+  // console.log(props.external.picture)
 
   const [openEditModal, setOpenEditModal] = useState(false);
 
@@ -52,31 +52,37 @@ export default function Guest(props) {
   };
 
   // const handleSaveButton = (e) => {
-  //   // setGuests([...guests, e])
+  //   // setExternals([...guests, e])
   // }
   return (
     <StyledTableRow>
       <StyledTableCell component="th" scope="row" style={{ display: 'flex', justifyContent: 'center', width: 70 }}>
-        <Avatar src={props.guest.imageUrl} />
+        <Avatar src={props.external.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
-        {props.guest.guest_name}
+        {props.external.external_name}
+      </StyledTableCell>
+      <StyledTableCell scope="row">
+        {props.external.email}
       </StyledTableCell>
       <StyledTableCell align="left">
-        {props.guest.contact_person}
+        {props.external.phone_number}
       </StyledTableCell>
-      <StyledTableCell align="left">{props.guest.info}</StyledTableCell>
+      <StyledTableCell align="left">
+        {props.external.details}
+      </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         <Tooltip arrow title="Edit" aria-label="confirm">
           <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
             <EditIcon style={{ fontSize: 14 }} />
           </IconButton>
         </Tooltip>
-        <GuestEditForm
-          guest={props.guest}
+        <ExternalEditForm
+          external={props.external}
           event_id={props.event_id}
+          type={props.type}
           open={openEditModal}
-          index={props.index}
+          handleDelete={props.handleDelete}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}
         />

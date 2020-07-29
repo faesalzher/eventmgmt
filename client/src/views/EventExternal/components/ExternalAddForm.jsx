@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
+import client3 from "assets/client-3.png";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -85,7 +86,7 @@ const DialogActions = withStyles(theme => ({
 
 
 
-export default function VolunteerAddForm(props) {
+export default function ExternalAddForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -93,25 +94,27 @@ export default function VolunteerAddForm(props) {
   // const [anchorEl, setAnchorEl] = React.useState(null);
   const intitialFormState = {
     _id: uuid(),
-    volunteer_name: "",
+    external_name: "",
+    external_type: props.type,
     event_id: props.event_id,
-    contact_person: "",
-    info: "",
-    imageUrl: "",
+    email: "",
+    phone_number: "",
+    details: "",
+    picture: client3,
   }
 
-  const [volunteerForm, setVolunteerForm] = useState(intitialFormState);
+  const [externalForm, setExternalForm] = useState(intitialFormState);
 
   const handleSaveButton = () => {
-    props.handleSaveButton(volunteerForm)
-    setVolunteerForm(intitialFormState);
+    props.handleSaveButton(externalForm)
+    setExternalForm(intitialFormState);
     props.close();
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setVolunteerForm({ ...volunteerForm, [id]: value })
+    setExternalForm({ ...externalForm, [id]: value })
   }
-
+  console.log(externalForm)
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -122,8 +125,8 @@ export default function VolunteerAddForm(props) {
       maxWidth={'xs'}
     >
       <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Add New Volunteer
-        </DialogTitle>
+        Add New {props.type}
+      </DialogTitle>
       <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
         <form noValidate >
           <div >
@@ -131,11 +134,11 @@ export default function VolunteerAddForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="volunteer_name"
-                label="Volunteer Name"
+                id="external_name"
+                label={props.type + " Name"}
                 type="text"
                 variant="outlined"
-                value={volunteerForm.volunteer_name}
+                value={externalForm.external_name}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -143,11 +146,11 @@ export default function VolunteerAddForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="contact_person"
-                label="Contact Person"
+                id="email"
+                label="Email"
                 type="text"
                 variant="outlined"
-                value={volunteerForm.contact_person}
+                value={externalForm.email}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -155,11 +158,23 @@ export default function VolunteerAddForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="info"
-                label="Info"
+                id="phone_number"
+                label="Phone Number"
                 type="text"
                 variant="outlined"
-                value={volunteerForm.info}
+                value={externalForm.phone_number}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField
+                style={{ backgroundColor: 'white' }}
+                margin="dense"
+                id="details"
+                label="Details"
+                type="text"
+                variant="outlined"
+                value={externalForm.details}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -168,7 +183,10 @@ export default function VolunteerAddForm(props) {
       </DialogContent>
       <DialogActions>
         {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(volunteerForm.volunteer_name === "" || volunteerForm.contact_person === ""|| volunteerForm.info === "") ?
+        {(externalForm.external_name === "" ||
+          externalForm.email === "" ||
+          externalForm.phone_number === "" ||
+          externalForm.details === "") ?
           < Button size="small" className={classes.iconbutton} disabled >Save</Button>
           :
           < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>

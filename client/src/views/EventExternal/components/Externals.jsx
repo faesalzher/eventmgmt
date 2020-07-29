@@ -24,10 +24,9 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage'
 
-import mockData from '../dataGuests';
 import {
-  Guest,
-  GuestAddForm
+  External,
+  ExternalAddForm
 } from '.';
 
 const useStyles1 = makeStyles((theme) => ({
@@ -112,13 +111,19 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-export default function Guests(props) {
+export default function Externals(props) {
   const classes = useStyles();
-  const [guests, setGuests] = useState(mockData);
+  // const [props.externals, setExternals] = useState(mockData);
+  const externals = (props.externals.filter(function (external) {
+    if (external.external_type === props.type) {
+      return external
+    }
+    return null;
+  }));
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openAddModal, setOpenAddModal] = useState(false);
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, guests.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, externals.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
     setOpenAddModal(true);
@@ -128,15 +133,7 @@ export default function Guests(props) {
     setOpenAddModal(false);
   };
 
-  const handleSaveButton = (e) => {
-    setGuests([...guests, e])
-  };
-  const handleSaveEditButton = (e, index) => {
-    const newArr = [...guests];
-    newArr[index] = e;
-    setGuests(newArr)
-  };
-  console.log(guests)
+  console.log(externals)
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -146,23 +143,24 @@ export default function Guests(props) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
+  console.log(props.type)
   return (
     <div>
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
         <Typography style={{ color: 'white' }} variant='subtitle2'>
-          List of Guest
+          List of {props.type}
         </Typography>
-        <Tooltip arrow title="Add New Guests" aria-label="confirm">
-          <IconButton onClick={handleOpenAddModal} style={{ padding: 0}}>
+        <Tooltip arrow title="Add New Externals" aria-label="confirm">
+          <IconButton onClick={handleOpenAddModal} style={{ padding: 0 }}>
             <AddIcon />
           </IconButton>
         </Tooltip>
-        <GuestAddForm
-          // guests={guests}
+        <ExternalAddForm
+          // props.externals={props.externals}
           event_id={props.event_id}
+          type={props.type}
           open={openAddModal}
-          handleSaveButton={handleSaveButton}
+          handleSaveButton={props.handleSaveButton}
           close={handleCloseAddModal}
         />
       </Toolbar>
@@ -172,8 +170,9 @@ export default function Guests(props) {
             <TableRow>
               <StyledTableCell style={{ width: 70 }} ></StyledTableCell>
               <StyledTableCell >Name</StyledTableCell>
-              <StyledTableCell align="left">Contact Person</StyledTableCell>
-              <StyledTableCell align="left">Info</StyledTableCell>
+              <StyledTableCell >Email</StyledTableCell>
+              <StyledTableCell align="left">Phone Number</StyledTableCell>
+              <StyledTableCell align="left">Detaiils</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 Action
               </StyledTableCell>
@@ -182,14 +181,15 @@ export default function Guests(props) {
           <TableBody>
             {
               (rowsPerPage > 0
-                ? guests.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : guests
-              ).map((guest, index) => {
-                return <Guest
+                ? externals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : externals
+              ).map((external, index) => {
+                return <External
                   key={index}
-                  guest={guest}
-                  index={index}
-                  handleSaveEditButton={handleSaveEditButton}
+                  type={props.type}
+                  external={external}
+                  handleDelete={props.handleDelete}
+                  handleSaveEditButton={props.handleSaveEditButton}
                 />
               })
             }
@@ -204,7 +204,7 @@ export default function Guests(props) {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={6}
-                count={guests.length}
+                count={externals.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

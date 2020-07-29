@@ -21,6 +21,10 @@ import { useTheme } from '@material-ui/core/styles';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
+import {
+  DeleteForm
+} from 'components';
+
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 
@@ -105,6 +109,7 @@ export default function EditAgendaModal(props) {
     end_time: props.agenda.end_time,
   };
   const [agendaForm, setAgendaForm] = useState(initialFormState)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -152,6 +157,20 @@ export default function EditAgendaModal(props) {
     setPopoverDate(popoverDate ? null : e.currentTarget);
   };
 
+  
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  }
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleDelete = () => {
+    props.handleDelete(props.agenda._id);
+    props.close();
+    // deleteComitee({ variables: { _id: props.comitee._id, } });
+  }
   const [validateTime, setValidateTime] = React.useState(false);
   const dtStart = new Date(agendaForm.date + agendaForm.start_time);
   const dtEnd = new Date(agendaForm.date + agendaForm.end_time);
@@ -244,7 +263,15 @@ export default function EditAgendaModal(props) {
         </div>
 
       </DialogContent  >
-      <DialogActions>
+      <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
+          Delete Agenda
+        </Button>
+        <DeleteForm
+          open={openDeleteModal}
+          handleDelete={handleDelete}
+          close={handleCloseDeleteModal}
+        />
         {(agendaForm.agenda_name === "" || agendaForm.details === "" || agendaForm.date === "") || validateTime === false ?
           < Button size="small" className={classes.iconbutton} disabled >Save</Button>
           :

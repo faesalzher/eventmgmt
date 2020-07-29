@@ -11,7 +11,7 @@ import {
   // UserList as UserListView,
   // Typography as TypographyView,
   // Icons as IconsView,
-  // Account as AccountView,
+  AccountProfile as AccountView,
   // Settings as SettingsView,
   // SignUp as SignUpView,
   // SignIn as SignInView,
@@ -24,7 +24,7 @@ import {
 } from './views';
 
 const Routes = props => {
-  
+
   return (
     <Switch>
       <Redirect
@@ -80,6 +80,12 @@ const Routes = props => {
         layout={MainLayout}
         path="/event/:_id"
       /> */}
+      <RouteWithLayout
+        component={AccountView}
+        exact
+        layout={MainLayout}
+        path="/account"
+      />
       <RouteWithLayout
         component={NotFoundView}
         exact

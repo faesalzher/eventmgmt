@@ -165,7 +165,7 @@ export default function Task(props) {
       <ListItem button onClick={handleClickOpenDialogDetail}
         style={{ display: 'inline' }}      >
         <div style={{ display: 'flex', flexDirection: 'column' }} >
-          <Typography style={{ fontSize: 13, }}>{props.task.name}</Typography>
+          <Typography style={{ fontSize: 13, }}>{props.task.task_name}</Typography>
           {props.task.due_date !== "" && !props.task.completed ?
             (days >= 0 && hrs >= 0 && mins >= 0) ?
               <div style={{ display: 'flex' }}>

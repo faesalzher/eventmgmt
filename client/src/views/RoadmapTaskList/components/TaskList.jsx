@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Button,
@@ -13,6 +13,9 @@ import {
   LinearProgress,
   Popover,
   List,
+  Menu,
+  MenuItem,
+  Avatar,
 } from '@material-ui/core';
 
 import Divider from '@material-ui/core/Divider';
@@ -27,6 +30,8 @@ import { DatetimePicker } from 'rc-datetime-picker';
 import moment from 'moment';
 import 'rc-datetime-picker/dist/picker.css';
 
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
 import {
   Task
@@ -52,8 +57,74 @@ const useStyles = makeStyles({
 });
 const mongoose = require('mongoose');
 const data = [
-  { _id: 0, name: 'Beli Makana', id_division: 0, priority: "low", due_date: "Mon Mar 16 2020 19:33", description: "Ini Deskripsi", completed: false, completed_date: "" },
-  { _id: 1, name: 'Beli 4', id_division: 1, priority: "high", completed: true, description: "", due_date: "", completed_date: "Sun Mar 15 2020 11:44:34 GMT+0700 (Western Indonesia Time)" },]
+  {
+    _id: 0,
+    task_name: 'Beli Makana',
+    division_id: "4c321960-9cca-11ea-b4b7-7959c72c83ff",
+    priority: "low",
+    due_date: "Mon Mar 16 2020 19:33",
+    task_description: "Ini Deskripsi",
+    roadmap_id: '0',
+    completed: false,
+    completed_date: ""
+  },
+  {
+    _id: 1,
+    task_name: 'Beli 4',
+    division_id: "aa6f98a0-a3e5-11ea-b1ac-37db3ef8a8bb",
+    priority: "high",
+    roadmap_id: '0',
+    completed: true,
+    task_description: "",
+    due_date: "",
+    completed_date: "Sun Mar 15 2020 11:44:34 GMT+0700 (Western Indonesia Time)"
+  },]
+
+const options = [
+  'None',
+  'Atria',
+  'Callisto',
+  'Dione',
+  'Ganymede',
+  'Hangouts Call',
+  'Luna',
+  'Oberon',
+  'Phobos',
+  'Pyxis',
+  'Sedna',
+  'Titania',
+  'Triton',
+  'Umbriel',
+];
+const ITEM_HEIGHT = 48;
+
+const COMITEESBYPROJECT_QUERY = gql`
+  query comiteesByProject($project_id: String!){
+     comiteesByProject(project_id:$project_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
+  }
+`;
+
+const STAFFS_QUERY = gql`
+{
+  staffs{
+      _id
+      staff_name
+      position_name
+      email
+      phone_number
+      password
+      picture
+      departement_id
+  }
+}
+`;
+
 export default function TaskList(props) {
   const [countUncompleted, setCountUncompleted] = React.useState(0);
   const [countCompleted, setCountCompleted] = React.useState(0);
@@ -63,23 +134,78 @@ export default function TaskList(props) {
 
   // const date = moment();
   const [moments, setMoments] = React.useState(moment);
-  const [taskData, setTaskData] = React.useState(data);
+  const [tasks, setTasks] = React.useState(data);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorElAssigned, setAnchorElAssigned] = React.useState(null);
+
+  const [comitees, setComitees] = useState([]);
+  const [staffs, setStaffs] = useState([]);
+
+  const openAssigned = Boolean(anchorElAssigned);
+  const tasksByRoadmap = (tasks.filter(function (task) {
+    if (task.roadmap_id === props.roadmap_id) {
+      return task
+    }
+    return null;
+  }));
+
 
   const [addTaskForm, setAddTaskForm] = React.useState(false)
+  const [assignedForm, setAssignedForm] = React.useState([])
   const [dueDateIsNull, setDueDateIsNull] = React.useState(true)
+
+  const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
+    variables: { project_id: props.project_id },
+    onCompleted: () => {
+      setComitees(
+        comiteesData.comiteesByProject
+      )
+    }
+  }
+  );
+
+  const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
+    onCompleted: () => {
+      setStaffs(
+        staffsData.staffs
+      )
+    }
+  }
+  );
+
+  // const staffsByComitee = (comitees.filter(function (comitee) {
+  //   staffs.map((staff) => {
+  //     if (comitee.staff_id === staff._id) {
+  //       return staff
+  //     }
+  //   })
+  // }));
+
+  console.log(comitees)
+  // console.log(staffsByComitee)
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    staffsRefetch();
+    comiteesRefetch();
+  };
 
   const initialFormState =
   {
-    key: mongoose.Types.ObjectId(),
-    name: "",
-    id_division: props.division._id,
-    due_date: "",
-    description: "",
-    completed: false,
-    completed_date: "",
+    _id: mongoose.Types.ObjectId(),
+    task_name: "",
+    division_id: props.division._id,
     priority: "",
+    roadmap_id: props.roadmap_id,
+    completed: false,
+    task_description: "",
+    due_date: "",
+    completed_date: ""
   };
+
   const [taskForm, setTaskForm] = useState(initialFormState);
 
   const handleInputChange = e => {
@@ -88,13 +214,13 @@ export default function TaskList(props) {
   };
 
   const handleCompletedChange = (e, index) => {
-    const newArr = [...taskData];
+    const newArr = [...tasks];
     newArr[index] = e;
-    setTaskData(newArr)
+    setTasks(newArr)
   };
 
   const handleSaveButton = () => {
-    setTaskData([...taskData, taskForm]);
+    setTasks([...tasks, taskForm]);
     setTaskForm(initialFormState);
     setDueDateIsNull(true);
   }
@@ -107,6 +233,7 @@ export default function TaskList(props) {
     setMoments(e);
     // console.log(moments_d);
   };
+
   const handleSetDueDate = e => {
     taskForm.due_date = moments._d.toString().slice(0, 21);
     setMoments(moments)
@@ -115,29 +242,44 @@ export default function TaskList(props) {
     setDueDateIsNull(false);
   };
 
+  const handleSelectAssigned = (comitee_id, staff_name) => {
+    setAssignedForm([...assignedForm, { comitee_id: comitee_id, staff_name: staff_name }]);
+    // console.log(moments_d);
+    handleCloseAssigned();
+  };
 
   const handleDeleteDueDate = () => {
     taskForm.due_date = "";
     setDueDateIsNull(true);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+
+  const handleCloseAssigned = () => {
+    setAnchorElAssigned(null);
+  };
+
+  const handleOpenAssigned = (event) => {
+    setAnchorElAssigned(event.currentTarget);
+  };
 
   const openCalendar = Boolean(anchorEl);
   const id = openCalendar ? 'simple-popover' : undefined;
 
 
   React.useEffect(() => {
-    const countUncompleted = taskData.filter((e) => e.completed === false && props.division._id === e.id_division).length;
+    const countUncompleted = tasksByRoadmap.filter((e) => e.completed === false && props.division._id === e.division_id).length;
     setCountUncompleted(countUncompleted);
-    const countCompleted = taskData.filter((e) => e.completed === true && props.division._id === e.id_division).length;
+    const countCompleted = tasksByRoadmap.filter((e) => e.completed === true && props.division._id === e.division_id).length;
     setCountCompleted(countCompleted);
-    const countTaskDivision = taskData.filter((e) => props.division._id === e.id_division).length;
+    const countTaskDivision = tasksByRoadmap.filter((e) => props.division._id === e.division_id).length;
     setCountTaskDivision(countTaskDivision);
-  }, [taskData, props.division._id])
+  }, [tasksByRoadmap, props.division._id])
 
+  console.log(assignedForm.length)
   return (
     <Card className={classes.root} elevation={0} >
       <div>
@@ -156,7 +298,7 @@ export default function TaskList(props) {
               justifyContent: "space-between",
             }}
           >
-            <Typography variant="h6" style={{ fontSize: 15, fontWeight: 400, }}>{props.division.name}</Typography>
+            <Typography variant="h6" style={{ fontSize: 15, fontWeight: 400, }}>{props.division.division_name}</Typography>
             <div style={{ display: "flex" }}>
               <Tooltip title="Add New Task" arrow>
                 <IconButton style={{ padding: 0 }} onClick={() => { setAddTaskForm(true) }}>
@@ -174,48 +316,95 @@ export default function TaskList(props) {
             <>
               <Paper variant="outlined" square style={{ marginTop: 10, padding: "0px 5px" }}>
                 <InputBase
-                  id="name"
+                  id="task_name"
                   // variant="outlined"
                   placeholder="new tasks"
                   size="small"
                   fullWidth
                   multiline
                   rowsMin="3"
-                  value={taskForm.name}
+                  value={taskForm.task_name}
                   onChange={handleInputChange}
                   style={{ fontSize: 15 }}
                 />
                 <Divider />
-                <div style={
-                  dueDateIsNull ?
-                    { display: 'flex', justifyContent: 'space-between' }
-                    :
-                    {}
-                }>
-                  {dueDateIsNull ?
-                    <div>
-                      <IconButton className={classes.iconbutton} onClick={handleOpenCalendar}>
-                        <CalendarTodayIcon style={{ fontSize: 14 }} />
-                      </IconButton>
-                      <IconButton className={classes.iconbutton} style={{ paddingLeft: 4 }} onClick={handleOpenCalendar}>
+                <div style={dueDateIsNull && assignedForm.length === 0 ? { display: 'flex', justifyContent: 'space-between' } : {}}>
+                  <div style={dueDateIsNull && assignedForm.length === 0 ? { display: 'flex', justifyContent: 'space-between' } : {}}>
+                    {dueDateIsNull ?
+                      <div>
+                        <IconButton className={classes.iconbutton} style={{ margin: '0px 4px' }} onClick={handleOpenCalendar}>
+                          <CalendarTodayIcon style={{ fontSize: 14 }} />
+                        </IconButton>
+                      </div>
+                      :
+                      <Chip
+                        variant="outlined"
+                        size="small"
+                        color="primary"
+                        icon={<CalendarTodayIcon style={{ fontSize: 9 }} />}
+                        label={taskForm.due_date}
+                        onClick={handleOpenCalendar}
+                        onDelete={() => handleDeleteDueDate()}
+                      />
+                    }
+                    <div stle={{ display: 'flex' }} >
+                      <IconButton
+                        className={classes.iconbutton}
+                        style={{ margin: '0px 4px' }}
+                        onClick={handleOpenAssigned}
+                        aria-controls="long-menu"
+                        aria-haspopup="true"
+                      >
                         <PersonAddIcon style={{ fontSize: 14 }} />
                       </IconButton>
+                      <Menu
+                        id="long-menu"
+                        anchorEl={anchorElAssigned}
+                        keepMounted
+                        open={openAssigned}
+                        onClose={handleCloseAssigned}
+                        PaperProps={{
+                          style: {
+                            maxHeight: ITEM_HEIGHT * 4.5,
+                            width: '20ch',
+                          },
+                        }}
+                      >
+                        {comitees.map((comitee) => (
+                          staffs.map((staff) => {
+                            if (staff._id === comitee.staff_id) {
+                              if (assignedForm.length === 0) {
+                                return <MenuItem key={comitee._id} onClick={() => handleSelectAssigned(comitee._id, staff.staff_name)}>
+                                  {staff.staff_name}
+                                </MenuItem>
+                            }
+ 
+                              } else {
+                                assignedForm.map((assigned) => {
+                                  return <div>{assigned.comitee_id}</div>
+                                })
+                              }
+                              return null;
+                            return null;
+                          })))}
+                      </Menu>
+                      {assignedForm.map((assigned, index) => {
+                        return <Chip
+                          size="small"
+                          avatar={<Avatar src="/static/images/avatar/1.jpg" />}
+                          label={assigned.staff_name}
+                          clickable
+                          variant='outlined'
+                          color="primary"
+                          onClick={() => console.log('succes')}
+                          onDelete={() => console.log('succes')}
+                        />
+                      })}
                     </div>
-                    :
-                    <Chip
-                      variant="outlined"
-                      size="small"
-                      color="primary"
-                      icon={<CalendarTodayIcon style={{ fontSize: 9 }} />}
-                      label={taskForm.due_date}
-                      onClick={handleOpenCalendar}
-                      onDelete={() => handleDeleteDueDate()}
-                    />
-                  }
-
+                  </div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button size="small" style={{ color: 'grey' }} onClick={() => { setAddTaskForm(false); setTaskForm(initialFormState) }}>Cancel</Button>
-                    {(taskForm.name === "") ?
+                    {(taskForm.task_name === "") ?
                       <Button size="small" disabled >Create</Button>
                       :
                       <Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Create</Button>
@@ -250,6 +439,7 @@ export default function TaskList(props) {
               <Button onClick={handleSetDueDate}>Set Due Date</Button>
             </div>
           </Popover>
+
         </div>
         <Scrollbars style={{ width: 275 }}
           autoHide
@@ -260,39 +450,39 @@ export default function TaskList(props) {
           autoHeightMax={350}
         >
           <CardContent style={{ padding: 0, backgroundColor: "#d8dce3" }} >
-            <List style={{ backgroundColor: "#d8dce3",padding:0}} component="nav" aria-label="main mailbox folders" >
-              {taskData.map((task, index) => {
-                if (props.division._id === task.id_division && !task.completed)
+            <List style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
+              {tasksByRoadmap.map((task, index) => {
+                if (props.division._id === task.division_id && !task.completed)
                   return <div>
-                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                  <Task
-                    task={task}
-                    key={index}
-                    index={index}
-                    handleCompletedChange={handleCompletedChange}
-                  />
-                </div>
+                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                    <Task
+                      task={task}
+                      key={index}
+                      index={index}
+                      handleCompletedChange={handleCompletedChange}
+                    />
+                  </div>
                 return null;
               })}
               <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
               {countCompleted === 0 ? <></> :
                 <div style={{ backgroundColor: "#e2e2e2" }}>
                   <Typography variant="h6"
-                    style={{ fontSize: 13, fontWeight: 410,padding: '4px 10px' }}>
+                    style={{ fontSize: 13, fontWeight: 410, padding: '4px 10px' }}>
                     Completed tasks</Typography>
                 </div>
               }
-              {taskData.map((task, index) => {
-                if (props.division._id === task.id_division && task.completed)
+              {tasksByRoadmap.map((task, index) => {
+                if (props.division._id === task.division_id && task.completed)
                   return <div>
-                  <Task
-                    task={task}
-                    key={index}
-                    index={index}
-                    handleCompletedChange={handleCompletedChange}
-                  />
-                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                </div>
+                    <Task
+                      task={task}
+                      key={index}
+                      index={index}
+                      handleCompletedChange={handleCompletedChange}
+                    />
+                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                  </div>
                 return null;
               })}
             </List>
