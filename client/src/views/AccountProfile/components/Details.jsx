@@ -13,6 +13,10 @@ import {
   TextField
 } from '@material-ui/core';
 
+import {
+  PasswordChangeForm
+} from '.';
+
 const useStyles = makeStyles(() => ({
   root: {}
 }));
@@ -21,14 +25,21 @@ const Details = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
+  const [openEditModal, setOpenEditModal] = useState(false);
 
+  const handleOpenEditModal = () => {
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+  };
   const [values, setValues] = useState({
     firstName: 'Faesal',
-    lastName: 'Herlambang',
+    position_name: 'Staff',
+    departement: 'Keuangan',
     email: 'faesal@student.ub.ac.id',
-    phone: '',
-    state: 'Alabama',
-    country: 'USA'
+    phone: '081615627998',
   });
 
   const handleChange = event => {
@@ -37,21 +48,6 @@ const Details = props => {
       [event.target.name]: event.target.value
     });
   };
-
-  const states = [
-    {
-      value: 'alabama',
-      label: 'Alabama'
-    },
-    {
-      value: 'new-york',
-      label: 'New York'
-    },
-    {
-      value: 'san-francisco',
-      label: 'San Francisco'
-    }
-  ];
 
   return (
     <Card
@@ -79,12 +75,11 @@ const Details = props => {
             >
               <TextField
                 fullWidth
-                helperText="Please specify the first name"
-                label="First name"
+                // helperText="Please specify the first name"
+                label="Name"
                 margin="dense"
-                name="firstName"
+                name="name"
                 onChange={handleChange}
-                required
                 value={values.firstName}
                 variant="outlined"
               />
@@ -94,16 +89,16 @@ const Details = props => {
               md={6}
               xs={12}
             >
-              <TextField
+              {/* <TextField
                 fullWidth
-                label="Last name"
+                label="Position name"
                 margin="dense"
-                name="lastName"
+                name="position"
+                disabled
                 onChange={handleChange}
-                required
-                value={values.lastName}
+                value={values.position}
                 variant="outlined"
-              />
+              /> */}
             </Grid>
             <Grid
               item
@@ -116,7 +111,6 @@ const Details = props => {
                 margin="dense"
                 name="email"
                 onChange={handleChange}
-                required
                 value={values.email}
                 variant="outlined"
               />
@@ -137,33 +131,21 @@ const Details = props => {
                 variant="outlined"
               />
             </Grid>
-            {/* <Grid
+            <Grid
               item
               md={6}
               xs={12}
             >
               <TextField
                 fullWidth
-                label="Select State"
+                label="Position Name"
                 margin="dense"
-                name="state"
+                name="position_name"
                 onChange={handleChange}
-                required
-                select
-                // eslint-disable-next-line react/jsx-sort-props
-                SelectProps={{ native: true }}
-                value={values.state}
+                disabled
+                value={values.position_name}
                 variant="outlined"
-              >
-                {states.map(option => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </TextField>
+              />
             </Grid>
             <Grid
               item
@@ -172,25 +154,34 @@ const Details = props => {
             >
               <TextField
                 fullWidth
-                label="Country"
+                label="Departement"
                 margin="dense"
-                name="country"
+                name="departement"
                 onChange={handleChange}
-                required
-                value={values.country}
+                disabled
+                value={values.departement}
                 variant="outlined"
               />
-            </Grid> */}
+            </Grid>
           </Grid>
         </CardContent>
         <Divider />
-        <CardActions>
+        <CardActions style={{display:'flex', justifyContent:'flex-end'}}>
           <Button
             color="primary"
-            variant="contained"
+            onClick={handleOpenEditModal}
           >
-            Save details
+            Change Password
           </Button>
+          <Button
+            color="primary"
+          >
+            Save
+          </Button>
+          <PasswordChangeForm
+            open={openEditModal}
+            close={handleCloseEditModal}
+          />
         </CardActions>
       </form>
     </Card>

@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef, useEffect } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
@@ -54,6 +54,22 @@ query staffById($_id: String!){
   }
 `;
 
+const EVENTSBYPROJECT_QUERY = gql`
+query eventsByProject($project_id: String!){
+  eventsByProject(project_id:$project_id) {
+    _id
+    event_name
+    event_description
+    event_location
+    cancel
+    event_start_date
+    event_end_date
+    picture
+    project_id
+  }
+}
+`;
+
 const useStyles = makeStyles(theme => ({
   root: {
     // minHeight: 80,
@@ -103,38 +119,84 @@ const ProjectCard = (props) => {
   const shadowStyles = useBouncyShadowStyles();
   const today = new Date();
 
+  const [events, setEvents] = useState([]);
   const [headOfProjectId, setHeadOfProjectId] = useState([{ staff_id: '0' }]);
   const [headOfProjectName, setHeadOfProjectName] = useState([]);
 
-  const { data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
+  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
     {
       variables: { project_id: props.project._id, position_id: '1' },
-      onCompleted: () => {
-        if (headOfProjectIdData.comiteesByHeadProject.length === 0) {
-          return setHeadOfProjectId([{ staff_id: '0' }])
-        } else {
-          return setHeadOfProjectId(headOfProjectIdData.comiteesByHeadProject)
-        }
-      }
     });
-  // React.useEffect(() => {
-  //   headOfProjectIdRefetch();
-  // });
+
+  useEffect(() => {
+    refresh()
+  });
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (headOfProjectIdData.comiteesByHeadProject.length === 0) {
+        return setHeadOfProjectId([{ staff_id: '0' }])
+      } else {
+        return setHeadOfProjectId(data.comiteesByHeadProject)
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loading && !error) {
+        onCompleted(headOfProjectIdData);
+      } else if (onError && !loading && error) {
+        onError(error);
+      }
+    }
+  }, [loading, headOfProjectIdData, error]);
+
   const { data: headOfProjectNameData, refetch: headOfProjectNameRefetch } = useQuery(STAFFBYID_QUERY,
     {
       variables: { _id: headOfProjectId[0].staff_id },
-      onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staffById) }
+      // onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staffById) }
     });
-  React.useEffect(() => {
-    refresh()
-  });
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (data === undefined) {
+        return
+      } else {
+        return setHeadOfProjectName(data.staffById)
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loading && !error) {
+        onCompleted(headOfProjectNameData);
+      } else if (onError && !loading && error) {
+        onError(error);
+      }
+    }
+  }, [loading, headOfProjectNameData, error]);
+
+  const { loading: eventLoading, error: eventError, data: eventData, refetch: eventRefetch } = useQuery(EVENTSBYPROJECT_QUERY,
+    {
+      variables: { project_id: props.project._id },
+    });
+
+  useEffect(() => {
+    const onCompleted = (data) => { setEvents(data.eventsByProject) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !eventLoading && !eventError) {
+        onCompleted(eventData);
+      } else if (onError && !eventLoading && eventError) {
+        onError(eventError);
+      }
+    }
+  }, [eventLoading, eventData, eventError]);
 
   const refresh = () => {
     headOfProjectIdRefetch();
     headOfProjectNameRefetch();
+    eventRefetch();
   };
-  console.log(headOfProjectName)
-
+// console.log(events.length)
   // const timer = React.useRef();
 
   // React.useEffect(() => {
@@ -179,7 +241,7 @@ const ProjectCard = (props) => {
                   >
                     Head Of Project -
                           {(headOfProjectName !== null) ?
-                      headOfProjectName.staff_name : ""
+                      " " + headOfProjectName.staff_name : ""
                     }
 
                   </Typography>
@@ -195,7 +257,7 @@ const ProjectCard = (props) => {
                 </Typography>
                 <Typography
                   className={classes.status}>
-                  0 Events Total
+                  {events.length} Events Total
                 </Typography>
               </div>
               <div style={{ justifyContent: 'space-between' }}>
@@ -217,7 +279,7 @@ const ProjectCard = (props) => {
         }}>
           {
             (props.project.cancel === "true") ? (
-              <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center',  width: 110, color: 'black' }}>
+              <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: 110, color: 'black' }}>
                 <Typography style={{ fontSize: 10 }}>Cancelled</Typography>
               </Box>
             ) : (

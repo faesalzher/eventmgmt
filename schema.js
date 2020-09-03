@@ -146,6 +146,13 @@ const RootQuery = new GraphQLObjectType({
         return Departement.find({});
       }
     },
+    eventsByProject: {
+      type: new GraphQLList(EventType),
+      args: { project_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Event.find({ project_id: args.project_id });
+      }
+    },
     events: {
       type: new GraphQLList(EventType),
       resolve(parent, args) {

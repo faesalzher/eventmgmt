@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import moment from 'moment';
+// import moment from 'moment';
 import { makeStyles } from '@material-ui/styles';
 import {
   Card,
@@ -11,17 +11,18 @@ import {
   Typography,
   Divider,
   Button,
-  LinearProgress
+  // LinearProgress
 } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {},
   details: {
-    display: 'flex'
+    display: 'flex',
+    // flexDirection: 'column'
   },
   avatar: {
-    marginLeft: 'auto',
-    height: 110,
+    margin: 10,
+    height: 100,
     width: 100,
     flexShrink: 0,
     flexGrow: 0
@@ -41,7 +42,8 @@ const Profile = props => {
 
   const user = {
     name: 'Faesal H',
-    city: 'Keuangan',
+    departement: 'Keuangan',
+    position_name: 'staff',
     avatar: '/images/avatars/avatar_11.png'
   };
 
@@ -53,35 +55,34 @@ const Profile = props => {
       <CardContent>
         <div className={classes.details}>
           <div>
-            <Typography
-              gutterBottom
-              variant="h2"
-            >
-              Faesal H
-            </Typography>
-            <Typography
-              className={classes.locationText}
-              color="textSecondary"
-              variant="body1"
-            >
-              {user.city} Departement
-            </Typography>
+            <Avatar
+              className={classes.avatar}
+              src={user.avatar}
+            />
           </div>
-          <Avatar
-            className={classes.avatar}
-            src={user.avatar}
-          />
+          <div style={{display:'flex',flexDirection:'column'}}>
+            <div>
+              <Typography
+                // gutterBottom
+                variant="h4"
+              >
+                {user.name}
+            </Typography>
+            </div>
+            <div>
+              <Typography
+                className={classes.locationText}
+                color="textSecondary"
+                variant="body1"
+              >
+                {user.position_name} of {user.departement} Departement
+            </Typography>
+            </div>
+          </div>
         </div>
-        {/* <div className={classes.progress}>
-          <Typography variant="body1">Profile Completeness: 70%</Typography>
-          <LinearProgress
-            value={70}
-            variant="determinate"
-          />
-        </div> */}
       </CardContent>
       <Divider />
-      <CardActions>
+      <CardActions style={{display:'flex', justifyContent:'space-between'}}>
         <Button
           className={classes.uploadButton}
           color="primary"

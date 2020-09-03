@@ -50,6 +50,9 @@ const DIVISIONSBYPROJECT_QUERY = gql`
   }
 `;
 
+
+
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -111,6 +114,7 @@ export default function ProjectDetail() {
   const [divisions, setDivisions] = useState([]);
   const [openEditModal, setOpenEditModal] = useState(false);
 
+ 
   const { data } = useQuery(PROJECT_QUERY,
     {
       variables: { project_id: project_id },
@@ -128,7 +132,7 @@ export default function ProjectDetail() {
     }
   }
   );
-  
+
   useEffect(() => {
     refresh();
   });
@@ -231,10 +235,10 @@ export default function ProjectDetail() {
           </TabPanel>
         </div>
         <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px' }}>
-          <ProjectEventList project={project} />
+          <ProjectEventList project={project}/>
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction} style={{ padding: '0px 30px' }} >
-          <ProjectOverview project={project} />
+          <ProjectOverview project={project} divisions={divisions}/>
         </TabPanel>
       </div>
     </div>

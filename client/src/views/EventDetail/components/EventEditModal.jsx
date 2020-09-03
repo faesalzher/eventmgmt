@@ -254,13 +254,13 @@ export default function EventEditModal(props) {
 
   const handleDelete = () => {
     deleteEvent({ variables: { _id: props.event._id, } });
-
     setNavigate(true)
   }
 
   if (navigate) {
     return <Redirect push to={"/project/" + props.project_id} />;
   }
+  
   return (
     <Dialog
       fullScreen={fullScreen}

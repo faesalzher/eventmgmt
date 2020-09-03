@@ -13,8 +13,8 @@ import {
   // Icons as IconsView,
   AccountProfile as AccountView,
   // Settings as SettingsView,
-  // SignUp as SignUpView,
-  // SignIn as SignInView,
+  SignUp as SignUpView,
+  SignIn as SignInView,
   ProjectDetail as ProjectDetailView,
   NotFound as NotFoundView,
   ProjectList as ProjectListView,
@@ -85,6 +85,18 @@ const Routes = props => {
         exact
         layout={MainLayout}
         path="/account"
+      />
+      <RouteWithLayout
+        component={SignUpView}
+        exact
+        layout={MinimalLayout}
+        path="/sign-up"
+      />
+      <RouteWithLayout
+        component={SignInView}
+        exact
+        layout={MinimalLayout}
+        path="/sign-in"
       />
       <RouteWithLayout
         component={NotFoundView}

@@ -5,7 +5,7 @@ import {
   // Fade, 
   // Typography
 } from '@material-ui/core';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import CircularProgress from '@material-ui/core/CircularProgress';
 // import { NotificationContainer, NotificationManager } from "react-light-notifications";
@@ -16,9 +16,9 @@ import {
 } from './components';
 
 
-const EVENTS_QUERY = gql`
-{
-  events{
+const EVENTSBYPROJECT_QUERY = gql`
+query eventsByProject($project_id: String!){
+  eventsByProject(project_id:$project_id) {
     _id
     event_name
     event_description
@@ -31,15 +31,6 @@ const EVENTS_QUERY = gql`
   }
 }
 `;
-
-const DELETE_EVENT = gql`
-mutation deleteEvent ($_id: String!) {
-  deleteEvent(_id:$_id){
-    _id
-  }
-}
-`;
-
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -56,15 +47,17 @@ const EventList = (props) => {
 
   const [events, setEvents] = useState([]);
 
-  const { loading, error, data, refetch } = useQuery(EVENTS_QUERY, {
-    // onCompleted: () => { setEvents(data.events) }
-  });
+  const { loading, error, data, refetch } = useQuery(EVENTSBYPROJECT_QUERY,
+    {
+      variables: { project_id: props.project._id },
+    });
 
   useEffect(() => {
     refresh();
   });
+
   useEffect(() => {
-    const onCompleted = (data) => { setEvents(data.events) };
+    const onCompleted = (data) => { setEvents(data.eventsByProject) };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !loading && !error) {
@@ -75,7 +68,6 @@ const EventList = (props) => {
     }
   }, [loading, data, error]);
 
-
   const refresh = () => {
     refetch();
   };
@@ -85,11 +77,6 @@ const EventList = (props) => {
       setEvents([...events, e]);
     }, [events]
   );
-  const [deleteEvent] = useMutation(DELETE_EVENT);
-
-  const handleDelete = e => {
-    deleteEvent({ variables: { _id: e, } });
-  }
 
   return (
     <div>
@@ -113,7 +100,6 @@ const EventList = (props) => {
                       project={props.project}
                       key={event._id}
                       event={event}
-                      handleDelete={handleDelete}
                     />
                   )
                 }
