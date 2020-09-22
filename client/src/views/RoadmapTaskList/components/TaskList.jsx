@@ -80,22 +80,7 @@ const data = [
     completed_date: "Sun Mar 15 2020 11:44:34 GMT+0700 (Western Indonesia Time)"
   },]
 
-const options = [
-  'None',
-  'Atria',
-  'Callisto',
-  'Dione',
-  'Ganymede',
-  'Hangouts Call',
-  'Luna',
-  'Oberon',
-  'Phobos',
-  'Pyxis',
-  'Sedna',
-  'Titania',
-  'Triton',
-  'Umbriel',
-];
+
 const ITEM_HEIGHT = 48;
 
 const COMITEESBYPROJECT_QUERY = gql`
@@ -164,7 +149,7 @@ export default function TaskList(props) {
   }
   );
 
-  const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
+  const { data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
     onCompleted: () => {
       setStaffs(
         staffsData.staffs
@@ -377,14 +362,12 @@ export default function TaskList(props) {
                                 return <MenuItem key={comitee._id} onClick={() => handleSelectAssigned(comitee._id, staff.staff_name)}>
                                   {staff.staff_name}
                                 </MenuItem>
-                            }
- 
-                              } else {
-                                assignedForm.map((assigned) => {
-                                  return <div>{assigned.comitee_id}</div>
-                                })
                               }
-                              return null;
+                            } else {
+                              assignedForm.map((assigned) => {
+                                return <div>{assigned.comitee_id}</div>
+                              })
+                            }
                             return null;
                           })))}
                       </Menu>

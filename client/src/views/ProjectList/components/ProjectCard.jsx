@@ -225,8 +225,8 @@ const ProjectCard = (props) => {
           >
             <CardMedia
               className={classes.media}
-              image={image}
-              title="Contemplative Reptile"
+              image={props.project.picture==="null"?image:props.project.picture}
+              title={props.project.project_name}
             />
             <CardContent className={classes.root} style={{ paddingTop: 5 }} >
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}

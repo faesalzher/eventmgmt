@@ -158,7 +158,7 @@ export default function AddProjectModal(props) {
     cancel: "false",
     project_start_date: new Date().toString(),
     project_end_date: new Date().toString(),
-    picture: "",
+    picture: "null",
     organization_id: "",
   };
 

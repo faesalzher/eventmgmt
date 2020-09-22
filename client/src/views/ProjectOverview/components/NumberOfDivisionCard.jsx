@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import MoneyIcon from '@material-ui/icons/Money';
+import BusinessIcon from '@material-ui/icons/Business';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700
   },
   avatar: {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: theme.palette.primary.main,
     height: 56,
     width: 56
   },
@@ -67,7 +67,7 @@ const NumberOfDivisionCard = props => {
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <MoneyIcon className={classes.icon} />
+              <BusinessIcon className={classes.icon} />
             </Avatar>
           </Grid>
         </Grid>

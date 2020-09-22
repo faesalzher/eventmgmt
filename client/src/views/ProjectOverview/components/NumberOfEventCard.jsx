@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import MoneyIcon from '@material-ui/icons/Money';
+import EventNoteIcon from '@material-ui/icons/EventNote';
 
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700
   },
   avatar: {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: theme.palette.primary.main,
     height: 56,
     width: 56
   },
@@ -117,7 +117,7 @@ const NumberOfEventCard = props => {
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <MoneyIcon className={classes.icon} />
+              <EventNoteIcon className={classes.icon} />
             </Avatar>
           </Grid>
         </Grid>

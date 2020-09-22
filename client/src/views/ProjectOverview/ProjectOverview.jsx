@@ -1,12 +1,14 @@
 import React from 'react';
 import {
   Grid,
+  // CardMedia,
   // CardActions,
   // Divider,
   // IconButton
 } from '@material-ui/core';
 
 import {
+  PictureCard,
   NumberOfEventCard,
   NumberOfComiteeCard,
   NumberOfDivisionCard,
@@ -25,16 +27,25 @@ export default function ProjectOverview(props) {
         item
         lg={6}
         md={6}
-        xl={4}
+        xl={12}
         xs={12}
       >
-        <DetailOverview project={props.project}/>
+        <DetailOverview project={props.project} />
       </Grid>
       <Grid
         item
         lg={6}
         md={6}
-        xl={4}
+        xl={12}
+        xs={12}
+      >
+        <PictureCard project={props.project} />
+      </Grid>
+      <Grid
+        item
+        lg={12}
+        md={12}
+        xl={12}
         xs={12}
       >
         <Grid
@@ -43,27 +54,27 @@ export default function ProjectOverview(props) {
         >
           <Grid
             item
-            lg={6}
+            lg={4}
             sm={6}
-            xl={4}
+            xl={6}
             xs={12}
           >
             <NumberOfEventCard project={props.project} />
           </Grid>
           <Grid
             item
-            lg={6}
+            lg={4}
             sm={6}
-            xl={4}
+            xl={6}
             xs={12}
           >
             <NumberOfDivisionCard divisions={props.divisions} />
           </Grid>
           <Grid
             item
-            lg={6}
+            lg={4}
             sm={6}
-            xl={4}
+            xl={6}
             xs={12}
           >
             <NumberOfComiteeCard project={props.project} />
