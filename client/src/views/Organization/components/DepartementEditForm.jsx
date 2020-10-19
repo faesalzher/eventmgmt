@@ -31,10 +31,19 @@ mutation deleteDepartement ($_id: String!) {
 }
 `;
 const EDIT_DEPARTEMENT = gql`
-  mutation editDepartement($_id: String!,$departement_name: String!) {
-    editDepartement(_id: $_id,departement_name: $departement_name) {
+  mutation editDepartement(
+    $_id: String!,
+    $departement_name: String!,
+    $organization_id: String!
+    ) {
+    editDepartement(
+      _id: $_id,
+      departement_name: $departement_name
+      organization_id: $organization_id
+      ) {
       _id
       departement_name
+      organization_id
     }
   }
 `;
@@ -115,6 +124,7 @@ export default function DepartementEditForm(props) {
   const intitialFormState = {
     _id: props.departement._id,
     departement_name: props.departement.departement_name,
+    organization_id: props.organization_id
   }
   const [departementForm, setDepartementForm] = useState(intitialFormState);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -139,6 +149,7 @@ export default function DepartementEditForm(props) {
         {
           _id: departementForm._id,
           departement_name: departementForm.departement_name,
+          organization_id: departementForm.organization_id
         }
       });
   }

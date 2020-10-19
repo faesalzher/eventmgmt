@@ -13,7 +13,46 @@ import {
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import signInImage from "assets/planer_desk.jpg";
-import logo from 'assets/image.png'
+import logo from 'assets/image.png';
+import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
+import { useAuth } from "context/auth.jsx";
+
+import { SECRET_KEY } from '../../secret_key.js'
+// const { SECRET_KEY } = require('../../secret_key');
+const jwt = require('jsonwebtoken');
+
+
+const CHECK_ORGANIZATION = gql`
+  query check_organization($email: String!){
+    check_organization(email:$email) {
+      _id
+      email
+      password
+    }
+  }
+`;
+
+const CHECK_STAFF = gql`
+  query check_staff($email: String!){
+    check_staff(email:$email) {
+      _id
+      email
+      password
+      organization_id
+    }
+  }
+`;
+// const LOGIN = gql`
+//   query login($email: String!){
+//     login(email:$email) {
+//       _id
+//       organization_name
+//       email
+//       password
+//     }
+//   }
+// `;
 
 const schema = {
   email: {
@@ -125,14 +164,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignIn = props => {
+const LogIn = props => {
   const { history } = props;
+  const { setAuthTokens } = useAuth();
 
   const classes = useStyles();
 
   const [formState, setFormState] = useState({
     isValid: false,
-    values: {},
+    values: {
+      email: "",
+      password: ""
+    },
     touched: {},
     errors: {}
   });
@@ -170,11 +213,122 @@ const SignIn = props => {
     }));
   };
 
-  const handleSignIn = event => {
+
+  React.useEffect(() => {
+    refresh();
+  });
+  const [organization, setOrganization] = useState({});
+  const [staff, setStaff] = useState({});
+
+  const {
+    data: dataOrganization,
+    loading: loadingOrganization,
+    error: errorOrganization,
+    refetch: refetchOrganization
+  } = useQuery(CHECK_ORGANIZATION,
+    {
+      variables: { email: formState.values.email, },
+    });
+
+  const {
+    data: dataStaff,
+    loading: loadingStaff,
+    error: errorStaff,
+    refetch: refetchStaff
+  } = useQuery(CHECK_STAFF,
+    {
+      variables: { email: formState.values.email, },
+    });
+
+  useEffect(() => {
+    const onCompleted = (data) => { setOrganization(data.check_organization) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingOrganization && !errorOrganization) {
+        onCompleted(dataOrganization);
+      } else if (onError && !loadingOrganization && errorOrganization) {
+        onError(errorOrganization);
+      }
+    }
+  }, [loadingOrganization, dataOrganization, errorOrganization]);
+
+  useEffect(() => {
+    const onCompleted = (data) => { setStaff(data.check_staff) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingStaff && !errorStaff) {
+        onCompleted(dataStaff);
+      } else if (onError && !loadingStaff && errorStaff) {
+        onError(errorStaff);
+      }
+    }
+  }, [loadingStaff, dataStaff, errorStaff]);
+
+
+  const refresh = () => {
+    refetchOrganization();
+    refetchStaff();
+  }
+  console.log(organization)
+  console.log(staff)
+
+  const handleLogIn = (event) => {
+    // refetch();
     event.preventDefault();
-    history.push('/');
+    // history.push('/');
+    // checkOrganization();
+    console.log(organization)
+    // const check_password;
+    if (organization.length === 0) {
+      if (staff.length === 0) {
+        console.log('user not found')
+      } else if (staff[0].password !== formState.values.password) {
+        console.log('password salah')
+      }else{
+        const token = generateTokenStaff(staff[0])
+        // // localStorage.setItem('jwtToken', token);
+        setAuthTokens(token);
+        history.push('/');
+        console.log('succes login staff')
+      }
+    } else if (organization[0].password !== formState.values.password) {
+      console.log('password salah')
+    } else {
+      const token = generateTokenOrganization(organization[0])
+      // localStorage.setItem('jwtToken', token);
+      setAuthTokens(token);
+      history.push('/');
+    }
+
   };
 
+  function generateTokenOrganization(user) {
+    return jwt.sign(
+      {
+        _id: user._id,
+        organization_id:user._id,
+        user_type: "organization"
+      },
+      SECRET_KEY,
+      { expiresIn: '30m' }
+    );
+  }
+
+  function generateTokenStaff(user) {
+    return jwt.sign(
+      {
+        _id: user._id,
+        organization_id:user.organization_id,
+        user_type: "staff"
+      },
+      SECRET_KEY,
+      { expiresIn: '30m' }
+    );
+  }
+
+  // if (data && data.check_organization) {
+  //   setOrganization(data.check_organization);
+  // }
   const hasError = field =>
     formState.touched[field] && formState.errors[field] ? true : false;
 
@@ -235,55 +389,20 @@ const SignIn = props => {
             <div className={classes.contentBody}>
               <form
                 className={classes.form}
-                onSubmit={handleSignIn}
+                onSubmit={handleLogIn}
               >
                 <Typography
                   className={classes.title}
                   variant="h2"
                 >
-                  Sign in
+                  Login
                 </Typography>
                 <Typography
                   color="textSecondary"
                   gutterBottom
                 >
-                  Sign in using email address
+                  Login using email address
                 </Typography>
-                {/* <Grid
-                  className={classes.socialButtons}
-                  container
-                  spacing={2}
-                >
-                  <Grid item>
-                    <Button
-                      color="primary"
-                      onClick={handleSignIn}
-                      size="large"
-                      variant="contained"
-                    >
-                      <FacebookIcon className={classes.socialIcon} />
-                      Login with Facebook
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      onClick={handleSignIn}
-                      size="large"
-                      variant="contained"
-                    >
-                      <GoogleIcon className={classes.socialIcon} />
-                      Login with Google
-                    </Button>
-                  </Grid>
-                </Grid>
-                <Typography
-                  align="center"
-                  className={classes.sugestion}
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  or login with email address
-                </Typography> */}
                 <TextField
                   className={classes.textField}
                   error={hasError('email')}
@@ -321,7 +440,7 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
-                  Sign in now
+                  Login now
                 </Button>
                 <Typography
                   color="textSecondary"
@@ -330,10 +449,10 @@ const SignIn = props => {
                   Don't have an account?{' '}
                   <Link
                     component={RouterLink}
-                    to="/sign-up"
+                    to="/register"
                     variant="h6"
                   >
-                    Sign up
+                    Register
                   </Link>
                 </Typography>
               </form>
@@ -345,8 +464,8 @@ const SignIn = props => {
   );
 };
 
-SignIn.propTypes = {
+LogIn.propTypes = {
   history: PropTypes.object
 };
 
-export default withRouter(SignIn);
+export default withRouter(LogIn);

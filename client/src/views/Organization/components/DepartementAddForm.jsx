@@ -21,10 +21,19 @@ import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
 const ADD_DEPARTEMENT = gql`
-  mutation addDepartement($_id: String!,$departement_name: String!) {
-    addDepartement(_id: $_id,departement_name: $departement_name) {
+  mutation addDepartement(
+    $_id: String!,
+    $departement_name: String!,
+    $organization_id: String!
+    ) {
+    addDepartement(
+      _id: $_id,
+      departement_name: $departement_name,
+      organization_id:$organization_id
+      ) {
       _id
       departement_name
+      organization_id
     }
   }
 `;
@@ -106,7 +115,9 @@ export default function DepartementAddForm(props) {
   const intitialFormState = {
     _id: uuid(),
     departement_name: "",
+    organization_id:props.organization_id
   }
+  console.log(props.organization_id)
 
   const [departementForm, setDepartementForm] = useState(intitialFormState);
   const [addDepartement] = useMutation(ADD_DEPARTEMENT);
@@ -121,6 +132,7 @@ export default function DepartementAddForm(props) {
         {
           _id: departementForm._id,
           departement_name: departementForm.departement_name,
+          organization_id: departementForm.organization_id,
         }
       });
   }

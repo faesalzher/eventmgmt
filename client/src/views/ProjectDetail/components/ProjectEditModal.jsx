@@ -299,7 +299,7 @@ export default function ProjectEditModal(props) {
         project_start_date: projectForm.project_start_date,
         project_end_date: projectForm.project_end_date,
         picture: projectForm.picture,
-        organization_id: projectForm.organization_id,
+        organization_id: props.organization_id,
       },
     });
     handleCloseModal();

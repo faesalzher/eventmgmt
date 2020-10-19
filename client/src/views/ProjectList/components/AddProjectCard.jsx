@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import AddIcon from '@material-ui/icons/Add';
-import {AddProjectModal} from '.';
+import { AddProjectModal } from '.';
 import {
   Card,
   CardActionArea,
@@ -41,7 +41,7 @@ const AddProjectCard = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
- 
+
 
   const classes = useStyles();
 
@@ -61,6 +61,7 @@ const AddProjectCard = (props) => {
       // elevation={elevate}
       >
         <AddProjectModal
+          organization_id={props.organization_id}
           openListener={open}
           onCloseListener={handleClose}
           closeAfterTransition

@@ -1,4 +1,4 @@
-const mongo = require('mongoose');
+const mongo = require("mongoose");
 const Schema = mongo.Schema;
 
 const Staff = new Schema({
@@ -10,6 +10,7 @@ const Staff = new Schema({
   password: String,
   picture: String,
   departement_id: String,
-})
+  organization_id: String,
+});
 
-module.exports = mongo.model('Staff', Staff)
+module.exports = mongo.model("Staff", Staff);

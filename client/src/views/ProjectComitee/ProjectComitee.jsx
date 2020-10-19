@@ -17,6 +17,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import jwtDecode from "jwt-decode";
 
 import {
   Comitees,
@@ -41,8 +42,8 @@ const COMITEESBYPROJECT_QUERY = gql`
 `;
 
 const STAFFS_QUERY = gql`
-{
-  staffs{
+query staffs($organization_id:String!){
+  staffs(organization_id: $organization_id){
       _id
       staff_name
       position_name
@@ -51,6 +52,7 @@ const STAFFS_QUERY = gql`
       password
       picture
       departement_id
+      organization_id
   }
 }
 `;
@@ -106,6 +108,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ProjectComitee(props) {
   const classes = useStyles();
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
+
   const [value, setValue] = React.useState(0);
   const [comitees, setComitees] = useState([]);
   const [positions, setPositions] = useState([]);
@@ -138,6 +142,7 @@ export default function ProjectComitee(props) {
   );
 
   const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setStaffs(
         staffsData.staffs

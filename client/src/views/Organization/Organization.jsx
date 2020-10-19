@@ -22,10 +22,11 @@ import {
   Staffs,
   Departements,
 } from './components';
+import jwtDecode from "jwt-decode";
 
 const DEPARTEMENS_QUERY = gql`
-{
-  departements{
+query departements($organization_id:String!){
+  departements(organization_id: $organization_id){
     _id
     departement_name
   }
@@ -33,8 +34,8 @@ const DEPARTEMENS_QUERY = gql`
 `;
 
 const STAFFS_QUERY = gql`
-{
-  staffs{
+query staffs($organization_id:String!){
+  staffs(organization_id: $organization_id){
       _id
       staff_name
       position_name
@@ -43,6 +44,7 @@ const STAFFS_QUERY = gql`
       password
       picture
       departement_id
+      organization_id
   }
 }
 `;
@@ -98,6 +100,7 @@ export default function Organization() {
   const [departements, setDepartements] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
 
   const handleOpenSnackbar = () => {
     setOpenSnackbar(true);
@@ -115,6 +118,7 @@ export default function Organization() {
   };
 
   const { data: departementsData, refetch: departementsRefetch } = useQuery(DEPARTEMENS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setDepartements(
         departementsData.departements
@@ -124,6 +128,7 @@ export default function Organization() {
   );
 
   const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setStaffs(
         staffsData.staffs
@@ -131,7 +136,8 @@ export default function Organization() {
     }
   }
   );
-  // console.log(departements._id)
+
+  console.log(staffs)
   useEffect(() => {
     refresh();
   });
@@ -228,7 +234,7 @@ export default function Organization() {
           >
             <Tab label="Staff" {...a11yProps(0)} />
             <Tab label="Departement" {...a11yProps(1)} />
-            <Tab label="Organization" {...a11yProps(2)} />
+            {/* <Tab label="Organization" {...a11yProps(2)} /> */}
           </Tabs>
         </Paper>
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
@@ -238,6 +244,7 @@ export default function Organization() {
             </div>
             :
             <Staffs
+              decodedToken={decodedToken}
               departements={departements}
               staffs={staffs}
               handleSaveButton={handleSaveStaffButton}
@@ -248,15 +255,17 @@ export default function Organization() {
         </TabPanel>
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
           <Departements
+            decodedToken={decodedToken}
+            organization_id={decodedToken.organization_id}
             departements={departements}
             handleSaveEditButton={handleSaveEditDepartementButton}
             handleSaveButton={handleSaveDepartementButton}
             handleDeleteDepartement={handleDeleteDepartement}
           />
         </TabPanel>
-        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
-       
-        </TabPanel>
+        {/* <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
+
+        </TabPanel> */}
       </Paper>
     </div>
   );

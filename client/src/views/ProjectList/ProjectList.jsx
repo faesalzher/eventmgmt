@@ -21,21 +21,21 @@ import Paper from '@material-ui/core/Paper';
 // import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-
+import jwtDecode from "jwt-decode";
 
 const PROJECTS_QUERY = gql`
-{
-  projects{
-    _id
-    project_name
-    project_description
-    cancel
-    project_start_date
-    project_end_date
-    picture
-    organization_id
+  query projects($organization_id:String!){
+    projects(organization_id: $organization_id){
+      _id
+      project_name
+      project_description
+      cancel
+      project_start_date
+      project_end_date
+      picture
+      organization_id
+    }
   }
-}
 `;
 
 const DELETE_PROJECT = gql`
@@ -62,8 +62,9 @@ function Alert(props) {
 
 const ProjectList = () => {
   const classes = useStyles();
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
 
-   const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const handleSucces = () => {
     setOpen(true);
@@ -79,6 +80,7 @@ const ProjectList = () => {
   const [projects, setProjects] = useState([]);
 
   const { loading, error, data, refetch } = useQuery(PROJECTS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     // onCompleted: () => { setProjects(data.projects) }
   });
   useEffect(() => {
@@ -120,7 +122,7 @@ const ProjectList = () => {
 
   if (error) return <p>Error :(</p>;
   // console.log(projects);
-
+  // console.log(decodedToken.organization_id)
 
   return (
     <div>
@@ -148,7 +150,11 @@ const ProjectList = () => {
                     Succes!
                </Alert>
                 </Snackbar>
-                <AddProjectCard addProject={addProject} />
+                {decodedToken.user_type === "organization" ?
+                  <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
+                  :
+                  <div></div>
+                }
                 {
                   projects.slice().reverse().map((project, index) => {
                     if (projects.length === 0) {

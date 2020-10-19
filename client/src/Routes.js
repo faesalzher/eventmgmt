@@ -1,9 +1,10 @@
-import React from 'react';
-import { Switch, Redirect } from 'react-router-dom';
+import React from "react";
+import { Switch, Redirect } from "react-router-dom";
 
-import { RouteWithLayout } from './components';
-import { Main as MainLayout, Minimal as MinimalLayout } from './layouts';
-import { Route } from 'react-router-dom';
+import { RouteWithLayout } from "./components";
+import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
+import { Route } from "react-router-dom";
+// import { useAuth } from "context/auth.jsx";
 
 import {
   Dashboard as DashboardView,
@@ -13,31 +14,28 @@ import {
   // Icons as IconsView,
   AccountProfile as AccountView,
   // Settings as SettingsView,
-  SignUp as SignUpView,
-  SignIn as SignInView,
+  // Register as RegisterView,
+  // LogIn as LogInView,
   ProjectDetail as ProjectDetailView,
   NotFound as NotFoundView,
   ProjectList as ProjectListView,
   EventDetail as EventDetailView,
   RoadmapTaskList as RoadmapTaskListView,
   LandingPage as LandingPageView,
-} from './views';
+} from "./views";
 
-const Routes = props => {
-
+const Routes = (props) => {
+  // const { authTokens } = useAuth();
   return (
     <Switch>
-      <Redirect
-        exact
-        from="/"
-        to="/dashboard"
-      />
+      <Redirect exact from="/" to="/dashboard" />
       <RouteWithLayout
         component={DashboardView}
         exact
         layout={MainLayout}
         path="/dashboard"
       />
+      {/* {console.log(authTokens)} */}
       <RouteWithLayout
         component={OrganizationView}
         exact
@@ -86,26 +84,29 @@ const Routes = props => {
         layout={MainLayout}
         path="/account"
       />
-      <RouteWithLayout
-        component={SignUpView}
+      {/* <RouteWithLayout
+        component={DashboardView}
         exact
-        layout={MinimalLayout}
-        path="/sign-up"
+        layout={MainLayout}
+        path="/login"
       />
       <RouteWithLayout
-        component={SignInView}
+        component={DashboardView}
         exact
-        layout={MinimalLayout}
-        path="/sign-in"
-      />
+        layout={MainLayout}
+        path="/register"
+      /> */}
       <RouteWithLayout
         component={NotFoundView}
         exact
         layout={MinimalLayout}
         path="/not-found"
       />
-      <Redirect to="/not-found" />
+      {/* <Redirect to="/not-found" /> */}
     </Switch>
+  // ) 
+  // : (
+  //     <Redirect to="/login" />
   );
 };
 

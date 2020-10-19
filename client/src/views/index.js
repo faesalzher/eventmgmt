@@ -16,8 +16,8 @@ export { default as EventAgenda } from './EventAgenda/EventAgenda.jsx';
 export { default as ProjectOverview } from './ProjectOverview/ProjectOverview.jsx';
 export { default as LandingPage } from './LandingPage/LandingPage.js';
 export { default as AccountProfile } from './AccountProfile/AccountProfile.jsx';
-export { default as SignIn } from './Authentication/SignIn.jsx';
-export { default as SignUp } from './Authentication/SignUp.jsx';
+export { default as LogIn } from './Authentication/LogIn.jsx';
+export { default as Register } from './Authentication/Register.jsx';
 
 
 

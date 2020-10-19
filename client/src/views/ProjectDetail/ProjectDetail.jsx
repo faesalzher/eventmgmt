@@ -9,6 +9,7 @@ import { createBrowserHistory } from 'history';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 // import useMediaQuery from '@material-ui/core/useMediaQuery';
+import jwtDecode from "jwt-decode";
 
 import {
   IconButton,
@@ -102,6 +103,7 @@ const useStyles = makeStyles(theme => ({
 export default function ProjectDetail() {
   const classes = useStyles();
   const theme = useTheme();
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
   const browserHistory = createBrowserHistory();
   let { project_id } = useParams();
   const [value, setValue] = React.useState(0);
@@ -212,6 +214,7 @@ export default function ProjectDetail() {
           </IconButton>
           <ProjectEditModal
             open={openEditModal}
+            organization_id={decodedToken.organization_id}
             divisions={divisions}
             close={handleCloseEditModal}
             handleSaveEditButton={handleSaveEditProjectButton}

@@ -15,7 +15,6 @@ import {
   AddEventCard,
 } from './components';
 
-
 const EVENTSBYPROJECT_QUERY = gql`
 query eventsByProject($project_id: String!){
   eventsByProject(project_id:$project_id) {

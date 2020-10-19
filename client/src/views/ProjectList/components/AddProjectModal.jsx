@@ -159,9 +159,9 @@ export default function AddProjectModal(props) {
     project_start_date: new Date().toString(),
     project_end_date: new Date().toString(),
     picture: "null",
-    organization_id: "",
+    organization_id: props.organization_id,
   };
-
+console.log(props.organization_id)
   const [projects, setProjects] = useState(initialFormState);
 
   const [date, setDate] = useState([

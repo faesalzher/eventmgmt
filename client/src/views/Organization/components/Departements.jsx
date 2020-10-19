@@ -130,7 +130,7 @@ export default function Departements(props) {
   useEffect(() => {
     setDepartements(props.departements)
   }, [setDepartements, props.departements])
-  
+
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, departements.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
@@ -156,13 +156,17 @@ export default function Departements(props) {
         <Typography style={{ color: 'black' }} variant='subtitle2'>
           List of Departement
         </Typography>
-        <Tooltip arrow title="Add New Departements" aria-label="confirm">
-          <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
+        {props.decodedToken.user_type === "organization" ?
+          <Tooltip arrow title="Add New Departements" aria-label="confirm">
+            <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          : <div></div>
+        }
         <DepartementAddForm
           // guests={guests}
+          organization_id={props.organization_id}
           event_id={props.event_id}
           open={openAddModal}
           handleSaveButton={props.handleSaveButton}
@@ -175,7 +179,10 @@ export default function Departements(props) {
             <TableRow>
               <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
-                Action
+                {props.decodedToken.user_type === "organization" ?
+                  "Action"
+                  : <div></div>
+                }
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -187,9 +194,11 @@ export default function Departements(props) {
               ).map((departement, index) => {
                 return <Departement
                   key={index}
+                  decodedToken={props.decodedToken}
                   handleDeleteDepartement={props.handleDeleteDepartement}
                   departement={departement}
                   index={index}
+                  organization_id={props.organization_id}
                   handleSaveEditButton={props.handleSaveEditButton}
                 />
               })

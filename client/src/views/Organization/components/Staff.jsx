@@ -56,7 +56,7 @@ export default function Staffs(props) {
   // }
   return (
     <StyledTableRow>
-      <StyledTableCell component="th" scope="row" style={{display:'flex', justifyContent:'center', width: 70 }}>
+      <StyledTableCell component="th" scope="row" style={{ display: 'flex', justifyContent: 'center', width: 70 }}>
         <Avatar src={props.staff.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
@@ -70,11 +70,15 @@ export default function Staffs(props) {
       </StyledTableCell>
       <StyledTableCell align="left">{props.staff.phone_number}</StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
-      <Tooltip arrow title="Edit" aria-label="confirm">
-          <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
-            <EditIcon style={{ fontSize: 14 }} />
-          </IconButton>
-        </Tooltip>
+        {props.decodedToken.user_type === "organization" ?
+          <Tooltip arrow title="Edit" aria-label="confirm">
+            <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+              <EditIcon style={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+          :
+          <div></div>
+        }
         <StaffEditForm
           staff={props.staff}
           departements={props.departements}

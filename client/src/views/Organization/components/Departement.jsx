@@ -56,16 +56,20 @@ export default function Volunteer(props) {
   // }
   return (
     <StyledTableRow>
-      <StyledTableCell  style={{ paddingLeft: 16 }} scope="row">
+      <StyledTableCell style={{ paddingLeft: 16 }} scope="row">
         {props.departement.departement_name}
       </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
-      <Tooltip arrow title="Edit" aria-label="confirm">
-          <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
-            <EditIcon style={{ fontSize: 14 }} />
-          </IconButton>
-        </Tooltip>
+        {props.decodedToken.user_type === "organization" ?
+          <Tooltip arrow title="Edit" aria-label="confirm">
+            <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+              <EditIcon style={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+          : <div></div>
+        }
         <DepartementEditForm
+          organization_id={props.organization_id}
           departement={props.departement}
           event_id={props.event_id}
           open={openEditModal}

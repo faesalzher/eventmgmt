@@ -1,17 +1,27 @@
-const axios = require('axios');
-
+const axios = require("axios");
 const {
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLID,
   GraphQLString,
   GraphQLList,
-  GraphQLSchema
-} = require('graphql');
+  GraphQLSchema,
+} = require("graphql");
 
-const Project = require('./model/Project')
+const Organization = require("./model/Organization");
+const OrganizationType = new GraphQLObjectType({
+  name: "Organization",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    organization_name: { type: GraphQLString },
+    email: { type: GraphQLID },
+    password: { type: GraphQLString },
+  }),
+});
+
+const Project = require("./model/Project");
 const ProjectType = new GraphQLObjectType({
-  name: 'Project',
+  name: "Project",
   fields: () => ({
     _id: { type: GraphQLID },
     project_name: { type: GraphQLString },
@@ -21,12 +31,12 @@ const ProjectType = new GraphQLObjectType({
     project_end_date: { type: GraphQLString },
     picture: { type: GraphQLString },
     organization_id: { type: GraphQLString },
-  })
+  }),
 });
 
-const Staff = require('./model/Staff')
+const Staff = require("./model/Staff");
 const StaffType = new GraphQLObjectType({
-  name: 'Staff',
+  name: "Staff",
   fields: () => ({
     _id: { type: GraphQLID },
     staff_name: { type: GraphQLString },
@@ -36,22 +46,23 @@ const StaffType = new GraphQLObjectType({
     password: { type: GraphQLString },
     picture: { type: GraphQLString },
     departement_id: { type: GraphQLString },
-  })
+    organization_id: { type: GraphQLString },
+  }),
 });
 
-const Departement = require('./model/Departement')
+const Departement = require("./model/Departement");
 const DepartementType = new GraphQLObjectType({
-  name: 'Departement',
+  name: "Departement",
   fields: () => ({
     _id: { type: GraphQLID },
     departement_name: { type: GraphQLString },
-  })
+    organization_id: { type: GraphQLString },
+  }),
 });
 
-
-const Event = require('./model/Event')
+const Event = require("./model/Event");
 const EventType = new GraphQLObjectType({
-  name: 'Event',
+  name: "Event",
   fields: () => ({
     _id: { type: GraphQLID },
     event_name: { type: GraphQLString },
@@ -61,57 +72,72 @@ const EventType = new GraphQLObjectType({
     event_start_date: { type: GraphQLString },
     event_end_date: { type: GraphQLString },
     picture: { type: GraphQLString },
-    project_id: { type: GraphQLString }
-  })
+    project_id: { type: GraphQLString },
+  }),
 });
 
-const Position = require('./model/Position')
+const Position = require("./model/Position");
 const PositionType = new GraphQLObjectType({
-  name: 'Position',
+  name: "Position",
   fields: () => ({
     _id: { type: GraphQLID },
     position_name: { type: GraphQLString },
     core: { type: GraphQLString },
-  })
+  }),
 });
 
-const Division = require('./model/Division')
+const Division = require("./model/Division");
 const DivisionType = new GraphQLObjectType({
-  name: 'Division',
+  name: "Division",
   fields: () => ({
     _id: { type: GraphQLID },
     division_name: { type: GraphQLString },
     project_id: { type: GraphQLString },
-  })
+  }),
 });
 
-const Comitee = require('./model/Comitee')
+const Comitee = require("./model/Comitee");
 const ComiteeType = new GraphQLObjectType({
-  name: 'Comitee',
+  name: "Comitee",
   fields: () => ({
     _id: { type: GraphQLID },
     staff_id: { type: GraphQLString },
     division_id: { type: GraphQLString },
     position_id: { type: GraphQLString },
     project_id: { type: GraphQLString },
-  })
+  }),
 });
 
 const RootQuery = new GraphQLObjectType({
-  name: 'RootQueryType',
+  name: "RootQueryType",
   fields: {
+    check_organization: {
+      type: new GraphQLList(OrganizationType),
+      args: { email: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Organization.find({ email: args.email });
+      },
+    },
+    organization: {
+      type: OrganizationType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Organization.findById(args._id);
+      },
+    },
     projects: {
       type: new GraphQLList(ProjectType),
+      args: { organization_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Project.find({});
-      }
+        return Project.find({ organization_id: args.organization_id });
+      },
     },
     project: {
       type: ProjectType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Project.findById(args._id);
-      }
+      },
     },
     // projectByStatus: {
     //   type: new GraphQLList(ProjectType),
@@ -120,64 +146,73 @@ const RootQuery = new GraphQLObjectType({
     //     return Project.find({ status: args.status });
     //   }
     // },
+    check_staff: {
+      type: new GraphQLList(StaffType),
+      args: { email: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Staff.find({ email: args.email });
+      },
+    },
     staffs: {
       type: new GraphQLList(StaffType),
+      args: { organization_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Staff.find({});
-      }
+        return Staff.find({ organization_id: args.organization_id });
+      },
     },
     staffById: {
       type: StaffType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Staff.findById(args._id);
-      }
+      },
     },
     staffsByDepartement: {
       type: new GraphQLList(StaffType),
       args: { departement_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Staff.find({ departement_id: args.departement_id });
-      }
+      },
     },
     departements: {
       type: new GraphQLList(DepartementType),
+      args: { organization_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Departement.find({});
-      }
+        return Departement.find({ organization_id: args.organization_id });
+      },
     },
     eventsByProject: {
       type: new GraphQLList(EventType),
       args: { project_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Event.find({ project_id: args.project_id });
-      }
+      },
     },
     events: {
       type: new GraphQLList(EventType),
       resolve(parent, args) {
         return Event.find({});
-      }
+      },
     },
     event: {
       type: EventType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Event.findById(args._id);
-      }
+      },
     },
     positions: {
       type: new GraphQLList(PositionType),
       resolve(parent, args) {
         return Position.find({});
-      }
+      },
     },
     divisionsByProject: {
       type: new GraphQLList(DivisionType),
       args: { project_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Division.find({ project_id: args.project_id });
-      }
+      },
     },
     // divisionIdByProjectAndName: {
     //   type: new GraphQLList(DivisionType),
@@ -192,7 +227,7 @@ const RootQuery = new GraphQLObjectType({
       args: { project_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Comitee.find({ project_id: args.project_id });
-      }
+      },
     },
     comiteesByHeadProject: {
       type: new GraphQLList(ComiteeType),
@@ -201,15 +236,50 @@ const RootQuery = new GraphQLObjectType({
         position_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return Comitee.find({ project_id: args.project_id, position_id: args.position_id });
-      }
+        return Comitee.find({
+          project_id: args.project_id,
+          position_id: args.position_id,
+        });
+      },
     },
-  }
+  },
 });
 
 const Mutation = new GraphQLObjectType({
-  name: 'Mutation',
+  name: "Mutation",
   fields: {
+    register: {
+      type: OrganizationType,
+      args: {
+        _id: { type: GraphQLID },
+        organization_name: { type: GraphQLString },
+        email: { type: GraphQLID },
+        password: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        // TODO: Make sure user doesnt already exist
+        // const email = args.email;
+        // const email_check = Organization.find({ email: args.email });
+        // // console.log(email);
+        // console.log(email_check);
+
+        // if (email_check) {
+        //   throw new UserInputError("Username is taken", {
+        //     errors: {
+        //       username: "This username is taken",
+        //     },
+        //   });
+        // }
+
+        let organization = new Organization({
+          _id: args._id,
+          organization_name: args.organization_name,
+          email: args.email,
+          password: args.password,
+        });
+        return organization.save();
+      },
+    },
     addProject: {
       type: ProjectType,
       args: {
@@ -234,7 +304,7 @@ const Mutation = new GraphQLObjectType({
           organization_id: args.organization_id,
         });
         return project.save();
-      }
+      },
     },
     editProject: {
       type: ProjectType,
@@ -250,24 +320,38 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         let edit = {};
-        if (args.project_name) { edit.project_name = args.project_name }
-        if (args.project_description) { edit.project_description = args.project_description }
-        if (args.cancel) { edit.cancel = args.cancel }
-        if (args.project_start_date) { edit.project_start_date = args.project_start_date }
-        if (args.project_end_date) { edit.project_end_date = args.project_end_date }
-        if (args.picture) { edit.picture = args.picture }
-        if (args.organization_id) { edit.organization_id = args.organization_id }
-        let project = Project.findByIdAndUpdate(args._id, edit, { new: true })
-        return project
-      }
+        if (args.project_name) {
+          edit.project_name = args.project_name;
+        }
+        if (args.project_description) {
+          edit.project_description = args.project_description;
+        }
+        if (args.cancel) {
+          edit.cancel = args.cancel;
+        }
+        if (args.project_start_date) {
+          edit.project_start_date = args.project_start_date;
+        }
+        if (args.project_end_date) {
+          edit.project_end_date = args.project_end_date;
+        }
+        if (args.picture) {
+          edit.picture = args.picture;
+        }
+        if (args.organization_id) {
+          edit.organization_id = args.organization_id;
+        }
+        let project = Project.findByIdAndUpdate(args._id, edit, { new: true });
+        return project;
+      },
     },
     deleteProject: {
       type: ProjectType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let project = Project.findByIdAndDelete(args._id)
-        return project
-      }
+        let project = Project.findByIdAndDelete(args._id);
+        return project;
+      },
     },
 
     addStaff: {
@@ -281,6 +365,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         picture: { type: GraphQLString },
         departement_id: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let staff = new Staff({
@@ -292,9 +377,10 @@ const Mutation = new GraphQLObjectType({
           password: args.password,
           picture: args.picture,
           departement_id: args.departement_id,
+          organization_id: args.organization_id,
         });
         return staff.save();
-      }
+      },
     },
     editStaff: {
       type: StaffType,
@@ -307,35 +393,53 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         picture: { type: GraphQLString },
         departement_id: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {};
-        if (args.staff_name) { edit.staff_name = args.staff_name }
-        if (args.position_name) { edit.position_name = args.position_name }
-        if (args.email) { edit.email = args.email }
-        if (args.phone_number) { edit.phone_number = args.phone_number }
-        if (args.password) { edit.password = args.password }
-        if (args.picture) { edit.picture = args.picture }
-        if (args.departement_id) { edit.departement_id = args.departement_id }
-        let staff = Staff.findByIdAndUpdate(args._id, edit, { new: true })
-        return staff
-      }
+        if (args.staff_name) {
+          edit.staff_name = args.staff_name;
+        }
+        if (args.position_name) {
+          edit.position_name = args.position_name;
+        }
+        if (args.email) {
+          edit.email = args.email;
+        }
+        if (args.phone_number) {
+          edit.phone_number = args.phone_number;
+        }
+        if (args.password) {
+          edit.password = args.password;
+        }
+        if (args.picture) {
+          edit.picture = args.picture;
+        }
+        if (args.departement_id) {
+          edit.departement_id = args.departement_id;
+        }
+        if (args.organization_id) {
+          edit.organization_id = args.organization_id;
+        }
+        let staff = Staff.findByIdAndUpdate(args._id, edit, { new: true });
+        return staff;
+      },
     },
     deleteStaff: {
       type: StaffType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let staff = Staff.findByIdAndDelete(args._id)
-        return staff
-      }
+        let staff = Staff.findByIdAndDelete(args._id);
+        return staff;
+      },
     },
     deleteStaffByDepartement: {
       type: StaffType,
       args: { departement_id: { type: GraphQLString } },
       resolve(parent, args) {
-        let staff = Staff.findByIdAndDelete(args.departement_id)
-        return staff
-      }
+        let staff = Staff.findByIdAndDelete(args.departement_id);
+        return staff;
+      },
     },
 
     addDepartement: {
@@ -343,33 +447,41 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         departement_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let departement = new Departement({
           _id: args._id,
           departement_name: args.departement_name,
+          organization_id: args.organization_id,
         });
         return departement.save();
-      }
+      },
     },
     editDepartement: {
       type: DepartementType,
       args: {
         _id: { type: GraphQLString },
         departement_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let departement = Departement.findByIdAndUpdate(args._id, { departement_name: args.departement_name }, { new: true })
-        return departement
-      }
+        let departement = Departement.findByIdAndUpdate(
+          args._id,
+          { departement_name: args.departement_name },
+          { organization_id: args.organization_id },
+          { new: true }
+        );
+        return departement;
+      },
     },
     deleteDepartement: {
       type: DepartementType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let departement = Departement.findByIdAndDelete(args._id)
-        return departement
-      }
+        let departement = Departement.findByIdAndDelete(args._id);
+        return departement;
+      },
     },
 
     addEvent: {
@@ -383,7 +495,7 @@ const Mutation = new GraphQLObjectType({
         event_start_date: { type: GraphQLString },
         event_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
-        project_id: { type: GraphQLString }
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let event = new Event({
@@ -398,7 +510,7 @@ const Mutation = new GraphQLObjectType({
           project_id: args.project_id,
         });
         return event.save();
-      }
+      },
     },
     editEvent: {
       type: EventType,
@@ -411,29 +523,45 @@ const Mutation = new GraphQLObjectType({
         event_start_date: { type: GraphQLString },
         event_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
-        project_id: { type: GraphQLString }
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {};
-        if (args.event_name) { edit.event_name = args.event_name }
-        if (args.event_description) { edit.event_description = args.event_description }
-        if (args.event_location) { edit.event_location = args.event_location }
-        if (args.cancel) { edit.cancel = args.cancel }
-        if (args.event_start_date) { edit.event_start_date = args.event_start_date }
-        if (args.event_end_date) { edit.event_end_date = args.event_end_date }
-        if (args.picture) { edit.picture = args.picture }
-        if (args.project_id) { edit.project_id = args.project_id }
-        let event = Event.findByIdAndUpdate(args._id, edit, { new: true })
-        return event
-      }
+        if (args.event_name) {
+          edit.event_name = args.event_name;
+        }
+        if (args.event_description) {
+          edit.event_description = args.event_description;
+        }
+        if (args.event_location) {
+          edit.event_location = args.event_location;
+        }
+        if (args.cancel) {
+          edit.cancel = args.cancel;
+        }
+        if (args.event_start_date) {
+          edit.event_start_date = args.event_start_date;
+        }
+        if (args.event_end_date) {
+          edit.event_end_date = args.event_end_date;
+        }
+        if (args.picture) {
+          edit.picture = args.picture;
+        }
+        if (args.project_id) {
+          edit.project_id = args.project_id;
+        }
+        let event = Event.findByIdAndUpdate(args._id, edit, { new: true });
+        return event;
+      },
     },
     deleteEvent: {
       type: EventType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let event = Event.findByIdAndDelete(args._id)
-        return event
-      }
+        let event = Event.findByIdAndDelete(args._id);
+        return event;
+      },
     },
 
     addDivision: {
@@ -450,7 +578,7 @@ const Mutation = new GraphQLObjectType({
           project_id: args.project_id,
         });
         return division.save();
-      }
+      },
     },
     editDivision: {
       type: DivisionType,
@@ -459,17 +587,21 @@ const Mutation = new GraphQLObjectType({
         division_name: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let division = Division.findByIdAndUpdate(args._id, { division_name: args.division_name }, { new: true })
-        return division
-      }
+        let division = Division.findByIdAndUpdate(
+          args._id,
+          { division_name: args.division_name },
+          { new: true }
+        );
+        return division;
+      },
     },
     deleteDivision: {
       type: DivisionType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let division = Division.findByIdAndDelete(args._id)
-        return division
-      }
+        let division = Division.findByIdAndDelete(args._id);
+        return division;
+      },
     },
 
     addComitee: {
@@ -490,7 +622,7 @@ const Mutation = new GraphQLObjectType({
           project_id: args.project_id,
         });
         return comitee.save();
-      }
+      },
     },
     editComitee: {
       type: ComiteeType,
@@ -503,26 +635,34 @@ const Mutation = new GraphQLObjectType({
       },
       resolve(parent, args) {
         let edit = {};
-        if (args.staff_id) { edit.staff_id = args.staff_id }
-        if (args.division_id) { edit.division_id = args.division_id }
-        if (args.position_id) { edit.position_id = args.position_id }
-        if (args.project_id) { edit.project_id = args.project_id }
-        let comitee = Comitee.findByIdAndUpdate(args._id, edit, { new: true })
-        return comitee
-      }
+        if (args.staff_id) {
+          edit.staff_id = args.staff_id;
+        }
+        if (args.division_id) {
+          edit.division_id = args.division_id;
+        }
+        if (args.position_id) {
+          edit.position_id = args.position_id;
+        }
+        if (args.project_id) {
+          edit.project_id = args.project_id;
+        }
+        let comitee = Comitee.findByIdAndUpdate(args._id, edit, { new: true });
+        return comitee;
+      },
     },
     deleteComitee: {
       type: ComiteeType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let comitee = Comitee.findByIdAndDelete(args._id)
-        return comitee
-      }
+        let comitee = Comitee.findByIdAndDelete(args._id);
+        return comitee;
+      },
     },
-  }
-})
+  },
+});
 
 module.exports = new GraphQLSchema({
   query: RootQuery,
-  mutation: Mutation
+  mutation: Mutation,
 });

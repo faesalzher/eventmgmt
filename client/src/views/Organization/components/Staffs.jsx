@@ -201,11 +201,15 @@ export default function Staffs(props) {
               </option>
             ))}
           </TextField>
-          <Tooltip arrow title="Add New Staffs" aria-label="confirm">
-            <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
+          {props.decodedToken.user_type === "organization" ?
+            <Tooltip arrow title="Add New Staffs" aria-label="confirm">
+              <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            :
+            <div></div>
+          }
           <StaffAddForm
             // guests={guests}
             // event_id={props.event_id}
@@ -228,8 +232,12 @@ export default function Staffs(props) {
               <StyledTableCell align="left">Email</StyledTableCell>
               <StyledTableCell align="left">Phone Number</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
-                Action
+                {props.decodedToken.user_type === "organization" ?
+                  "Action"
+                  : <div></div>
+                }
               </StyledTableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
@@ -239,6 +247,7 @@ export default function Staffs(props) {
                 : staffsByDepartement
               ).map((staff) => {
                 return <Staff
+                  decodedToken={props.decodedToken}
                   key={staff._id}
                   handleDeleteStaff={props.handleDeleteStaff}
                   staff={staff}
