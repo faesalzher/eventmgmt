@@ -14,11 +14,10 @@ import { ApolloProvider } from "@apollo/react-hooks";
 const browserHistory = createBrowserHistory();
 
 const client = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
+  uri: "https://eventmgmt-deploy.herokuapp.com/graphql",
 });
 
 export default function App() {
-
 
   return (
     <ApolloProvider client={client}>
