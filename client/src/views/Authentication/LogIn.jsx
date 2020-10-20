@@ -9,8 +9,11 @@ import {
   IconButton,
   TextField,
   Link,
-  Typography
+  Typography,
+  CircularProgress,
 } from '@material-ui/core';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import signInImage from "assets/planer_desk.jpg";
 import logo from 'assets/image.png';
@@ -69,6 +72,10 @@ const schema = {
     }
   }
 };
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -170,6 +177,9 @@ const LogIn = props => {
 
   const classes = useStyles();
 
+  const [loading, setLoading] = useState(false)
+  const [loadingSucces, setLoadingSucces] = useState(false)
+
   const [formState, setFormState] = useState({
     isValid: false,
     values: {
@@ -269,44 +279,80 @@ const LogIn = props => {
     refetchOrganization();
     refetchStaff();
   }
-  console.log(organization)
-  console.log(staff)
+
+  const [openErrorMsg, setOpenErrorMsg] = React.useState(false);
+
+  const handleError = () => {
+    setOpenErrorMsg(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenErrorMsg(false);
+  };
 
   const handleLogIn = (event) => {
     // refetch();
     event.preventDefault();
-    // history.push('/');
-    // checkOrganization();
-    console.log(organization)
-    // const check_password;
-    if (organization.length === 0) {
-      if (staff.length === 0) {
-        console.log('user not found')
-      } else if (staff[0].password !== formState.values.password) {
-        console.log('password salah')
-      }else{
-        const token = generateTokenStaff(staff[0])
-        // // localStorage.setItem('jwtToken', token);
-        setAuthTokens(token);
-        history.push('/');
-        console.log('succes login staff')
-      }
-    } else if (organization[0].password !== formState.values.password) {
-      console.log('password salah')
-    } else {
-      const token = generateTokenOrganization(organization[0])
-      // localStorage.setItem('jwtToken', token);
-      setAuthTokens(token);
-      history.push('/');
-    }
+    setLoading(true);
 
+    setTimeout(() => {
+      if (organization.length === 0) {
+        if (staff.length === 0) {
+          setFormState(formState => ({
+            ...formState,
+            errors: {
+              ...formState.errors, email: ["User Not Found"], password: [""]
+            } || {}
+          }));
+          handleError();
+        } else if (staff[0].password !== formState.values.password) {
+          setFormState(formState => ({
+            ...formState,
+            errors: {
+              ...formState.errors, password: ["The password you entered is incorrect"]
+            } || {}
+          }));
+          handleError();
+        } else {
+          const token = generateTokenStaff(staff[0])
+          setAuthTokens(token);
+          setLoadingSucces(true);
+          setTimeout(() => {
+            history.push('/');
+            setLoadingSucces(false);
+          }, 500);
+        }
+      } else if (organization[0].password !== formState.values.password) {
+        setFormState(formState => ({
+          ...formState,
+          errors: {
+            ...formState.errors, password: ["The password you entered is incorrect"]
+          } || {}
+        }));
+        handleError();
+      } else {
+        const token = generateTokenOrganization(organization[0])
+        setAuthTokens(token);
+        setLoadingSucces(true);
+        setTimeout(() => {
+          history.push('/');
+          setLoadingSucces(false);
+        }, 500);
+      }
+      setLoading(false)
+    }, 1000);
   };
 
   function generateTokenOrganization(user) {
     return jwt.sign(
       {
         _id: user._id,
-        organization_id:user._id,
+        staff_id: "",
+        organization_id: user._id,
         user_type: "organization"
       },
       SECRET_KEY,
@@ -317,8 +363,9 @@ const LogIn = props => {
   function generateTokenStaff(user) {
     return jwt.sign(
       {
-        _id: user._id,
-        organization_id:user.organization_id,
+        // _id: user._id,
+        staff_id: user._id,
+        organization_id: user.organization_id,
         user_type: "staff"
       },
       SECRET_KEY,
@@ -331,135 +378,169 @@ const LogIn = props => {
   // }
   const hasError = field =>
     formState.touched[field] && formState.errors[field] ? true : false;
+  console.log(staff)
 
   return (
     <div className={classes.root}>
-      <Grid
-        className={classes.grid}
-        container
-      >
-        <Grid
-          className={classes.quoteContainer}
-          item
-          lg={5}
-        >
-          <div className={classes.quote}>
-            <div className={classes.quoteInner}>
-              <img
-                alt="Logo"
-                src={logo}
-                width='80'
-                height='80'
-              />
-              <Typography
-                className={classes.quoteText}
-                variant="h1"
-              >
-                Event Management
+      {loadingSucces ?
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '-webkit-fill-available' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 100, justifyContent: 'space-around' }}>
+            <CircularProgress />
+            <Typography variant="h6" gutterBottom>
+              Logging in
+          </Typography>
+          </div>
+        </div>
+        :
+        <div className={classes.root}>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={openErrorMsg}
+            autoHideDuration={3000}
+            onClose={handleClose}>
+            <Alert onClose={handleClose} severity="error">
+              Login Failed !
+               </Alert>
+          </Snackbar>
+          <Grid
+            className={classes.grid}
+            container
+          >
+            <Grid
+              className={classes.quoteContainer}
+              item
+              lg={5}
+            >
+              <div className={classes.quote}>
+                <div className={classes.quoteInner}>
+                  <img
+                    alt="Logo"
+                    src={logo}
+                    width='80'
+                    height='80'
+                  />
+                  <Typography
+                    className={classes.quoteText}
+                    variant="h1"
+                  >
+                    Event Management
               </Typography>
-              <div className={classes.person}>
-                <Typography
-                  className={classes.name}
-                  variant="body1"
-                >
-                  Create your own project to organize and manage an event
+                  <div className={classes.person}>
+                    <Typography
+                      className={classes.name}
+                      variant="body1"
+                    >
+                      Create your own project to organize and manage an event
                 </Typography>
-                {/* <Typography
+                    {/* <Typography
                   className={classes.bio}
                   variant="body2"
                 >
                   Manager at inVision
                 </Typography> */}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </Grid>
-        <Grid
-          className={classes.content}
-          item
-          lg={7}
-          xs={12}
-        >
-          <div className={classes.content}>
-            <div className={classes.contentHeader}>
-              <IconButton onClick={handleBack}>
-                <ArrowBackIcon />
-              </IconButton>
-            </div>
-            <div className={classes.contentBody}>
-              <form
-                className={classes.form}
-                onSubmit={handleLogIn}
-              >
-                <Typography
-                  className={classes.title}
-                  variant="h2"
-                >
-                  Login
+            </Grid>
+            <Grid
+              className={classes.content}
+              item
+              lg={7}
+              xs={12}
+            >
+              <div className={classes.content}>
+                {loading ?
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '-webkit-fill-available' }}>
+                    <CircularProgress />
+                  </div>
+                  :
+                  <div>
+                    <div className={classes.contentHeader}>
+                      <IconButton onClick={handleBack}>
+                        <ArrowBackIcon />
+                      </IconButton>
+                    </div>
+                    <div className={classes.contentBody}>
+                      <form
+                        className={classes.form}
+                        onSubmit={handleLogIn}
+                      >
+                        <Typography
+                          className={classes.title}
+                          variant="h2"
+                        >
+                          Login
                 </Typography>
-                <Typography
-                  color="textSecondary"
-                  gutterBottom
-                >
-                  Login using email address
+                        <Typography
+                          color="textSecondary"
+                          gutterBottom
+                        >
+                          Login using email address
                 </Typography>
-                <TextField
-                  className={classes.textField}
-                  error={hasError('email')}
-                  fullWidth
-                  helperText={
-                    hasError('email') ? formState.errors.email[0] : null
-                  }
-                  label="Email address"
-                  name="email"
-                  onChange={handleChange}
-                  type="text"
-                  value={formState.values.email || ''}
-                  variant="outlined"
-                />
-                <TextField
-                  className={classes.textField}
-                  error={hasError('password')}
-                  fullWidth
-                  helperText={
-                    hasError('password') ? formState.errors.password[0] : null
-                  }
-                  label="Password"
-                  name="password"
-                  onChange={handleChange}
-                  type="password"
-                  value={formState.values.password || ''}
-                  variant="outlined"
-                />
-                <Button
-                  className={classes.signInButton}
-                  color="primary"
-                  disabled={!formState.isValid}
-                  fullWidth
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                >
-                  Login now
-                </Button>
-                <Typography
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  Don't have an account?{' '}
-                  <Link
-                    component={RouterLink}
-                    to="/register"
-                    variant="h6"
-                  >
-                    Register
-                  </Link>
-                </Typography>
-              </form>
-            </div>
-          </div>
-        </Grid>
-      </Grid>
+                        <TextField
+                          className={classes.textField}
+                          error={hasError('email')}
+                          fullWidth
+                          helperText={
+                            hasError('email') ? formState.errors.email[0] : null
+                          }
+                          label="Email address"
+                          name="email"
+                          onChange={handleChange}
+                          type="text"
+                          value={formState.values.email || ''}
+                          variant="outlined"
+                        />
+                        <TextField
+                          className={classes.textField}
+                          error={hasError('password')}
+                          fullWidth
+                          helperText={
+                            hasError('password') ? formState.errors.password[0] : null
+                          }
+                          label="Password"
+                          name="password"
+                          onChange={handleChange}
+                          type="password"
+                          value={formState.values.password || ''}
+                          variant="outlined"
+                        />
+                        <Button
+                          className={classes.signInButton}
+                          color="primary"
+                          disabled={!formState.isValid}
+                          fullWidth
+                          size="large"
+                          type="submit"
+                          variant="contained"
+                        >
+                          Login
+                       </Button>
+                        <Typography
+                          color="textSecondary"
+                          variant="body1"
+                        >
+                          Don't have an account?{' '}
+                          <Link
+                            component={RouterLink}
+                            to="/register"
+                            variant="h6"
+                          >
+                            Register
+                       </Link>
+                        </Typography>
+                      </form>
+                    </div>
+                  </div>
+                }
+              </div>
+            </Grid>
+          </Grid>
+        </div>
+      }
     </div>
   );
 };

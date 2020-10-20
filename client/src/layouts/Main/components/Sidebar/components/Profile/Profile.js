@@ -20,8 +20,8 @@ const ORGANIZATION_QUERY = gql`
 `;
 
 const STAFF_QUERY = gql`
-  query staffById($_id: String!) {
-    staffById(_id: $_id) {
+  query staffById($staff_id: String!) {
+    staffById(_id: $staff_id) {
       _id
       staff_name
       email
@@ -63,7 +63,7 @@ const Profile = (props) => {
   });
 
   const { data: dataStaff,refetch:refetchStaff } = useQuery(STAFF_QUERY, {
-    variables: { _id: decodedToken._id },
+    variables: { staff_id: decodedToken.staff_id },
     onCompleted: () => {
       setProfileStaff(dataStaff.staffById);
     },
@@ -94,9 +94,9 @@ const Profile = (props) => {
 
   // console.log(decodedToken._id)
   // console.log(profileOrganization);
-  console.log(decodedToken);
+  // console.log(decodedToken);
   const classes = useStyles();
-  console.log(decodedToken);
+  // console.log(decodedToken);
   return (
     <div {...rest} className={clsx(classes.root, className)}>
       <Avatar
