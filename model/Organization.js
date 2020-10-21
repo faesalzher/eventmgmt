@@ -6,6 +6,8 @@ const Organization = new Schema({
   organization_name: String,
   email: String,
   password: String,
+  description: String,
+  picture: String,
 })
 
 module.exports = mongo.model('Organization', Organization)

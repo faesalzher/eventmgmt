@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const ProfileEditForm = props => {
+const OrganizationEditForm = props => {
 
   const classes = useStyles();
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -36,11 +36,11 @@ const ProfileEditForm = props => {
   const handleCloseEditModal = () => {
     setOpenEditModal(false);
   };
-  const [profile, setProfile] = useState(props.profile);
+  const [organization, setOrganization] = useState(props.organization);
 
   const handleChange = event => {
-    setProfile({
-      ...profile,
+    setOrganization({
+      ...organization,
       [event.target.name]: event.target.value
     });
   };
@@ -72,9 +72,9 @@ const ProfileEditForm = props => {
             <TextField
               fullWidth
               margin="dense"
-              name="staff_name"
+              name="organization_name"
               onChange={handleChange}
-              value={profile.staff_name}
+              value={organization.organization_name}
               variant="outlined"
             />
           </Grid>
@@ -96,7 +96,7 @@ const ProfileEditForm = props => {
               margin="dense"
               name="email"
               onChange={handleChange}
-              value={profile.email}
+              value={organization.email}
               variant="outlined"
             />
           </Grid>
@@ -106,7 +106,7 @@ const ProfileEditForm = props => {
             xs={12}
             className={classes.center}
           >
-            <Typography variant="subtitle2">Phone Number</Typography>
+            <Typography variant="subtitle2">Description</Typography>
           </Grid>
           <Grid
             item
@@ -116,79 +116,9 @@ const ProfileEditForm = props => {
             <TextField
               fullWidth
               margin="dense"
-              name="phone_number"
+              name="description"
               onChange={handleChange}
-              type="number"
-              value={profile.phone_number}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
-          >
-            <Typography variant="subtitle2">Position Name</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
-          >
-            <TextField
-              fullWidth
-              margin="dense"
-              name="position_name"
-              onChange={handleChange}
-              disabled
-              value={profile.position_name}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
-          >
-            <Typography variant="subtitle2">Departement</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
-          >
-            <TextField
-              fullWidth
-              margin="dense"
-              name="departement_id"
-              onChange={handleChange}
-              disabled
-              value={props.departement_name}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
-          >
-            <Typography variant="subtitle2">Organization</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
-          >
-            <TextField
-              fullWidth
-              margin="dense"
-              name="organization_id"
-              onChange={handleChange}
-              disabled
-              value={props.organization_name}
+              value={organization.description}
               variant="outlined"
             />
           </Grid>
@@ -229,8 +159,8 @@ const ProfileEditForm = props => {
   );
 };
 
-ProfileEditForm.propTypes = {
+OrganizationEditForm.propTypes = {
   className: PropTypes.string
 };
 
-export default ProfileEditForm;
+export default OrganizationEditForm;

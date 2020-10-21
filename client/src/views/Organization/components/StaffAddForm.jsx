@@ -32,6 +32,7 @@ const ADD_STAFF = gql`
     $password: String!,
     $picture: String!,
     $departement_id: String!,
+    $organization_id: String!,
     ){
     addStaff(
       _id: $_id,
@@ -42,6 +43,7 @@ const ADD_STAFF = gql`
       password:$password,
       picture:$picture,
       departement_id:$departement_id,
+      organization_id:$organization_id,
     ){
       _id
       staff_name
@@ -51,6 +53,7 @@ const ADD_STAFF = gql`
       password
       picture
       departement_id
+      organization_id
     }
   }
 `;
@@ -137,6 +140,7 @@ export default function StaffAddForm(props) {
     password: "1234",
     picture: "",
     departement_id: "",
+    organization_id: props.organization_id,
   }
 
   const [staffForm, setStaffForm] = useState(intitialFormState);
@@ -157,6 +161,7 @@ export default function StaffAddForm(props) {
         password: staffForm.password,
         picture: staffForm.picture,
         departement_id: staffForm.departement_id,
+        organization_id: staffForm.organization_id,
       }
     });
     setStaffForm(intitialFormState);

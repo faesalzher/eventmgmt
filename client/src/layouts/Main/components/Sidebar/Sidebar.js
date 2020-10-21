@@ -100,7 +100,7 @@ const Sidebar = props => {
         pages={pages}
       />
       <Divider />
-      <Profile />
+      <Profile collapsed={props.collapsed}/>
     </div>
   );
 };

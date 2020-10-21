@@ -83,6 +83,7 @@ export default function Staffs(props) {
           staff={props.staff}
           departements={props.departements}
           open={openEditModal}
+          organization_id={props.organization_id}
           handleDeleteStaff={props.handleDeleteStaff}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}

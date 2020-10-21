@@ -196,6 +196,8 @@ const Register = props => {
       organization_name: form.values.organization_name,
       email: form.values.email,
       password: form.values.password,
+      description:"",
+      picture:"",
     },
   });
 

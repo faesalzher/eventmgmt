@@ -8,7 +8,8 @@ import {
   Typography,
   Paper,
   Snackbar,
-  CircularProgress
+  CircularProgress,
+
   // Tooltip,
   // IconButton,
 } from '@material-ui/core';
@@ -209,64 +210,72 @@ export default function Organization() {
   };
 
   return (
-    <div className={classes.root}>
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}>
-        <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
-          Succes!
+    <div>
+      <div className={classes.root}>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}>
+          <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
+            Succes!
          </MuiAlert>
-      </Snackbar>
-      <Paper>
-        <Paper elevation={0} style={{ backgroundColor: 'orange' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            centered
-            style={{ color: 'white' }}
-            aria-label="project comitee tabs"
-            className={classes.tabs}
-          >
-            <Tab label="Staff" {...a11yProps(0)} />
-            <Tab label="Departement" {...a11yProps(1)} />
-            {/* <Tab label="Organization" {...a11yProps(2)} /> */}
-          </Tabs>
-        </Paper>
-        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
-          {staffsLoading ?
-            <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
-              <CircularProgress size={100} />
-            </div>
-            :
-            <Staffs
+        </Snackbar>
+        <Paper>
+          <Paper elevation={0} style={{ backgroundColor: 'orange' }}>
+            <Paper elevation={0} style={{ height:40, display: "flex", backgroundColor: "rgb(230 153 11)", flexDirection: "row", justifyContent: "center" }}>
+              <Typography variant="button"
+                style={{ display: "flex", color: "white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>User Management</Typography>
+            </Paper>
+            {/* <Divider /> */}
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              centered
+              style={{ color: 'white' }}
+              aria-label="project comitee tabs"
+              className={classes.tabs}
+            >
+              <Tab label="Staff" {...a11yProps(0)} />
+              <Tab label="Departement" {...a11yProps(1)} />
+              {/* <Tab label="Organization" {...a11yProps(2)} /> */}
+            </Tabs>
+          </Paper>
+          <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
+            {staffsLoading ?
+              <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
+                <CircularProgress size={100} />
+              </div>
+              :
+              <Staffs
+                decodedToken={decodedToken}
+                organization_id={decodedToken.organization_id}
+                departements={departements}
+                staffs={staffs}
+                handleSaveButton={handleSaveStaffButton}
+                handleSaveEditButton={handleSaveEditStaffButton}
+                handleDeleteStaff={handleDeleteStaff}
+              />
+            }
+          </TabPanel>
+          <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
+            <Departements
               decodedToken={decodedToken}
+              organization_id={decodedToken.organization_id}
               departements={departements}
-              staffs={staffs}
-              handleSaveButton={handleSaveStaffButton}
-              handleSaveEditButton={handleSaveEditStaffButton}
-              handleDeleteStaff={handleDeleteStaff}
+              handleSaveEditButton={handleSaveEditDepartementButton}
+              handleSaveButton={handleSaveDepartementButton}
+              handleDeleteDepartement={handleDeleteDepartement}
             />
-          }
-        </TabPanel>
-        <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
-          <Departements
-            decodedToken={decodedToken}
-            organization_id={decodedToken.organization_id}
-            departements={departements}
-            handleSaveEditButton={handleSaveEditDepartementButton}
-            handleSaveButton={handleSaveDepartementButton}
-            handleDeleteDepartement={handleDeleteDepartement}
-          />
-        </TabPanel>
-        {/* <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
+          </TabPanel>
+          {/* <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
 
         </TabPanel> */}
-      </Paper>
+        </Paper>
+      </div>
     </div>
   );
 }

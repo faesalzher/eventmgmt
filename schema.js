@@ -16,6 +16,8 @@ const OrganizationType = new GraphQLObjectType({
     organization_name: { type: GraphQLString },
     email: { type: GraphQLID },
     password: { type: GraphQLString },
+    description: { type: GraphQLString },
+    picture: { type: GraphQLString },
   }),
 });
 
@@ -262,6 +264,8 @@ const Mutation = new GraphQLObjectType({
         organization_name: { type: GraphQLString },
         email: { type: GraphQLID },
         password: { type: GraphQLString },
+        description: { type: GraphQLString },
+        picture: { type: GraphQLString },
       },
       resolve(parent, args) {
         // TODO: Make sure user doesnt already exist

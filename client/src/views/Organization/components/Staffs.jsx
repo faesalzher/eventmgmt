@@ -213,6 +213,7 @@ export default function Staffs(props) {
           <StaffAddForm
             // guests={guests}
             // event_id={props.event_id}
+            organization_id={props.organization_id}
             departement_id={departement_id}
             departements={departements}
             departement_name={departement_name}
@@ -251,6 +252,7 @@ export default function Staffs(props) {
                   key={staff._id}
                   handleDeleteStaff={props.handleDeleteStaff}
                   staff={staff}
+                  organization_id={props.organization_id}
                   departements={departements}
                   handleSaveEditButton={props.handleSaveEditButton}
                 />
