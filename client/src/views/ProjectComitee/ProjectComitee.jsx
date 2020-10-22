@@ -199,6 +199,7 @@ export default function ProjectComitee(props) {
     setComitees([...comitees, e])
   };
 
+  console.log(comiteesData)
   return (
     <div>
       <Snackbar

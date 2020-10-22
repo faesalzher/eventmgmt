@@ -161,7 +161,18 @@ export default function AddProjectModal(props) {
     picture: "null",
     organization_id: props.organization_id,
   };
-console.log(props.organization_id)
+
+  const divisionName = [
+    'Core Comitee',
+    'Program Subcomitee',
+    'Secretariat Subcomitee',
+    'Funding Subcomitee',
+    'Food Subcomitee',
+    'Security Subcomitee',
+    'Publication and Documentation Subcomitee',
+    'Equipment and Transportation Subcomitee',
+  ]
+
   const [projects, setProjects] = useState(initialFormState);
 
   const [date, setDate] = useState([
@@ -173,7 +184,7 @@ console.log(props.organization_id)
   ]);
 
   const [save, setSave] = useState(false)
-  
+
   // console.log(data);
   const handleDate = e => {
     setDate([e.selection])
@@ -209,15 +220,18 @@ console.log(props.organization_id)
             organization_id: projects.organization_id,
           }
         });
-      addDivision(
-        {
-          variables:
+
+      for (let i = 0; i < divisionName.length; i++) {
+        addDivision(
           {
-            _id: uuid(),
-            division_name: "Core",
-            project_id: projects._id,
-          }
-        });
+            variables:
+            {
+              _id: uuid(),
+              division_name: divisionName[i],
+              project_id: projects._id,
+            }
+          });
+      }
       setProjects(initialFormState);
     }, 400);
     setTimeout(() => {

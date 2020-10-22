@@ -19,14 +19,16 @@ import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import randomColor from 'randomcolor';
 
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import uuid from 'uuid/v1';
+import { useParams } from "react-router-dom";
+import { Redirect } from 'react-router';
 
-const ADD_ROADMAP = gql`
-  mutation addRoadmap(
+import { DeleteForm } from "components";
+
+const EDIT_ROADMAP = gql`
+  mutation editRoadmap(
     $_id: String!,
     $roadmap_name: String!,
     $start_date: String!,
@@ -34,7 +36,7 @@ const ADD_ROADMAP = gql`
     $color:String!,
     $event_id:String!
     ) {
-    addRoadmap(
+    editRoadmap(
       _id: $_id,
       roadmap_name: $roadmap_name,
       start_date:$start_date,
@@ -52,6 +54,14 @@ const ADD_ROADMAP = gql`
   }
 `;
 
+
+const DELETE_ROADMAP = gql`
+  mutation deleteRoadmap($_id: String!) {
+    deleteRoadmap(_id: $_id) {
+      _id
+    }
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -121,28 +131,42 @@ const DialogActions = withStyles(theme => ({
 
 
 
-export default function RoadmapAddForm(props) {
+export default function RoadmapEditForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
-  // const [anchorEl, setAnchorEl] = React.useState(null);
-  const intitialFormState = {
-    _id: uuid(),
-    roadmap_name: "",
-    color: randomColor({ luminosity: 'dark' }) ,
-    event_id: props.event_id,
-    start_date: "",
-    end_date: "",
-  }
+
+  let { project_id, event_id } = useParams();
 
   const initialDateRange = [{
     startDate: new Date(),
     endDate: new Date(),
     key: 'selection'
   }]
-  const [roadmapForm, setRoadmapForm] = useState(intitialFormState);
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [roadmapForm, setRoadmapForm] = useState({});
+  const [navigate, setNavigate] = useState(false);
+
+  React.useEffect(() => {
+    setRoadmapForm(props.roadmap);
+  }, [setRoadmapForm, props.roadmap]);
+
   const [date, setDate] = useState(initialDateRange);
+
+  console.log(roadmapForm.start_date)
+  React.useEffect(() => {
+    if (roadmapForm.start_date !== undefined) {
+      setDate([
+        {
+          startDate: new Date(roadmapForm.start_date),
+          endDate: new Date(roadmapForm.end_date),
+          key: "selection",
+        },
+      ]);
+    }
+  }, [setDate, roadmapForm.start_date, roadmapForm.end_date]);
 
   const handleDeleteDate = () => {
     setDate(initialDateRange);
@@ -158,14 +182,15 @@ export default function RoadmapAddForm(props) {
     setRoadmapForm({ ...roadmapForm, [id]: value })
   }
 
-  const [addRoadmap] = useMutation(ADD_ROADMAP);
+  const [editRoadmap] = useMutation(EDIT_ROADMAP);
+  const [deleteRoadmap] = useMutation(DELETE_ROADMAP);
 
   const handleSaveButton = () => {
     // roadmapForm.color = roadmapForm.color
     roadmapForm.start_date = date[0].startDate.toString().slice(0, 16);
     roadmapForm.end_date = date[0].endDate.toString().slice(0, 16);
-    props.handleSaveButton(roadmapForm)
-    addRoadmap(
+    props.handleSaveEditButton(roadmapForm)
+    editRoadmap(
       {
         variables:
         {
@@ -177,10 +202,28 @@ export default function RoadmapAddForm(props) {
           event_id: roadmapForm.event_id,
         }
       });
-    setRoadmapForm(intitialFormState);
+    // setRoadmapForm(intitialFormState);
     handleDeleteDate()
     props.close();
   }
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleDelete = () => {
+    deleteRoadmap({ variables: { _id: roadmapForm._id } });
+    setNavigate(true);
+  };
+
+  if (navigate) {
+    return <Redirect push to={'/project/' + project_id + '/' + event_id} />;
+  }
+
 
   return (
     <Dialog
@@ -191,7 +234,7 @@ export default function RoadmapAddForm(props) {
       maxWidth={false}
     >
       <DialogTitle id="customized-dialog-title" onClose={props.onCloseListener}>
-        Add New roadmap
+        Edit roadmap
         </DialogTitle>
       <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
@@ -222,8 +265,20 @@ export default function RoadmapAddForm(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
+      <DialogActions style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          variant="outlined"
+          size="small"
+          color="secondary"
+          onClick={handleDeleteModal}
+        >
+          Delete Project
+        </Button>
+        <DeleteForm
+          open={openDeleteModal}
+          handleDelete={handleDelete}
+          close={handleCloseDeleteModal}
+        />
         {(roadmapForm.roadmap_name === "") ?
           < Button size="small" className={classes.iconbutton} disabled >Save</Button>
           :

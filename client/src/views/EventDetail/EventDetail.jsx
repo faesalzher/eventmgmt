@@ -22,7 +22,6 @@ import {
   IconButton,
 } from '@material-ui/core';
 
-import randomColor from 'randomcolor';
 
 import {
   EventOverview,
@@ -42,6 +41,7 @@ const PROJECT_QUERY = gql`
     }
   }
 `;
+
 const EVENT_QUERY = gql`
   query event($event_id: String!){
     event(_id:$event_id) {
@@ -57,6 +57,7 @@ const EVENT_QUERY = gql`
     }
   }
 `;
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -103,11 +104,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const dataRoadmap = [
-  { _id: '0', event_id: "0", roadmap_name: "Persiapan Tiket", start_date: "04/11/2020", end_date: '04/18/2020', color: randomColor({ luminosity: 'dark' }), },
-  { _id: '1', event_id: '0', roadmap_name: "Jersey", start_date: "04/12/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
-  { _id: '2', event_id: '0', roadmap_name: "Sponshorships", start_date: "04/18/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
-]
+
 export default function EventDetail() {
   const classes = useStyles();
   const theme = useTheme();
@@ -120,7 +117,7 @@ export default function EventDetail() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const [event, setEvent] = React.useState([]);
+  const [event, setEvent] = React.useState({event_name:""});
   const { data: eventData, refetch: eventRefetch } = useQuery(EVENT_QUERY,
     {
       variables: { event_id: event_id },
@@ -136,7 +133,7 @@ export default function EventDetail() {
   const refresh = () => {
     eventRefetch();
   };
-  const [project, setProject] = React.useState([]);
+  const [project, setProject] = React.useState({project_name:""});
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {
       variables: { project_id: project_id },
@@ -145,7 +142,6 @@ export default function EventDetail() {
       }
     });
 
-  const [roadmaps, setRoadmaps] = useState(dataRoadmap);
   const [openEditModal, setOpenEditModal] = useState(false);
 
   const breadcrumb_item = [
@@ -153,9 +149,7 @@ export default function EventDetail() {
     { name: project.project_name, link: `/project/${project._id}` },
     { name: event.event_name, link: '/' }
   ]
-  const handleSaveButton = (e) => {
-    setRoadmaps([...roadmaps, e])
-  }
+
 
   const handleOpenEditModal = () => {
     setOpenEditModal(true);
@@ -215,9 +209,8 @@ export default function EventDetail() {
           <EventRoadmapList
             event_id={event_id}
             project_id={project_id}
-            roadmaps={roadmaps}
             xs={fullScreen}
-            handleSaveButton={handleSaveButton} />
+            />
         </TabPanel>
         <TabPanel value={value} index={1} style={{ padding: '0px 30px' }}>
           <EventExternal

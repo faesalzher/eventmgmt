@@ -25,9 +25,9 @@ import {
 import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 
 import {
-  TaskList
+  TaskList,
+  RoadmapEditForm,
 } from './components';
-
 
 const DIVISIONSBYPROJECT_QUERY = gql`
   query divisionsByProject($project_id: String!){
@@ -35,6 +35,50 @@ const DIVISIONSBYPROJECT_QUERY = gql`
       _id
       division_name
       project_id
+    }
+  }
+`;
+
+const PROJECT_QUERY = gql`
+  query project($project_id: String!){
+    project(_id:$project_id) {
+      _id
+      project_name
+    }
+  }
+`;
+
+const EVENT_QUERY = gql`
+  query event($event_id: String!){
+    event(_id:$event_id) {
+      _id
+      event_name
+    }
+  }
+`;
+
+// const ROADMAP_QUERY = gql`
+//   query roadmap($roadmap_id: String!){
+//     roadmap(_id:$roadmap_id) {
+//       _id
+//       roadmap_name
+//       start_date
+//       end_date
+//       color
+//       event_id
+//     }
+//   }
+// `;
+
+const ROADMAPBYEVENTID_QUERY = gql`
+  query roadmapByEvent($event_id: String!){
+    roadmapByEvent(event_id:$event_id) {
+      _id
+      roadmap_name
+      start_date
+      end_date
+      color
+      event_id
     }
   }
 `;
@@ -62,18 +106,11 @@ export default function RoadamapTaskList() {
   const browserHistory = createBrowserHistory();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   let { project_id, event_id, roadmap_id } = useParams();
-  // const [value, setValue] = React.useState(0);
-  // const matches = useMediaQuery(theme.breakpoints.up('sm'));
+
+  const [openEditModal, setOpenEditModal] = useState(false);
+
   const [divisions, setDivisions] = useState([]);
 
-  // const [divisionData,
-  //   // setDivisionData
-  // ] = React.useState([
-  //   { _id: 0, name: 'Konsumsi', roadmap_id: '0' },
-  //   { _id: 1, name: 'Perlengkapan', roadmap_id: '0' },
-  //   { _id: 2, name: 'Humas', roadmap_id: '0' },
-  //   { _id: 3, name: 'Kemanan', roadmap_id: '0' },
-  // ]);
   const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
     variables: { project_id: project_id },
     onCompleted: () => {
@@ -84,21 +121,66 @@ export default function RoadamapTaskList() {
   }
   );
 
+
+
+  const [project, setProject] = React.useState({ project_name: "" });
+  const { data: projectData } = useQuery(PROJECT_QUERY,
+    {
+      variables: { project_id: project_id },
+      onCompleted: () => {
+        setProject(projectData.project)
+      }
+    });
+
+  const [event, setEvent] = React.useState({ event_name: "" });
+  const { data: eventData } = useQuery(EVENT_QUERY,
+    {
+      variables: { event_id: event_id },
+      onCompleted: () => {
+        setEvent(eventData.event)
+      }
+    });
+
+
+
+  const [roadmap, setRoadmap] = React.useState({});
+  const { data: roadmapData, refetch: roadmapRefetch } = useQuery(ROADMAPBYEVENTID_QUERY,
+    {
+      variables: { event_id: event_id },
+      onCompleted: () => {
+          setRoadmap(roadmapData.roadmapByEvent[0])
+      }
+    });
+
   useEffect(() => {
     refresh();
   });
 
   const refresh = () => {
     divisionsRefetch();
+    roadmapRefetch()
+  };
+
+  const handleOpenEditModal = () => {
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+  };
+
+
+  const handleSaveEditRoadmapButton = (e) => {
+    setRoadmap(e)
   };
 
   const breadcrumb_item = [
     { name: 'Project List', link: '/project' },
-    { name: 'Dies Natalies UB', link: `/project/${project_id}` },
-    { name: 'Fun Bike', link: `/project/${project_id}/${event_id}` },
-    { name: 'Jersey', link: `/` }
+    { name: project.project_name, link: `/project/${project_id}` },
+    { name: event.event_name, link: `/project/${project_id}/${event_id}` },
+    { name: roadmap.roadmap_name, link: `/` }
   ]
-  console.log(divisions)
+
   return (
     <div className={classes.tabs_root}>
       <Paper className={classes.tabs_root} style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -109,12 +191,18 @@ export default function RoadamapTaskList() {
         </div>
         <Typography color='textSecondary' variant="button"
           style={{ display: "flex", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
-          Roadmap Jersey Task List
-            </Typography>
+          Task to do of roadmap {roadmap.roadmap_name}
+        </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton className={classes.iconbutton}>
+          <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
             <SettingsIcon />
           </IconButton>
+          <RoadmapEditForm
+            open={openEditModal}
+            close={handleCloseEditModal}
+            handleSaveEditButton={handleSaveEditRoadmapButton}
+            roadmap={roadmap}
+          />
         </div>
       </Paper>
       <div className={classes.root}>

@@ -97,7 +97,6 @@ const Profile = (props) => {
   // console.log(profileOrganization);
   // console.log(decodedToken);
   const classes = useStyles();
-  console.log(profileStaff);
   return (
     <div style={props.collapsed!=='true' ? {} : { display: "flex" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>

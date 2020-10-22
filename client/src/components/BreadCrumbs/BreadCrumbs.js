@@ -28,8 +28,7 @@ export default function BreadCrumbs(props) {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-     
+    <div className={classes.root}>     
       <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
         {
           props.breadcrumb_item.map((item, index) => {
@@ -48,7 +47,6 @@ export default function BreadCrumbs(props) {
           })
         }
       </Breadcrumbs>
-        {console.log(props.breadcrumb_item)}
     </div>
   );
 }

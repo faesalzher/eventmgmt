@@ -166,7 +166,7 @@ export default function TaskList(props) {
   //   })
   // }));
 
-  console.log(comitees)
+  // console.log(comitees)
   // console.log(staffsByComitee)
 
   useEffect(() => {
@@ -264,7 +264,7 @@ export default function TaskList(props) {
     setCountTaskDivision(countTaskDivision);
   }, [tasksByRoadmap, props.division._id])
 
-  console.log(assignedForm.length)
+  // console.log(assignedForm.length)
   return (
     <Card className={classes.root} elevation={0} >
       <div>

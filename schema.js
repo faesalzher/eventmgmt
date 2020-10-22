@@ -110,6 +110,19 @@ const ComiteeType = new GraphQLObjectType({
   }),
 });
 
+const Roadmap = require("./model/Roadmap");
+const RoadmapType = new GraphQLObjectType({
+  name: "Roadmap",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    roadmap_name: { type: GraphQLString },
+    start_date: { type: GraphQLString },
+    end_date: { type: GraphQLString },
+    color: { type: GraphQLString },
+    event_id: { type: GraphQLString },
+  }),
+});
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -249,6 +262,20 @@ const RootQuery = new GraphQLObjectType({
           project_id: args.project_id,
           position_id: args.position_id,
         });
+      },
+    },
+    roadmaps: {
+      type: new GraphQLList(RoadmapType),
+      args: { event_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Roadmap.find({ event_id: args.event_id });
+      },
+    },
+    roadmapByEvent: {
+      type: new GraphQLList(RoadmapType),
+      args: { event_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Roadmap.find({ event_id: args.event_id });
       },
     },
   },
@@ -668,6 +695,68 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let comitee = Comitee.findByIdAndDelete(args._id);
         return comitee;
+      },
+    },
+
+    addRoadmap: {
+      type: RoadmapType,
+      args: {
+        _id: { type: GraphQLString },
+        roadmap_name: { type: GraphQLString },
+        start_date: { type: GraphQLString },
+        end_date: { type: GraphQLString },
+        color: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let roadmap = new Roadmap({
+          _id: args._id,
+          roadmap_name: args.roadmap_name,
+          start_date: args.start_date,
+          end_date: args.end_date,
+          color: args.color,
+          event_id: args.event_id,
+        });
+        return roadmap.save();
+      },
+    },
+    editRoadmap: {
+      type: RoadmapType,
+      args: {
+        _id: { type: GraphQLString },
+        roadmap_name: { type: GraphQLString },
+        end_date: { type: GraphQLString },
+        start_date: { type: GraphQLString },
+        color: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {};
+        if (args.roadmap_name) {
+          edit.roadmap_name = args.roadmap_name;
+        }
+        if (args.start_date) {
+          edit.start_date = args.start_date;
+        }
+        if (args.end_date) {
+          edit.end_date = args.end_date;
+        }
+        if (args.color) {
+          edit.color = args.color;
+        }
+        if (args.event_id) {
+          edit.event_id = args.event_id;
+        }
+        let roadmap = Roadmap.findByIdAndUpdate(args._id, edit, { new: true });
+        return roadmap;
+      },
+    },
+    deleteRoadmap: {
+      type: RoadmapType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let roadmap = Roadmap.findByIdAndDelete(args._id);
+        return roadmap;
       },
     },
   },

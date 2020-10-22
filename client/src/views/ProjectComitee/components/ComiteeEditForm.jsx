@@ -215,7 +215,7 @@ export default function ComiteeEditForm(props) {
 
   let checkDivisionCore = [];
   props.divisions.map((division) => {
-    if (division.division_name === "Core") {
+    if (division.division_name === "Core Comitee") {
       checkDivisionCore.push(division._id)
     }
     return null;

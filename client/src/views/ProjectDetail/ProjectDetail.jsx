@@ -112,7 +112,7 @@ export default function ProjectDetail() {
     setValue(newValue);
   };
 
-  const [project, setProject] = React.useState([]);
+  const [project, setProject] = React.useState({project_name:""});
   const [divisions, setDivisions] = useState([]);
   const [openEditModal, setOpenEditModal] = useState(false);
 

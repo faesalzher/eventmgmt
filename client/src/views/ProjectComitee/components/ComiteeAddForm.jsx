@@ -227,7 +227,7 @@ export default function ComiteeAddForm(props) {
 
   let checkCoreDivisionId = [];
   props.divisions.map((division) => {
-    if (division_id === division._id && division.division_name === "Core")
+    if (division_id === division._id && division.division_name === "Core Comitee")
       checkCoreDivisionId.push(division._id)
     return null;
   });
