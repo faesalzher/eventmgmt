@@ -259,7 +259,7 @@ const ProfileDetailCard = props => {
             <div className={classes.avatarHeader}>
               <Avatar
                 className={classes.avatar}
-                src={"profile.picture"}
+                src={profile.picture}
               />
             </div>
             {openEditPage ?

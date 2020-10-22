@@ -147,6 +147,7 @@ const OrganizationDetailCard = props => {
       picture: e,
     });
   };
+  console.log(organization.picture)
 
   const removeImage = (e) => {
     setOrganization({
@@ -211,7 +212,7 @@ const OrganizationDetailCard = props => {
             <div className={classes.avatarHeader}>
               <Avatar
                 className={classes.avatar}
-                src={"organization.picture"}
+                src={organization.picture}
               />
             </div>
             {openEditPage ?

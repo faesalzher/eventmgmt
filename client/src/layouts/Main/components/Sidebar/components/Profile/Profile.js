@@ -14,6 +14,7 @@ const ORGANIZATION_QUERY = gql`
       _id
       email
       organization_name
+      picture
     }
   }
 `;
@@ -25,6 +26,7 @@ const STAFF_QUERY = gql`
       staff_name
       email
       position_name
+      picture
     }
   }
 `;
@@ -94,17 +96,21 @@ const Profile = (props) => {
   };
 
   // console.log(decodedToken._id)
-  // console.log(profileOrganization);
-  // console.log(decodedToken);
+  console.log(profileOrganization.picture);
+  console.log(decodedToken);
   const classes = useStyles();
   return (
-    <div style={props.collapsed!=='true' ? {} : { display: "flex" }}>
+    <div style={props.collapsed !== "true" ? {} : { display: "flex" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Avatar
           alt="Person"
           className={classes.avatar}
           component={RouterLink}
-          src={"/images/avatars/avatar_11.png"}
+          src={
+            decodedToken.user_type === "organization"
+              ? profileOrganization.picture
+              : profileStaff.picture
+          }
           to="/settings"
         />
       </div>

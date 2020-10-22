@@ -26,6 +26,7 @@ const STAFFSBYID_QUERY = gql`
       staff_name
       phone_number
       email
+      picture
     }
   }
 `;
@@ -77,7 +78,7 @@ export default function Comitees(props) {
   return (
     <StyledTableRow>
       <StyledTableCell component="th" scope="row" style={{ display: 'flex', justifyContent: 'center', width: 70 }}>
-        <Avatar src={props.comitee.picture} />
+        <Avatar src={staff.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
         {staff.staff_name}
