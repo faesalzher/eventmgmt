@@ -61,7 +61,7 @@ const useStyles = makeStyles({
 const data = [
   {
     _id: '0',
-    task_name: 'Beli Makana',
+    task_name: 'Cek Vendor',
     division_id: "4c321960-9cca-11ea-b4b7-7959c72c83ff",
     priority: "low",
     due_date: "Mon Mar 16 2020 19:33",
@@ -72,7 +72,7 @@ const data = [
   },
   {
     _id: '1',
-    task_name: 'Beli 4',
+    task_name: 'Cek kesiapan bahan',
     division_id: "aa6f98a0-a3e5-11ea-b1ac-37db3ef8a8bb",
     priority: "high",
     roadmap_id: "5f42a7d0-145d-11eb-bc0e-2b1019b52172",

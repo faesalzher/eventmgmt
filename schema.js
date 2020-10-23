@@ -278,6 +278,13 @@ const RootQuery = new GraphQLObjectType({
         return Roadmap.find({ event_id: args.event_id });
       },
     },
+      roadmap: {
+      type: RoadmapType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Roadmap.findById(args._id);
+      },
+    },
   },
 });
 

@@ -71,6 +71,19 @@ const EVENT_QUERY = gql`
 //   }
 // `;
 
+const ROADMAP_QUERY = gql`
+  query roadmap($roadmap_id: String!){
+    roadmap(_id:$roadmap_id) {
+      _id
+      roadmap_name
+      start_date
+      end_date
+      color
+      event_id
+    }
+  }
+`;
+
 const ROADMAPBYEVENTID_QUERY = gql`
   query roadmapByEvent($event_id: String!){
     roadmapByEvent(event_id:$event_id) {
@@ -151,11 +164,11 @@ export default function RoadamapTaskList() {
 
 
   const [roadmap, setRoadmap] = React.useState({});
-  const { data: roadmapData, refetch: roadmapRefetch } = useQuery(ROADMAPBYEVENTID_QUERY,
+  const { data: roadmapData, refetch: roadmapRefetch } = useQuery(ROADMAP_QUERY,
     {
-      variables: { event_id: event_id },
+      variables: { roadmap_id: roadmap_id },
       onCompleted: () => {
-        setRoadmap(roadmapData.roadmapByEvent[0])
+        setRoadmap(roadmapData.roadmap)
       }
     });
 
