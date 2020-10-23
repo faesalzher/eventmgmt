@@ -102,18 +102,23 @@ export default function Task(props) {
   const classes = useStyles();
   const shadowStyles = useSoftRiseShadowStyles();
 
+  const [task, setTask] = useState(props.task)
+  React.useEffect(() => {
+    setTask(props.task)
+  },[setTask, props.task])
+
   const [chatCount, setChatCount] = useState(0);
   const handleChangeChecked = id => e => {
-    let newArr = { ...props.task };
-    newArr.completed = e.target.checked;
+    let newArr = { ...task };
+    newArr.completed = 'true';
     newArr.completed_date = new Date().toString();
-    props.handleCompletedChange(newArr, props.index);
+    props.handleCompletedChange(newArr);
   };
   const handleChangeUnchecked = id => e => {
-    let newArr = { ...props.task };
-    newArr.completed = e.target.checked;
+    let newArr = { ...task };
+    newArr.completed = 'false';
     newArr.completed_date = "";
-    props.handleCompletedChange(newArr, props.index);
+    props.handleCompletedChange(newArr);
   };
 
   const dueDate = new Date(props.task.due_date);
@@ -135,17 +140,16 @@ export default function Task(props) {
   };
 
   const handleCompletedChange = (e) => {
-    props.handleCompletedChange(e, props.index)
+    props.handleCompletedChange(e)
   }
 
   const handleChatCount = e => {
     setChatCount(e);
   }
 
-
   return (
     <div
-      style={props.task.completed === true ?
+      style={props.task.completed === 'true' ?
         { backgroundColor: '#e2e2e2', display: 'flex' } :
         { backgroundColor: 'white', display: 'flex' }}
       className={clsx(shadowStyles.root)}
@@ -156,17 +160,17 @@ export default function Task(props) {
             { backgroundColor: "#a3cd3b" } : (props.task.priority === "high") ?
               { backgroundColor: "#ff4943" } : { backgroundColor: "#e2e2e2" }
       } >
-        {props.task.completed === true ?
-          <StyledCheckbox checked={true} onChange={handleChangeUnchecked('completed')} />
+        {props.task.completed === 'true' ?
+          <StyledCheckbox checked={true} onChange={handleChangeUnchecked()} />
           :
-          <div><StyledCheckbox onChange={handleChangeChecked('completed')} /></div>
+          <div><StyledCheckbox onChange={handleChangeChecked()} /></div>
         }
       </div>
       <ListItem button onClick={handleClickOpenDialogDetail}
         style={{ display: 'inline' }}      >
         <div style={{ display: 'flex', flexDirection: 'column' }} >
           <Typography style={{ fontSize: 13, }}>{props.task.task_name}</Typography>
-          {props.task.due_date !== "" && !props.task.completed ?
+          {props.task.due_date !== "" && props.task.completed === "false" ?
             (days >= 0 && hrs >= 0 && mins >= 0) ?
               <div style={{ display: 'flex' }}>
                 <Typography variant="body2" color="textSecondary" style={{ fontSize: 10, fontWeight: 600 }}>
@@ -184,7 +188,7 @@ export default function Task(props) {
             : <div >
             </div>
           }
-          {props.task.completed ?
+          {props.task.completed === "true" ?
             <div style={{ display: 'flex' }}>
               <Typography variant="body2" color="textSecondary" style={{ fontSize: 10, fontWeight: 500 }}>
                 Completed on </Typography>

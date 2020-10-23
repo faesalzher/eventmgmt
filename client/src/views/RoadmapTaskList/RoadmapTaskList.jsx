@@ -21,6 +21,7 @@ import {
   IconButton,
   Paper,
   Typography,
+  Grid,
 } from '@material-ui/core';
 import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 
@@ -29,15 +30,15 @@ import {
   RoadmapEditForm,
 } from './components';
 
-const DIVISIONSBYPROJECT_QUERY = gql`
-  query divisionsByProject($project_id: String!){
-    divisionsByProject(project_id:$project_id) {
-      _id
-      division_name
-      project_id
-    }
-  }
-`;
+// const DIVISIONSBYPROJECT_QUERY = gql`
+//   query divisionsByProject($project_id: String!){
+//     divisionsByProject(project_id:$project_id) {
+//       _id
+//       division_name
+//       project_id
+//     }
+//   }
+// `;
 
 const PROJECT_QUERY = gql`
   query project($project_id: String!){
@@ -86,9 +87,15 @@ const ROADMAPBYEVENTID_QUERY = gql`
 
 const useStyles = makeStyles(theme => ({
   root: {
-    // padding: theme.spacing(4),
-    paddingTop: theme.spacing(1),
+    padding: '0px 30px',
+    paddingTop: '8px',
   },
+  // container: {
+  //   // padding: '0px 130px',
+  //   // [theme.breakpoints.down('xs')]: {
+  //   //   padding: '0px 0px'
+  //   // }
+  // },
   tabs_root: {
     // backgroundColor: theme.palette.background.paper,
     flexGrow: 1,
@@ -109,17 +116,17 @@ export default function RoadamapTaskList() {
 
   const [openEditModal, setOpenEditModal] = useState(false);
 
-  const [divisions, setDivisions] = useState([]);
+  // const [divisions, setDivisions] = useState([]);
 
-  const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
-    variables: { project_id: project_id },
-    onCompleted: () => {
-      setDivisions(
-        divisionsData.divisionsByProject
-      )
-    }
-  }
-  );
+  // const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
+  //   variables: { project_id: project_id },
+  //   onCompleted: () => {
+  //     setDivisions(
+  //       divisionsData.divisionsByProject
+  //     )
+  //   }
+  // }
+  // );
 
 
 
@@ -148,7 +155,7 @@ export default function RoadamapTaskList() {
     {
       variables: { event_id: event_id },
       onCompleted: () => {
-          setRoadmap(roadmapData.roadmapByEvent[0])
+        setRoadmap(roadmapData.roadmapByEvent[0])
       }
     });
 
@@ -157,7 +164,7 @@ export default function RoadamapTaskList() {
   });
 
   const refresh = () => {
-    divisionsRefetch();
+    // divisionsRefetch();
     roadmapRefetch()
   };
 
@@ -206,26 +213,25 @@ export default function RoadamapTaskList() {
         </div>
       </Paper>
       <div className={classes.root}>
-        <div style={{ paddingLeft: 30, paddingTop: 8 }}>
+        <div style={{ paddingTop: 8 }}>
           {fullScreen ? <></> :
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           }
         </div>
-        <div style={{ overflowX: 'auto' }}>
-          <div style={{ padding: '0px 30px' }}>
-            <div style={{ display: 'flex', flexDirection: 'row', height: 424, width: (divisions.length * 315) }}>
-              {divisions.map((division, index) => {
-                return <TaskList
-                  division={division}
-                  roadmap_id={roadmap_id}
-                  key={division._id}
-                  project_id={project_id}
-                />
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div >
+        <Grid container spacing={1} style={{ justifyContent: 'center' }}>
+          <Grid
+            lg={6}
+            sm={6}
+            xl={6}
+            xs={12}
+            item>
+            <TaskList
+              roadmap_id={roadmap_id}
+              project_id={project_id}
+            />
+          </Grid>
+        </Grid>
+      </div >
+    </div>
   );
 }

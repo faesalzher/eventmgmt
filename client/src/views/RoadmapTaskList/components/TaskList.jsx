@@ -22,7 +22,7 @@ import Divider from '@material-ui/core/Divider';
 // import CustomScroll from 'react-custom-scroll';
 import { Scrollbars } from 'react-custom-scrollbars';
 import AddIcon from '@material-ui/icons/Add';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+// import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
@@ -37,13 +37,15 @@ import {
   Task
 } from '.';
 
+import uuid from 'uuid/v1';
+
 const useStyles = makeStyles({
   root: {
-    width: 275,
-    marginRight: 20,
+    // width: 275,
+    // margin: '10px 20px',
     // marginBottom: 150,
     // height:200,
-    minHeight: 70,
+    minHeight: 420,
     // height: 400,
     // maxHeight: 500,
     backgroundColor: "rgba(0, 0, 0, 0.12)",
@@ -55,26 +57,26 @@ const useStyles = makeStyles({
     padding: 0
   }
 });
-const mongoose = require('mongoose');
+
 const data = [
   {
-    _id: 0,
+    _id: '0',
     task_name: 'Beli Makana',
     division_id: "4c321960-9cca-11ea-b4b7-7959c72c83ff",
     priority: "low",
     due_date: "Mon Mar 16 2020 19:33",
     task_description: "Ini Deskripsi",
-    roadmap_id: '0',
-    completed: false,
+    roadmap_id: "5f42a7d0-145d-11eb-bc0e-2b1019b52172",
+    completed: 'false',
     completed_date: ""
   },
   {
-    _id: 1,
+    _id: '1',
     task_name: 'Beli 4',
     division_id: "aa6f98a0-a3e5-11ea-b1ac-37db3ef8a8bb",
     priority: "high",
-    roadmap_id: '0',
-    completed: true,
+    roadmap_id: "5f42a7d0-145d-11eb-bc0e-2b1019b52172",
+    completed: 'true',
     task_description: "",
     due_date: "",
     completed_date: "Sun Mar 15 2020 11:44:34 GMT+0700 (Western Indonesia Time)"
@@ -127,13 +129,7 @@ export default function TaskList(props) {
   const [staffs, setStaffs] = useState([]);
 
   const openAssigned = Boolean(anchorElAssigned);
-  const tasksByRoadmap = (tasks.filter(function (task) {
-    if (task.roadmap_id === props.roadmap_id) {
-      return task
-    }
-    return null;
-  }));
-
+ 
 
   const [addTaskForm, setAddTaskForm] = React.useState(false)
   const [assignedForm, setAssignedForm] = React.useState([])
@@ -180,12 +176,12 @@ export default function TaskList(props) {
 
   const initialFormState =
   {
-    _id: mongoose.Types.ObjectId(),
+    _id: uuid(),
     task_name: "",
-    division_id: props.division._id,
+    // division_id: props.division._id,
     priority: "",
     roadmap_id: props.roadmap_id,
-    completed: false,
+    completed: 'false',
     task_description: "",
     due_date: "",
     completed_date: ""
@@ -198,10 +194,20 @@ export default function TaskList(props) {
     setTaskForm({ ...taskForm, [id]: value });
   };
 
-  const handleCompletedChange = (e, index) => {
-    const newArr = [...tasks];
-    newArr[index] = e;
-    setTasks(newArr)
+  const handleCompletedChange = (e) => {
+    // const newArr = [...tasks];
+    // newArr[index] = e;
+    // setTasks(newArr)
+
+
+    const temp = [...tasks];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setTasks(temp)
+
+    console.log(e._id)
   };
 
   const handleSaveButton = () => {
@@ -255,16 +261,38 @@ export default function TaskList(props) {
   const id = openCalendar ? 'simple-popover' : undefined;
 
 
-  React.useEffect(() => {
-    const countUncompleted = tasksByRoadmap.filter((e) => e.completed === false && props.division._id === e.division_id).length;
-    setCountUncompleted(countUncompleted);
-    const countCompleted = tasksByRoadmap.filter((e) => e.completed === true && props.division._id === e.division_id).length;
-    setCountCompleted(countCompleted);
-    const countTaskDivision = tasksByRoadmap.filter((e) => props.division._id === e.division_id).length;
-    setCountTaskDivision(countTaskDivision);
-  }, [tasksByRoadmap, props.division._id])
+  const tasksByRoadmap = (tasks.filter(function (task) {
+    if (task.roadmap_id === props.roadmap_id) {
+      return task
+    }
+    return null;
+  }));
 
-  // console.log(assignedForm.length)
+  const completedTasks = (tasks.filter(function (task) {
+    if (task.completed === 'true') {
+      return task
+    }
+    return null;
+  }));
+
+  const uncompletedTasks = (tasks.filter(function (task) {
+    if (task.completed === 'false') {
+      return task
+    }
+    return null;
+  }));
+  
+  React.useEffect(() => {
+    const countUncompleted = tasksByRoadmap.filter((e) => e.completed === 'false').length;
+    setCountUncompleted(countUncompleted);
+    const countCompleted = tasksByRoadmap.filter((e) => e.completed === 'true').length;
+    setCountCompleted(countCompleted);
+    // const countTaskDivision = tasksByRoadmap.filter((e) => props.division._id === e.division_id).length;
+    // setCountTaskDivision(countTaskDivision);
+  }, [tasksByRoadmap])
+
+  console.log(tasks)
+
   return (
     <Card className={classes.root} elevation={0} >
       <div>
@@ -283,18 +311,18 @@ export default function TaskList(props) {
               justifyContent: "space-between",
             }}
           >
-            <Typography variant="h6" style={{ fontSize: 15, fontWeight: 400, }}>{props.division.division_name}</Typography>
+            <Typography variant="h6" style={{ fontSize: 15, fontWeight: 400, }}>Task</Typography>
             <div style={{ display: "flex" }}>
               <Tooltip title="Add New Task" arrow>
                 <IconButton style={{ padding: 0 }} onClick={() => { setAddTaskForm(true) }}>
                   <AddIcon style={{ fontSize: 20, }} />
                 </IconButton>
               </Tooltip>
-              <div style={{ paddingLeft: 10 }}>
+              {/* <div style={{ paddingLeft: 10 }}>
                 <IconButton style={{ padding: 0 }}>
                   <MoreVertIcon style={{ fontSize: 20 }} />
                 </IconButton>
-              </div>
+              </div> */}
             </div>
           </div>
           {addTaskForm ? (
@@ -424,7 +452,7 @@ export default function TaskList(props) {
           </Popover>
 
         </div>
-        <Scrollbars style={{ width: 275 }}
+        <Scrollbars
           autoHide
           autoHideTimeout={1000}
           autoHideDuration={200}
@@ -434,18 +462,15 @@ export default function TaskList(props) {
         >
           <CardContent style={{ padding: 0, backgroundColor: "#d8dce3" }} >
             <List style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
-              {tasksByRoadmap.map((task, index) => {
-                if (props.division._id === task.division_id && !task.completed)
-                  return <div>
-                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                    <Task
-                      task={task}
-                      key={index}
-                      index={index}
-                      handleCompletedChange={handleCompletedChange}
-                    />
-                  </div>
-                return null;
+              {uncompletedTasks.map((task,index) => {
+                return <div>
+                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                  <Task
+                    task={task}
+                    key={index}
+                    handleCompletedChange={handleCompletedChange}
+                  />
+                </div>
               })}
               <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
               {countCompleted === 0 ? <></> :
@@ -455,18 +480,15 @@ export default function TaskList(props) {
                     Completed tasks</Typography>
                 </div>
               }
-              {tasksByRoadmap.map((task, index) => {
-                if (props.division._id === task.division_id && task.completed)
-                  return <div>
-                    <Task
-                      task={task}
-                      key={index}
-                      index={index}
-                      handleCompletedChange={handleCompletedChange}
-                    />
-                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                  </div>
-                return null;
+              {completedTasks.map((task, index) => {
+                return <div>
+                  <Task
+                    task={task}
+                    key={index}
+                    handleCompletedChange={handleCompletedChange}
+                  />
+                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                </div>
               })}
             </List>
           </CardContent>
@@ -481,17 +503,17 @@ export default function TaskList(props) {
           paddingRight: 10,
         }}
       >
-        {countTaskDivision === 0 ?
+        {tasksByRoadmap.length === 0 ?
           <LinearProgress style={{ marginTop: 4 }} variant="determinate" value={0} />
           :
-          <LinearProgress style={{ marginTop: 4 }} variant="determinate" value={(countCompleted / countTaskDivision) * 100} />
+          <LinearProgress style={{ marginTop: 4 }} variant="determinate" value={(countCompleted / tasksByRoadmap.length) * 100} />
         }
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, alignItems: 'right' }}>
             {countUncompleted} active task
         </Typography>
           <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, alignItems: 'right' }}>
-            {countCompleted}/{countTaskDivision} task completed
+            {countCompleted}/{tasksByRoadmap.length} task completed
         </Typography>
         </div>
       </div>
