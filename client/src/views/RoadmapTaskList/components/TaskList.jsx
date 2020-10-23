@@ -129,7 +129,7 @@ export default function TaskList(props) {
   const [staffs, setStaffs] = useState([]);
 
   const openAssigned = Boolean(anchorElAssigned);
- 
+
 
   const [addTaskForm, setAddTaskForm] = React.useState(false)
   const [assignedForm, setAssignedForm] = React.useState([])
@@ -281,7 +281,7 @@ export default function TaskList(props) {
     }
     return null;
   }));
-  
+
   React.useEffect(() => {
     const countUncompleted = tasksByRoadmap.filter((e) => e.completed === 'false').length;
     setCountUncompleted(countUncompleted);
@@ -462,15 +462,16 @@ export default function TaskList(props) {
         >
           <CardContent style={{ padding: 0, backgroundColor: "#d8dce3" }} >
             <List style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
-              {uncompletedTasks.map((task,index) => {
-                return <div>
-                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                  <Task
-                    task={task}
-                    key={index}
-                    handleCompletedChange={handleCompletedChange}
-                  />
-                </div>
+              {tasksByRoadmap.map((task, index) => {
+                if (task.completed === "false")
+                  return <div>
+                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                    <Task
+                      task={task}
+                      key={index}
+                      handleCompletedChange={handleCompletedChange}
+                    />
+                  </div>
               })}
               <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
               {countCompleted === 0 ? <></> :
@@ -480,15 +481,16 @@ export default function TaskList(props) {
                     Completed tasks</Typography>
                 </div>
               }
-              {completedTasks.map((task, index) => {
-                return <div>
-                  <Task
-                    task={task}
-                    key={index}
-                    handleCompletedChange={handleCompletedChange}
-                  />
-                  <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
-                </div>
+              {tasksByRoadmap.map((task, index) => {
+                if (task.completed === "true")
+                  return <div>
+                    <Task
+                      task={task}
+                      key={index}
+                      handleCompletedChange={handleCompletedChange}
+                    />
+                    <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
+                  </div>
               })}
             </List>
           </CardContent>
