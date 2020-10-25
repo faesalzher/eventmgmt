@@ -11,6 +11,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import PropTypes from 'prop-types';
 
+import { makeStyles} from '@material-ui/core/styles';
+
 import { Externals } from './components';
 import mockData from './dataExternal';
 
@@ -44,7 +46,15 @@ function a11yProps(index) {
   };
 }
 
+const useStyles = makeStyles(theme => ({
+  header: {
+    backgroundColor: theme.palette.primary.main,
+  },
+}));
 export default function EventExternal(props) {
+
+  const classes = useStyles();
+
   const [value, setValue] = React.useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -90,7 +100,7 @@ export default function EventExternal(props) {
   };
 
   return (
-    <Paper style={{ backgroundColor: 'orange' }}>
+    <Paper className={classes.header}>
       <Snackbar
         anchorOrigin={{
           vertical: 'top',
@@ -106,7 +116,7 @@ export default function EventExternal(props) {
       <Tabs
         value={value}
         onChange={handleChange}
-        indicatorColor="primary"
+        indicatorColor="secondary"
         // textColor="secondary"
         style={{ color: 'white' }}
         variant="fullWidth"

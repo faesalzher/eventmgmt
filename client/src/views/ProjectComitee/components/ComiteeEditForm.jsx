@@ -1,17 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl,
   MenuItem,
 } from '@material-ui/core';
@@ -19,10 +13,6 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-
-import {
-  DeleteForm
-} from 'components';
 
 const DELETE_COMITEE = gql`
 mutation deleteComitee ($_id: String!) {
@@ -77,51 +67,10 @@ const useStyles = makeStyles(theme => ({
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
+  deleteBtn: {
+    color: theme.palette.error.main
+  }
 }));
-
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
 
 
 export default function ComiteeEditForm(props) {
@@ -140,9 +89,8 @@ export default function ComiteeEditForm(props) {
     division_id: props.comitee.division_id,
     project_id: props.comitee.project_id,
   }
-  
+
   const [comiteeForm, setComiteeForm] = useState(intitialFormState);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteComitee] = useMutation(DELETE_COMITEE);
   const [editComitee] = useMutation(EDIT_COMITEE);
 
@@ -162,21 +110,13 @@ export default function ComiteeEditForm(props) {
     });
   }
 
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  }
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
-
   const handleDelete = () => {
     props.handleDeleteComitee(props.comitee._id);
     // setDivisionForm(intitialFormState);
     props.close();
     deleteComitee({ variables: { _id: props.comitee._id, } });
   }
-  
+
   const handleChangeDivision = (event) => {
     comiteeForm.division_id = event.target.value;
     setDivision_id(event.target.value);
@@ -231,10 +171,8 @@ export default function ComiteeEditForm(props) {
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={() => handleCloseModal()}>
-        Edit Comitee
-        </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
+      <DialogTitle title={"Edit Comitee"} onClose={() => handleCloseModal()} />
+      <DialogContent style={{}} >
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
@@ -336,27 +274,20 @@ export default function ComiteeEditForm(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
-          Delete
-        </Button>
-        <DeleteForm
-          open={openDeleteModal}
-          handleDelete={handleDelete}
-          close={handleCloseDeleteModal}
-        />
-        {
-          (comiteeForm._id === "" ||
+      <DialogActionsEdit
+        validation={
+          (
+            comiteeForm._id === "" ||
             comiteeForm.staff_id === "" ||
             comiteeForm.position_id === "" ||
             comiteeForm.division_id === ""
-          )
-            ?
-            < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-            :
-            < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveEditButton()}>Save</Button>
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveEditButton()}
+        delete={() => handleDelete()}
+        close={() => handleCloseModal()}
+      />
     </Dialog>
   );
 };

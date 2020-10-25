@@ -87,7 +87,7 @@ const DialogContent = withStyles(theme => ({
 const DialogActions = withStyles(theme => ({
   root: {
     margin: 0,
-    padding: theme.spacing(1),
+    padding: '10px 16px',
   },
 }))(MuiDialogActions);
 
@@ -157,7 +157,7 @@ export default function EditAgendaModal(props) {
     setPopoverDate(popoverDate ? null : e.currentTarget);
   };
 
-  
+
   const handleDeleteModal = () => {
     setOpenDeleteModal(true);
   }
@@ -199,9 +199,7 @@ export default function EditAgendaModal(props) {
         Edit Agenda
       </DialogTitle>
       <DialogContent dividers style={
-        fullScreen ?
-          { backgroundColor: "#e6e8eb" } :
-          { backgroundColor: "#e6e8eb", height: 600, flexDirection: 'row', display: 'flex' }}>
+        fullScreen ? {} : { height: 600, flexDirection: 'row', display: 'flex' }}>
         <div className={classes.form} style={fullScreen ? {} : {}}>
           <FormControl className={classes.formControl}>
             <TextField

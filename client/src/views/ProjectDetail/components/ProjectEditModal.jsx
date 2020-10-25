@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { withStyles, makeStyles, useTheme } from "@material-ui/styles";
-import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogActions from "@material-ui/core/DialogActions";
-import CloseIcon from "@material-ui/icons/Close";
+import { makeStyles, useTheme } from "@material-ui/styles";
+import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from "@material-ui/core/TextField";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import {
   Button,
   Dialog,
   Typography,
-  IconButton,
   Box,
   ButtonBase,
 } from "@material-ui/core";
@@ -27,7 +23,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import AdjustIcon from "@material-ui/icons/Adjust";
 import { Redirect } from "react-router";
 
-import { DeleteForm, CancelForm, EditImageForm } from "components";
+import { CancelForm, EditImageForm } from "components";
 
 import image from "assets/project.png";
 // import imagesStyles from "assets/jss/material-kit-react/imagesStyles";
@@ -164,67 +160,19 @@ const useStyles = makeStyles((theme) => ({
   },
   imageTitle: {
     position: "relative",
-    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${
-      theme.spacing(1) + 1
+    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 1
       }px`,
   },
-  // imageMarked: {
-  //   height: 3,
-  //   width: 18,
-  //   backgroundColor: theme.palette.common.white,
-  //   position: "absolute",
-  //   bottom: -2,
-  //   left: "calc(50% - 9px)",
-  //   transition: theme.transitions.create("opacity"),
-  // },
-}));
-
-const styles = (theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
+  imageMarked: {
+    height: 3,
+    width: 18,
+    backgroundColor: theme.palette.common.white,
     position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
+    bottom: -2,
+    left: "calc(50% - 9px)",
+    transition: theme.transitions.create("opacity"),
   },
-});
-const DialogTitle = withStyles(styles)((props) => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center" }}>
-        {children}
-      </Typography>
-      {onClose ? (
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={onClose}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles((theme) => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles((theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
+}));
 
 export default function ProjectEditModal(props) {
   const classes = useStyles();
@@ -233,17 +181,9 @@ export default function ProjectEditModal(props) {
   const today = new Date();
 
   const [projectForm, setProjectForm] = React.useState([]);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditImageModal, setOpenEditImageModal] = useState(false);
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [navigate, setNavigate] = useState(false);
-  // useEffect(() => {
-  //   refresh();
-  // });
-
-  // const refresh = () => {
-  //   refetch();
-  // };
 
   useEffect(() => {
     setProjectForm(props.project);
@@ -332,14 +272,6 @@ export default function ProjectEditModal(props) {
     }
   };
 
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
-
   const handleDelete = () => {
     deleteProject({ variables: { _id: props.project._id } });
     props.divisions.map((division) => {
@@ -390,10 +322,8 @@ export default function ProjectEditModal(props) {
       }}
       maxWidth={false}
     >
-      <DialogTitle id="edit-project-title" onClose={() => handleCloseModal()}>
-        Edit Project
-      </DialogTitle>
-      <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
+      <DialogTitle title="Edit Project" onClose={() => handleCloseModal()} />
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
         <form
           noValidate
           style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}
@@ -443,13 +373,13 @@ export default function ProjectEditModal(props) {
                 <span
                   className={classes.imageSrc}
                   style={
-                    projectForm.picture==='null'?
-                    {
-                    backgroundImage: `url(${image})`,
-                    }:
-                    {
-                    backgroundImage: `url(${projectForm.picture})`,
-                  }}
+                    projectForm.picture === 'null' ?
+                      {
+                        backgroundImage: `url(${image})`,
+                      } :
+                      {
+                        backgroundImage: `url(${projectForm.picture})`,
+                      }}
                 />
                 <span className={classes.imageBackdrop} />
                 <span className={classes.imageButton}>
@@ -569,26 +499,20 @@ export default function ProjectEditModal(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions
-        style={{ display: "flex", justifyContent: "space-between" }}
-      >
-        <Button
-          variant="outlined"
-          size="small"
-          color="secondary"
-          onClick={handleDeleteModal}
-        >
-          Delete Project
-        </Button>
-        <DeleteForm
-          open={openDeleteModal}
-          handleDelete={handleDelete}
-          close={handleCloseDeleteModal}
-        />
-        <Button autoFocus color="primary" onClick={handleButton}>
-          Save
-        </Button>
-      </DialogActions>
+      <DialogActionsEdit
+        validation={
+          (
+            projectForm.project_name === "" ||
+            projectForm.project_description === "" ||
+            projectForm.project_start_date === "" ||
+            projectForm.project_end_date === ""
+          ) ?
+            ("invalid") : ("valid")
+        }
+        submit={() => handleButton()}
+        delete={() => handleDelete()}
+        close={()=>handleCloseModal()}
+      />
     </Dialog>
   );
 }

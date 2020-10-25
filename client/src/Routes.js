@@ -6,6 +6,7 @@ import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 import { Route } from "react-router-dom";
 // import { useAuth } from "context/auth.jsx";
 
+
 import {
   Dashboard as DashboardView,
   Organization as OrganizationView,
@@ -26,6 +27,7 @@ import {
 
 const Routes = (props) => {
   // const { authTokens } = useAuth();
+
   return (
     <Switch>
       <Redirect exact from="/" to="/dashboard" />

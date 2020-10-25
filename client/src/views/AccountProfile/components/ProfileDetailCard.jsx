@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles} from '@material-ui/styles';
 import {
   Card,
   CardHeader,
@@ -86,6 +86,15 @@ const useStyles = makeStyles(theme => ({
     // marginRight: theme.spacing(2)
     fontSize: 10
   },
+  header: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  title: {
+    color: theme.palette.white
+  },
+  subheader: {
+    color: theme.palette.divider
+  },
   [theme.breakpoints.down('xs')]: {
     header: {
       display: 'block'
@@ -94,7 +103,7 @@ const useStyles = makeStyles(theme => ({
       display: 'flex',
       justifyContent: 'center'
     },
-    title: {
+    center: {
       textAlign: 'center'
     }
   }
@@ -103,7 +112,6 @@ const useStyles = makeStyles(theme => ({
 
 const ProfileDetailCard = props => {
   const { className, decodedToken, ...rest } = props;
-
   const classes = useStyles();
 
   const initialFormState = {
@@ -220,11 +228,11 @@ const ProfileDetailCard = props => {
         className={classes.header}
         subheader={
           <div>
-            <Typography variant="body2" className={classes.title} color="textSecondary" component="p">
+            <Typography variant="body2" className={[classes.subheader, classes.center].join(" ")} color="textSecondary" component="p">
               {profile.position_name}{" of "}{departement.departement_name}{" departement"}
             </Typography>
             <Typography
-              className={[classes.organization, classes.title].join(" ")}
+              className={[classes.organization, classes.subheader, classes.center].join(" ")}
               color="textSecondary"
               variant="body1"
             >
@@ -234,10 +242,10 @@ const ProfileDetailCard = props => {
         }
         title={
           <div>
-            <Typography gutterBottom variant="h5" component="h2" className={classes.title}>
+            <Typography gutterBottom variant="h5" component="h2" className={[classes.title, classes.center].join(" ")}>
               {profile.staff_name}
             </Typography>
-            <Typography gutterBottom variant="body2" className={classes.title} style={{ color: "cornflowerblue" }} component="p">
+            <Typography gutterBottom variant="body2" className={[classes.center].join(" ")} style={{ color: "cornflowerblue" }} component="p">
               {profile.email}
             </Typography>
           </div>

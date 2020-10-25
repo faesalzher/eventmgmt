@@ -8,15 +8,15 @@ export default {
   white,
   primary: {
     contrastText: white,
-    dark: colors.indigo[900],
-    main: '#1E88E5',
-    light: colors.indigo[100]
+    dark: '#232535',
+    main: '#33364d',
+    light: '#5b5e70'
   },
   secondary: {
     contrastText: white,
-    dark: colors.blue[900],
-    main: colors.blue['A400'],
-    light: colors.blue['A400']
+    dark: "#0b6e66",
+    main: "#109e92",
+    light: "#3fb1a7"
   },
   success: {
     contrastText: white,
@@ -32,9 +32,9 @@ export default {
   },
   warning: {
     contrastText: white,
-    dark: colors.orange[900],
-    main: colors.orange[600],
-    light: colors.orange[400]
+    dark: colors.yellow[900],
+    main: colors.yellow[600],
+    light: colors.yellow[400]
   },
   error: {
     contrastText: white,

@@ -39,7 +39,7 @@ import {
 
 import uuid from 'uuid/v1';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
     // width: 275,
     // margin: '10px 20px',
@@ -53,10 +53,14 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'space-between'
   },
-  iconbutton: {
-    padding: 0
+  taskHeaderFooter: {
+    backgroundColor: theme.palette.primary.main,
+    color: 'white',
+    padding: 10,
+    paddingLeft: 13,
+    paddingRight: 10,
   }
-});
+}));
 
 const data = [
   {
@@ -115,7 +119,7 @@ const STAFFS_QUERY = gql`
 export default function TaskList(props) {
   const [countUncompleted, setCountUncompleted] = React.useState(0);
   const [countCompleted, setCountCompleted] = React.useState(0);
-  const [countTaskDivision, setCountTaskDivision] = React.useState(0);
+  // const [countTaskDivision, setCountTaskDivision] = React.useState(0);
 
   const classes = useStyles();
 
@@ -296,22 +300,14 @@ export default function TaskList(props) {
   return (
     <Card className={classes.root} elevation={0} >
       <div>
-        <div
-          style={{
-            backgroundColor: 'orange',
-            color: 'white',
-            padding: 10,
-            paddingLeft: 13,
-            paddingRight: 10,
-          }}
-        >
+        <div className={classes.taskHeaderFooter}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
             }}
           >
-            <Typography variant="h6" style={{ fontSize: 15, fontWeight: 400, }}>Task</Typography>
+            <Typography variant="h6" style={{ fontSize: 15, color:'white',fontWeight: 400, }}>Task to do</Typography>
             <div style={{ display: "flex" }}>
               <Tooltip title="Add New Task" arrow>
                 <IconButton style={{ padding: 0 }} onClick={() => { setAddTaskForm(true) }}>
@@ -496,25 +492,17 @@ export default function TaskList(props) {
           </CardContent>
         </Scrollbars>
       </div>
-      <div
-        style={{
-          backgroundColor: 'orange',
-          color: 'white',
-          padding: 6,
-          paddingLeft: 13,
-          paddingRight: 10,
-        }}
-      >
+      <div className={classes.taskHeaderFooter}>
         {tasksByRoadmap.length === 0 ?
-          <LinearProgress style={{ marginTop: 4 }} variant="determinate" value={0} />
+          <LinearProgress style={{ marginTop: 4 }} color="secondary" variant="determinate" value={0} />
           :
-          <LinearProgress style={{ marginTop: 4 }} variant="determinate" value={(countCompleted / tasksByRoadmap.length) * 100} />
+          <LinearProgress style={{ marginTop: 4 }} color="secondary" variant="determinate" value={(countCompleted / tasksByRoadmap.length) * 100} />
         }
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, alignItems: 'right' }}>
+          <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, color:'white', alignItems: 'right' }}>
             {countUncompleted} active task
         </Typography>
-          <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, alignItems: 'right' }}>
+          <Typography style={{ marginBottom: 4, fontSize: 10, fontWeight: 300, color:'white',alignItems: 'right' }}>
             {countCompleted}/{tasksByRoadmap.length} task completed
         </Typography>
         </div>

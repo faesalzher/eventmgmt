@@ -1,17 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -61,51 +55,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
-
-
 export default function DivisionAddForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -120,7 +69,7 @@ export default function DivisionAddForm(props) {
 
   const [divisionForm, setDivisionForm] = useState(intitialFormState);
   const [addDivision] = useMutation(ADD_DIVISION);
-console.log(props.project_id)
+  console.log(props.project_id)
   const handleSaveButton = () => {
     props.handleSaveButton(divisionForm)
     setDivisionForm(intitialFormState);
@@ -149,10 +98,8 @@ console.log(props.project_id)
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Add New Division
-        </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
+      <DialogTitle title={"Add New Division"} onClose={props.close} />
+      <DialogContent style={{}}>
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
@@ -170,14 +117,15 @@ console.log(props.project_id)
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(divisionForm.division_name === "" || divisionForm.contact_person === "" || divisionForm.info === "") ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        close={props.close}
+        validation={
+          (
+            divisionForm.division_name === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveButton()} />
     </Dialog>
   );
 };

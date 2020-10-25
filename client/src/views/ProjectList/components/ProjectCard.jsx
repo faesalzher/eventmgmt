@@ -6,7 +6,6 @@ import { useBouncyShadowStyles } from '@mui-treasury/styles/shadow/bouncy';
 // import SettingsIcon from '@material-ui/icons/Settings';
 // import AddprojectsModal from '../AddProjectModal';
 import DateRangeIcon from '@material-ui/icons/DateRange';
-import RemoveIcon from '@material-ui/icons/Remove';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import image from 'assets/project.png'
@@ -54,22 +53,6 @@ query staffById($_id: String!){
   }
 `;
 
-const EVENTSBYPROJECT_QUERY = gql`
-query eventsByProject($project_id: String!){
-  eventsByProject(project_id:$project_id) {
-    _id
-    event_name
-    event_description
-    event_location
-    cancel
-    event_start_date
-    event_end_date
-    picture
-    project_id
-  }
-}
-`;
-
 const useStyles = makeStyles(theme => ({
   root: {
     // minHeight: 80,
@@ -87,6 +70,10 @@ const useStyles = makeStyles(theme => ({
   icon: {
     fontSize: 12,
   },
+  iconDate: {
+    fontSize: 12,
+    margin: 4
+  },
   status: {
     fontWeight: 450,
     fontSize: 11,
@@ -101,6 +88,34 @@ const useStyles = makeStyles(theme => ({
   media: {
     height: 110,
   },
+  cancelled: {
+    backgroundColor: theme.palette.error.main
+  },
+  planned: {
+    backgroundColor: theme.palette.warning.main
+  },
+  completed: {
+    backgroundColor: theme.palette.success.main,
+    color: 'white'
+  },
+  active: {
+    backgroundColor: theme.palette.info.main
+  },
+  boxStatus: {
+    textAlign: 'center',
+    width: 110,
+    height: 17,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  fontStatus: {
+    fontSize: 11,
+    color: 'white'
+  },
+  primaryColor: {
+    color: theme.palette.primary.main
+  }
 }));
 
 const CustomRouterLink = forwardRef((props, ref) => (
@@ -117,9 +132,7 @@ const ProjectCard = (props) => {
   const { handleDelete, className, ...rest } = props;
   const classes = useStyles();
   const shadowStyles = useBouncyShadowStyles();
-  const today = new Date();
 
-  const [events, setEvents] = useState([]);
   const [headOfProjectId, setHeadOfProjectId] = useState([{ staff_id: '0' }]);
   const [headOfProjectName, setHeadOfProjectName] = useState([]);
 
@@ -174,36 +187,26 @@ const ProjectCard = (props) => {
     }
   }, [loading, headOfProjectNameData, error]);
 
-  const { loading: eventLoading, error: eventError, data: eventData, refetch: eventRefetch } = useQuery(EVENTSBYPROJECT_QUERY,
-    {
-      variables: { project_id: props.project._id },
-    });
-
-  useEffect(() => {
-    const onCompleted = (data) => { setEvents(data.eventsByProject) };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !eventLoading && !eventError) {
-        onCompleted(eventData);
-      } else if (onError && !eventLoading && eventError) {
-        onError(eventError);
-      }
-    }
-  }, [eventLoading, eventData, eventError]);
 
   const refresh = () => {
     headOfProjectIdRefetch();
     headOfProjectNameRefetch();
-    eventRefetch();
   };
-// console.log(events.length)
-  // const timer = React.useRef();
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     clearTimeout(timer.current);
-  //   };
-  // }, []);
+  const today = new Date();
+  const start_date = new Date(props.project.project_start_date);
+  const end_date = new Date(props.project.project_end_date);
+
+  const plannedDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
+  const activeDays = Math.ceil((today.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
+  const completedDays = Math.ceil((today.getTime() - end_date.getTime()) / (1000 * 3600 * 24));
+  const totalActiveDays = Math.ceil((end_date.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
+
+  const isToday = (someDate) => {
+    return someDate.getDate() === today.getDate() &&
+      someDate.getMonth() === today.getMonth() &&
+      someDate.getFullYear() === today.getFullYear()
+  }
 
   return (
     <Grid
@@ -225,7 +228,7 @@ const ProjectCard = (props) => {
           >
             <CardMedia
               className={classes.media}
-              image={props.project.picture==="null"?image:props.project.picture}
+              image={props.project.picture === "null" ? image : props.project.picture}
               title={props.project.project_name}
             />
             <CardContent className={classes.root} style={{ paddingTop: 5 }} >
@@ -241,7 +244,7 @@ const ProjectCard = (props) => {
                   >
                     Head Of Project -
                           {(headOfProjectName !== null) ?
-                      " " + headOfProjectName.staff_name : ""
+                      " " + headOfProjectName.staff_name : " (Vacant}"
                     }
 
                   </Typography>
@@ -253,17 +256,68 @@ const ProjectCard = (props) => {
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
                 <Typography
                   className={classes.status}>
-                  0% Events Completed
+                  {
+                    (props.project.cancel === "true") ? (
+                      0
+                    ) : ((today < new Date(props.project.project_start_date)) ? (
+                      0
+                    ) : (
+                        (today < new Date(props.project.project_end_date)) ? (
+                          Math.round(((activeDays) / (totalActiveDays+1)) * 100)
+                        ) : (
+                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
+                              0
+                            ) : (
+                                100
+                              )
+                          )
+                      )
+                      )
+                  }% Completed
                 </Typography>
                 <Typography
                   className={classes.status}>
-                  {events.length} Events Total
+                  {
+                    (props.project.cancel === "true") ? (
+                      " "
+                    ) : ((today < new Date(props.project.project_start_date)) ? (
+                      (plannedDays) + " Days to go"
+                    ) : (
+                        (today < new Date(props.project.project_end_date)) ? (
+                          "Days " + (activeDays) + " of " + (totalActiveDays + 1)
+                        ) : (
+                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
+                              "Days " + (activeDays) + " of " + (totalActiveDays + 1)
+                            ) : (
+                                (completedDays) + " Days ago"
+                              )
+                          )
+                      )
+                      )
+                  }
                 </Typography>
               </div>
               <div style={{ justifyContent: 'space-between' }}>
                 <LinearProgress
                   className={classes.progress}
-                  value={75.5}
+                  value={
+                    (props.project.cancel === "true") ? (
+                      0
+                    ) : ((today < new Date(props.project.project_start_date)) ? (
+                      0
+                    ) : (
+                        (today < new Date(props.project.project_end_date)) ? (
+                          ((activeDays) / (totalActiveDays + 1)) * 100
+                        ) : (
+                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
+                              0
+                            ) : (
+                                100
+                              )
+                          )
+                      )
+                      )
+                  }
                   variant="determinate"
                 />
               </div>
@@ -273,39 +327,40 @@ const ProjectCard = (props) => {
         <CardActions style={{
           paddingLeft: 16,
           paddingRight: 12,
+          paddingTop: 0,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           {
             (props.project.cancel === "true") ? (
-              <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: 110, color: 'black' }}>
-                <Typography style={{ fontSize: 10 }}>Cancelled</Typography>
+              <Box borderRadius={4} className={[classes.cancelled, classes.boxStatus].join(" ")}>
+                <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
               </Box>
             ) : (
                 (today < new Date(props.project.project_start_date)) ? (
-                  <Box borderRadius={4} style={{ backgroundColor: 'yellow', textAlign: 'center', width: 110, height: 16, color: 'black' }}>
-                    <Typography style={{ fontSize: 10 }}>Planned</Typography>
+                  <Box borderRadius={4} className={[classes.planned, classes.boxStatus].join(" ")}>
+                    <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Planned</Typography>
                   </Box>
                 ) : (
-                    (today < new Date(props.project.project_end_date)) ? (
-                      <Box borderRadius={4} style={{ backgroundColor: 'green', textAlign: 'center', width: 110, height: 16, color: 'white' }}>
-                        <Typography style={{ fontSize: 10 }}>Active</Typography>
-                      </Box>
-                    ) : (
-                        <Box borderRadius={4} style={{ backgroundColor: 'blue', textAlign: 'center', width: 110, height: 16, color: 'white' }}>
-                          <Typography style={{ fontSize: 10 }}>Completed</Typography>
+                    (today < new Date(props.project.project_end_date) ||
+                      isToday(new Date(props.project.project_start_date)) ||
+                      isToday(new Date(props.project.project_end_date))) ? (
+                        <Box borderRadius={4} className={[classes.active, classes.boxStatus].join(" ")}>
+                          <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
+                        </Box>
+                      ) : (
+                        <Box borderRadius={4} className={[classes.completed, classes.boxStatus].join(" ")}>
+                          <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
                         </Box>
                       )
-                  ))}
-          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end', color: 'blue' }}>
-            <DateRangeIcon className={classes.icon} />
+                  )
+              )
+          }
+          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
+            <DateRangeIcon className={classes.iconDate} />
             <Typography className={classes.status}>
-              {props.project.project_start_date.slice(4, 10)}
-            </Typography>
-            <RemoveIcon className={classes.icon} />
-            <Typography className={classes.status}>
-              {props.project.project_end_date.slice(4, 15)}
+              {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
             </Typography>
           </div>
         </CardActions>

@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
     "&:hover": {
-      background: theme.palette.primary.main,
+      background: theme.palette.secondary.main,
       color: 'white'
     },
   },

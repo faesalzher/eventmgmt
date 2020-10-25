@@ -2,27 +2,19 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import FormControl from '@material-ui/core/FormControl';
-// import MenuItem from '@material-ui/core/MenuItem';
 import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import uuid from 'uuid/v1';
@@ -82,69 +74,19 @@ const useStyles = makeStyles(theme => ({
   form: {
     display: 'flex',
     flexDirection: 'column',
-    // width: '50%',
     margin: theme.spacing(2),
     marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
-    // minWidth: 50
     width: "100%"
   },
   formDate: {
-    // margin: theme.spacing(2),
-    // marginLeft: theme.spacing(0),
     width: "100%"
   },
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
 }));
-
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
-
 
 export default function AddProjectModal(props) {
   const classes = useStyles();
@@ -183,7 +125,6 @@ export default function AddProjectModal(props) {
     }
   ]);
 
-  const [save, setSave] = useState(false)
 
   // console.log(data);
   const handleDate = e => {
@@ -200,7 +141,6 @@ export default function AddProjectModal(props) {
   const [addDivision] = useMutation(ADD_DIVISION);
 
   const handleButton = e => {
-    setSave(true)
     setTimeout(() => {
       props.addProject(projects);
 
@@ -234,10 +174,6 @@ export default function AddProjectModal(props) {
       }
       setProjects(initialFormState);
     }, 400);
-    setTimeout(() => {
-      setSave(false)
-    }, 400);
-
   };
 
   return (
@@ -252,15 +188,12 @@ export default function AddProjectModal(props) {
       }}
       maxWidth={false}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.onCloseListener}>
-        Add New Project
-        </DialogTitle>
-      <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
+      <DialogTitle onClose={props.onCloseListener} title={"Add New Project"} />
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
           <div className={classes.form} style={fullScreen ? {} : { width: '50%' }}>
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="project_name"
                 label="Project Name"
@@ -272,14 +205,13 @@ export default function AddProjectModal(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="project_description"
                 label="Description"
                 type="text"
                 variant="outlined"
                 multiline
-                rowsMax={9}
+                // rows={8}
                 value={projects.project_description}
                 onChange={handleInputChange}
               />
@@ -296,12 +228,18 @@ export default function AddProjectModal(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {save ? <CircularProgress size={20} /> : <div></div>}
-        <Button autoFocus color="primary" onClick={handleButton}>
-          Save
-          </Button>
-      </DialogActions>
+      <DialogActionsAdd
+        close={props.onCloseListener}
+        validation={
+          (
+            projects.project_name === "" ||
+            projects.project_description === "" ||
+            projects.project_start_date === "" ||
+            projects.project_end_date === ""
+          ) ?
+            ("invalid") : ("valid")
+        }
+        submit={() => handleButton()} />
     </Dialog>
   );
 };

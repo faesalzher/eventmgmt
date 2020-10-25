@@ -12,6 +12,7 @@ import {
 
 import AddIcon from '@material-ui/icons/Add';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import { makeStyles } from '@material-ui/core/styles';
 
 // import { useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
@@ -37,23 +38,23 @@ const ROADMAPS_QUERY = gql`
   }
 `;
 
+const useStyles = makeStyles(theme => ({
+  root: {
+    padding: '0px 30px',
+    paddingTop: '8px',
+  },
+  tabs_root: {
+    flexGrow: 1,
+  },
+  roadmapHeaderFooter: {
+    backgroundColor: theme.palette.primary.main,
+    color: 'white',
+    padding: '10px 9px',
+  }
+}));
 
 export default function EventRoadmapList(props) {
-
-  // const dataRoadmap = [
-  //   { _id: '0', event_id: "0", roadmap_name: "Persiapan Tiket", start_date: "04/11/2020", end_date: '04/18/2020', color: randomColor({ luminosity: 'dark' }), },
-  //   { _id: '1', event_id: '0', roadmap_name: "Jersey", start_date: "04/12/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
-  //   { _id: '2', event_id: '0', roadmap_name: "Sponshorships", start_date: "04/18/2020", end_date: '04/28/2020', color: randomColor({ luminosity: 'dark' }), },
-  // ]
-
-  // const initialFormState = {
-  //   _id: '',
-  //   roadmap_name: "",
-  //   color: "",
-  //   event_id: props.event_id,
-  //   start_date: "",
-  //   end_date: "",
-  // }
+  const classes = useStyles();
 
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -115,13 +116,7 @@ export default function EventRoadmapList(props) {
 
   return (
     <Card style={{ maxHeight: "100%", width: '100%' }} elevation={0} >
-      <div
-        style={{
-          backgroundColor: 'orange',
-          color: 'white',
-          padding: '10px 9px',
-        }}
-      >
+      <div className={classes.roadmapHeaderFooter} >
         <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
           Roadmap List
           <div style={{ display: 'flex', width: 50, justifyContent: 'space-between' }}>

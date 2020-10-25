@@ -104,6 +104,9 @@ const useStyles = makeStyles((theme) => ({
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
+  colorSecondary: {
+    backgroundColor: theme.palette.primary.main
+  }
 }));
 
 export default function ProjectComitee(props) {
@@ -215,7 +218,7 @@ export default function ProjectComitee(props) {
          </MuiAlert>
       </Snackbar>
       <Paper>
-        <Paper elevation={0} style={{ backgroundColor: 'orange' }}>
+        <Paper elevation={0} className={classes.colorSecondary}>
           <Tabs
             value={value}
             onChange={handleChange}

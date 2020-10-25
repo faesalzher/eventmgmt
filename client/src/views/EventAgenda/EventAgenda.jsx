@@ -32,11 +32,14 @@ const dataAgenda = [
   // { _id: 4, agenda_name: "z", start_time: "10:30", date: "Tue Jun 09 2020", end_time: '12:50' },
 ];
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 700,
   },
-});
+  colorSecondary: {
+    backgroundColor: theme.palette.primary.main
+  }
+}));
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -144,13 +147,13 @@ export default function EventAgenda() {
               <Chip
                 // variant="outlined"
                 icon={<CalendarTodayIcon style={{ fontSize: 10, marginLeft: 8 }} />}
-                color="primary"
+                color="secondary"
                 size="small"
                 label={rundownDate.date} />
             </div>
             <TableContainer component={Paper}>
               <Table size="small" className={classes.table} aria-label="customized table">
-                <TableHead style={{ backgroundColor: 'orange' }}>
+                <TableHead className={classes.colorSecondary}>
                   <TableRow>
                     <StyledTableCell align="center">Time</StyledTableCell>
                     <StyledTableCell align="left">Agenda Name</StyledTableCell>
@@ -186,7 +189,9 @@ export default function EventAgenda() {
         />
         <Button
           onClick={handleOpenAddDialog}
-          variant="contained" size="small" color="primary">
+          variant="contained" 
+          size="small"
+           color="secondary">
           add new agenda    <AddIcon />
         </Button>
       </div>

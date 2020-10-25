@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Tabs, Tab, AppBar, Box, Typography } from '@material-ui/core';
+import { Tabs, Tab, Paper, Box, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useParams } from "react-router-dom";
@@ -186,7 +186,7 @@ export default function ProjectDetail() {
   ]
   return (
     <div className={classes.tabs_root}>
-      <AppBar position="static" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} elevation={1} color="default">
+      <Paper position="static" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} elevation={1} color="default">
         <div style={{ display: "flex", flexDirection: "row" }}>
           <IconButton className={classes.iconbutton} style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
             <ArrowBackIcon />
@@ -221,7 +221,7 @@ export default function ProjectDetail() {
             project={project}
           />
         </div>
-      </AppBar>
+      </Paper>
       <div className={classes.root}>
         <div style={{ paddingLeft: 30, paddingTop: 8 }}>
           <BreadCrumbs breadcrumb_item={breadcrumb_item} />

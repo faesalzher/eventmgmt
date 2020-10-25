@@ -22,6 +22,8 @@ import {
   Footer as FooterContent,
   Sidebar as SidebarContent,
 } from "./components";
+import { ThemeProvider } from "@material-ui/core/styles";
+import theme from "theme";
 
 const useStyles = makeStyles((theme) => ({
   // root: {
@@ -146,7 +148,9 @@ const Main = (props) => {
               {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </CollapseBtn>
           </Sidebar>
-          <Content className={classes.content}>{children}</Content>
+          <ThemeProvider theme={theme}>
+            <Content className={classes.content}>{children}</Content>
+          </ThemeProvider>
           <Footer className={classes.footer}>
             <FooterContent />
           </Footer>

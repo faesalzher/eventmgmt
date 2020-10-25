@@ -84,18 +84,18 @@ const ROADMAP_QUERY = gql`
   }
 `;
 
-const ROADMAPBYEVENTID_QUERY = gql`
-  query roadmapByEvent($event_id: String!){
-    roadmapByEvent(event_id:$event_id) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
+// const ROADMAPBYEVENTID_QUERY = gql`
+//   query roadmapByEvent($event_id: String!){
+//     roadmapByEvent(event_id:$event_id) {
+//       _id
+//       roadmap_name
+//       start_date
+//       end_date
+//       color
+//       event_id
+//     }
+//   }
+// `;
 
 
 const useStyles = makeStyles(theme => ({
@@ -211,7 +211,7 @@ export default function RoadamapTaskList() {
         </div>
         <Typography color='textSecondary' variant="button"
           style={{ display: "flex", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
-          Task to do of roadmap {roadmap.roadmap_name}
+          Roadmap {roadmap.roadmap_name}
         </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
@@ -233,9 +233,9 @@ export default function RoadamapTaskList() {
         </div>
         <Grid container spacing={1} style={{ justifyContent: 'center' }}>
           <Grid
-            lg={6}
-            sm={6}
-            xl={6}
+            lg={12}
+            sm={12}
+            xl={12}
             xs={12}
             item>
             <TaskList

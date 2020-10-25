@@ -3,16 +3,14 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import { useBouncyShadowStyles } from '@mui-treasury/styles/shadow/bouncy';
 import DateRangeIcon from '@material-ui/icons/DateRange';
-import RemoveIcon from '@material-ui/icons/Remove';
 import image from 'assets/project.png'
 
 import {
-  // Button,
+  Avatar,
   Card,
   CardActions,
   CardActionArea,
   CardContent,
-  CardMedia,
   Grid,
   Typography,
   Tooltip,
@@ -41,6 +39,10 @@ const useStyles = makeStyles(theme => ({
   icon: {
     fontSize: 12,
   },
+  iconDate: {
+    fontSize: 12,
+    margin: 4,
+  },
   status: {
     fontWeight: 450,
     fontSize: 11,
@@ -55,6 +57,44 @@ const useStyles = makeStyles(theme => ({
   media: {
     height: 110,
   },
+  avatar: {
+    marginRight: 10,
+    height: 70,
+    width: 70,
+  },
+  verticalCenter: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column'
+  },
+  cancelled: {
+    backgroundColor: theme.palette.error.main
+  },
+  planned: {
+    backgroundColor: theme.palette.warning.main,
+  },
+  completed: {
+    backgroundColor: theme.palette.success.main,
+    color: 'white'
+  },
+  active: {
+    backgroundColor: theme.palette.info.main
+  },
+  boxStatus: {
+    textAlign: 'center',
+    width: 110,
+    height: 17,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  fontStatus: {
+    fontSize: 11,
+    color: 'white'
+  },
+  primaryColor:{
+    color: theme.palette.primary.main
+  }
 }));
 
 const CustomRouterLink = forwardRef((props, ref) => (
@@ -72,6 +112,14 @@ const EventCard = (props) => {
   const classes = useStyles();
   const shadowStyles = useBouncyShadowStyles();
   const today = new Date();
+  const start_date = new Date(props.event.event_start_date);
+  const end_date = new Date(props.event.event_end_date);
+
+  // To calculate the time difference of two dates 
+  const timeDifference = start_date.getTime() - end_date.getTime();
+
+  // To calculate the no. of days between two dates 
+  const daysDifference = timeDifference / (1000 * 3600 * 24);
   return (
     <Grid
       item
@@ -83,34 +131,50 @@ const EventCard = (props) => {
       <Card
         {...rest}
         className={clsx(classes.root, className, shadowStyles.root)}
-        elevation={0}
+        elevation={1}
       >
         <Tooltip title={"See Details of ".concat(props.event.event_name)}>
           <CardActionArea className={classes.root}
             component={CustomRouterLink}
             to={`/project/${props.project._id}/${props.event._id}`}
           >
-            <CardMedia
+            {/* <CardMedia
               className={classes.media}
               image={image}
               title="Contemplative Reptile"
-            />
-            <CardContent className={classes.root} style={{ paddingTop: 5 }} >
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-                className={classes.root}
-              >
-                <div style={{ width: 'fit-content' }} >
-                  <Typography variant="h6" className={classes.content}>
-                    {props.event.event_name}
-                  </Typography>
-                  <Typography
-                    className={classes.title}
-                    color="textSecondary"
-                    variant="body2"
-                  >
-                    <LocationOnIcon className={classes.icon} />
-                    {" "+props.event.event_location}
-                  </Typography>
+            /> */}
+            <CardContent className={classes.root} >
+              <div style={{ display: 'flex' }}>
+                <Avatar
+                  className={classes.avatar}
+                  src={image}
+                />
+                <div className={[classes.root, classes.verticalCenter].join(" ")} style={{ justifyContent: 'end' }}>
+                  <div style={{ width: 'fit-content' }} >
+                    <Typography variant="h6" className={classes.content}>
+                      {props.event.event_name}
+                    </Typography>
+                    <div style={{ display: 'flex' }}>
+                      <LocationOnIcon className={classes.icon} style={{ marginTop: 2, marginRight: 2 }} />
+                      <div className={classes.verticalCenter}>
+                        <Typography
+                          className={classes.title}
+                          color="textSecondary"
+                          variant="body2"
+                        >
+                          {" " + props.event.event_location}
+                        </Typography>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <Typography style={{ fontWeight: 700, fontSize: 11, margin: '0px 3px' }}>
+                      {daysDifference + 1}
+                    </Typography>
+                    <Typography color="textSecondary" variant="body2" className={[classes.title, classes.verticalCenter].join(" ")}>
+                      Days Event
+                        </Typography>
+                  </div>
                 </div>
               </div>
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
@@ -136,39 +200,36 @@ const EventCard = (props) => {
         <CardActions style={{
           paddingLeft: 16,
           paddingRight: 12,
+          paddingTop: 0,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           {
-            (props.event.cancel === "true") ? (
-              <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: 110, color: 'black' }}>
-                <Typography style={{ fontSize: 10 }}>Cancelled</Typography>
+            (props.project.cancel === "true") ? (
+              <Box borderRadius={4} className={[classes.cancelled, classes.boxStatus].join(" ")}>
+                <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
               </Box>
             ) : (
                 (today < new Date(props.event.event_start_date)) ? (
-                  <Box borderRadius={4} style={{ backgroundColor: 'yellow', textAlign: 'center', width: 110, height: 16, color: 'black' }}>
-                    <Typography style={{ fontSize: 10 }}>Planned</Typography>
+                  <Box borderRadius={4} className={[classes.planned, classes.boxStatus].join(" ")}>
+                    <Typography variant="subtitle2" className={[classes.fontStatus,classes.primaryColor].join(" ")}>Planned</Typography>
                   </Box>
                 ) : (
                     (today < new Date(props.event.event_end_date)) ? (
-                      <Box borderRadius={4} style={{ backgroundColor: 'green', textAlign: 'center', width: 110, height: 16, color: 'white' }}>
-                        <Typography style={{ fontSize: 10 }}>Active</Typography>
+                      <Box borderRadius={4} className={[classes.active, classes.boxStatus].join(" ")}>
+                        <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
                       </Box>
                     ) : (
-                        <Box borderRadius={4} style={{ backgroundColor: 'blue', textAlign: 'center', width: 110, height: 16, color: 'white' }}>
-                          <Typography style={{ fontSize: 10 }}>Completed</Typography>
+                        <Box borderRadius={4} className={[classes.completed, classes.boxStatus].join(" ")}>
+                          <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
                         </Box>
                       )
                   ))}
-          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end', color: 'blue' }}>
-            <DateRangeIcon className={classes.icon} />
+          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
+            <DateRangeIcon className={classes.iconDate} />
             <Typography className={classes.status}>
-              {props.event.event_start_date.slice(4, 10)}
-            </Typography>
-            <RemoveIcon className={classes.icon} />
-            <Typography className={classes.status}>
-              {props.event.event_end_date.slice(4, 15)}
+              {props.event.event_start_date.slice(4, 10)} - {props.event.event_end_date.slice(4, 15)}
             </Typography>
           </div>
         </CardActions>

@@ -15,6 +15,7 @@ import image2 from "assets/project.png";
 const Dashboard = () => {
   // const classes = useStyles();
   // const styles = AwsSliderStyles();
+
   return (
       <AwesomeSlider >
         <div data-src={image1} />

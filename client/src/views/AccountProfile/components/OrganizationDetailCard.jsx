@@ -67,6 +67,9 @@ const useStyles = makeStyles(theme => ({
     // marginRight: theme.spacing(2)
     fontSize: 10
   },
+  header: {
+    backgroundColor:theme.palette.primary.main
+  },
   [theme.breakpoints.down('xs')]: {
     header: {
       display: 'block'

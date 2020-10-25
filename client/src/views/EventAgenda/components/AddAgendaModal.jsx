@@ -84,7 +84,7 @@ const DialogContent = withStyles(theme => ({
 const DialogActions = withStyles(theme => ({
   root: {
     margin: 0,
-    padding: theme.spacing(1),
+    padding: '10px 16px',
   },
 }))(MuiDialogActions);
 

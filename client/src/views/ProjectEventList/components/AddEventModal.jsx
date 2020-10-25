@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/styles';
-import { makeStyles } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
+  useMediaQuery
 } from '@material-ui/core';
 
 import { useMutation } from '@apollo/react-hooks';
@@ -66,70 +60,25 @@ const useStyles = makeStyles(theme => ({
   form: {
     display: 'flex',
     flexDirection: 'column',
-    width: '50%',
     margin: theme.spacing(2),
-    marginRight: theme.spacing(0),
+    marginTop: 0,
   },
   formControl: {
-    minWidth: 50
+    width: "100%"
   },
   formDate: {
-    margin: theme.spacing(2),
-    marginLeft: theme.spacing(0),
-
+    width: "100%"
   },
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
 }));
 
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
-
-
 export default function AddEventModal(props) {
   const classes = useStyles();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
+
   const initialFormState =
   {
     _id: uuid(),
@@ -153,8 +102,6 @@ export default function AddEventModal(props) {
     }
   ]);
 
-
-  // console.log(data);
   const handleDate = e => {
     setDate([e.selection])
     eventForm.event_start_date = e.selection.startDate.toString();
@@ -198,16 +145,14 @@ export default function AddEventModal(props) {
         timeout: 500,
       }}
       maxWidth={false}
+      fullScreen={fullScreen}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.onCloseListener}>
-        Add New Event
-        </DialogTitle>
-      <DialogContent dividers>
-        <form noValidate style={{ display: "flex", flexDirection: 'row' }}>
-          <div className={classes.form} >
+      <DialogTitle title="Add New Event" onClose={props.onCloseListener} />
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
+        <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
+          <div className={classes.form} style={fullScreen ? {} : { width: '50%' }} >
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_name"
                 label="Event Name"
@@ -217,7 +162,6 @@ export default function AddEventModal(props) {
                 onChange={handleInputChange}
               />
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_description"
                 multiline
@@ -229,7 +173,6 @@ export default function AddEventModal(props) {
                 onChange={handleInputChange}
               />
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_location"
                 label="Location"
@@ -251,11 +194,18 @@ export default function AddEventModal(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button autoFocus color="primary" onClick={handleButton}>
-          Save
-          </Button>
-      </DialogActions>
+      <DialogActionsAdd
+        close={props.onCloseListener}
+        validation={
+          (
+            eventForm.event_name === "" ||
+            eventForm.event_description === "" ||
+            eventForm.event_start_date === "" ||
+            eventForm.event_end_date === ""
+          ) ?
+            ("invalid") : ("valid")
+        }
+        submit={() => handleButton()} />
     </Dialog>
   );
 };

@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
     "&:hover": {
-      background: theme.palette.primary.main,
+      background: theme.palette.secondary.main,
       color: 'white'
     },
   },
@@ -55,7 +55,7 @@ export default function AddEventCard(props){
       <Card
         {...rest}
         className={clsx(classes.root, className)}
-        elevation={0}
+        elevation={1}
       // onMouseEnter={() => (setElevate(3))}
       // onMouseLeave={() => (setElevate(1))}
       // elevation={elevate}
@@ -75,7 +75,7 @@ export default function AddEventCard(props){
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-            <AddIcon style={{ fontSize: 70, alignItems: "center" }}></AddIcon>
+            <AddIcon style={{ fontSize: 96, alignItems: "center" }}></AddIcon>
           </CardContent>
         </CardActionArea>
       </Card>
