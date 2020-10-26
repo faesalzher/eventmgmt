@@ -3,7 +3,8 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardMedia } from '@material-ui/core';
-import image from 'assets/project.png'
+import image from "assets/default-placeholder.png";
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,7 +32,7 @@ const PictureCard = props => {
     >
       <CardMedia
         className={classes.media}
-        image={props.project.picture === "null" ? image : props.project.picture}
+        image={props.project.picture === " " ? image : props.project.picture}
         title={props.project.project_name}
       />
     </Card>

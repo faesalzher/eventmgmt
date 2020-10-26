@@ -10,7 +10,6 @@ import {
   IconButton,
   Avatar,
   Typography,
-  Button,
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 
@@ -21,7 +20,7 @@ import {
   OrganizationEditForm,
   Organization
 } from '.';
-import { EditImageForm } from "components";
+import { EditAvatarForm } from "components";
 
 
 const ORGANIZATION_QUERY = gql`
@@ -46,12 +45,12 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
   },
   avatar: {
-    margin: 10,
-    marginBottom: 0,
+    // margin: 10,
+    // marginBottom: 0,
     height: 100,
     width: 100,
-    flexShrink: 0,
-    flexGrow: 0
+    // flexShrink: 0,
+    // flexGrow: 0
   },
   organization: {
     display: 'flex',
@@ -68,7 +67,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 10
   },
   header: {
-    backgroundColor:theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main
   },
   [theme.breakpoints.down('xs')]: {
     header: {
@@ -76,7 +75,8 @@ const useStyles = makeStyles(theme => ({
     },
     avatarHeader: {
       display: 'flex',
-      justifyContent: 'center'
+      justifyContent: 'center',
+    marginLeft: 16
     },
     title: {
       textAlign: 'center'
@@ -135,15 +135,6 @@ const OrganizationDetailCard = props => {
     setOpenEditPage(false);
   };
 
-  const [openEditImageModal, setOpenEditImageModal] = useState(false);
-  const handleEditImageModal = () => {
-    setOpenEditImageModal(true);
-  };
-
-  const handleCloseEditImageModal = () => {
-    setOpenEditImageModal(false);
-  };
-
   const uploadImage = (e) => {
     setOrganization({
       ...organization,
@@ -159,24 +150,16 @@ const OrganizationDetailCard = props => {
     });
   };
 
-  console.log(organization)
   return (
     <Card
       {...rest}
       className={clsx(classes.root, className)}
     >
-      <EditImageForm
-        open={openEditImageModal}
-        uploadImage={uploadImage}
-        removeImage={removeImage}
-        // handleDelete={handleDelete}
-        close={handleCloseEditImageModal}
-      />
       <CardHeader
         className={classes.header}
         subheader={
           <div>
-            <Typography variant="body2" className={classes.title} color="textSecondary" component="p">
+            <Typography variant="body2" className={classes.title} style={{color:'white'}} component="p">
               {'Admin account '}
             </Typography>
             {/* <Typography
@@ -190,7 +173,7 @@ const OrganizationDetailCard = props => {
         }
         title={
           <div>
-            <Typography gutterBottom variant="h5" component="h2" className={classes.title}>
+            <Typography gutterBottom variant="h5" component="h2" className={classes.title} style={{color:'white'}}>
               {organization.organization_name}
             </Typography>
             <Typography gutterBottom variant="body2" className={classes.title} style={{ color: "cornflowerblue" }} component="p">
@@ -211,24 +194,24 @@ const OrganizationDetailCard = props => {
             </div>
         }
         avatar={
-          <div>
-            <div className={classes.avatarHeader}>
-              <Avatar
-                className={classes.avatar}
-                src={organization.picture}
-              />
-            </div>
+          <div style={{ padding: 10 }}>
             {openEditPage ?
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button className={classes.uploadButton}
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  onClick={() => handleEditImageModal()}
-                >
-                  Upload a picture
-          </Button>
-              </div> : <div></div>}
+              <div className={classes.avatarHeader}>
+                <EditAvatarForm
+                  uploadImage={uploadImage}
+                  picture={organization.picture}
+                  removeImage={removeImage}
+                  size={100}
+                />
+              </div>
+              :
+              <div className={classes.avatarHeader}>
+                <Avatar
+                  className={classes.avatar}
+                  src={organization.picture}
+                />
+              </div>
+            }
           </div>
         }
       >

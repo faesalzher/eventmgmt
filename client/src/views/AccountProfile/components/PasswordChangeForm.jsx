@@ -23,18 +23,12 @@ const useStyles = makeStyles(theme => ({
   form: {
     display: 'flex',
     flexDirection: 'column',
-    // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
-    // minWidth: 50
     width: "100%"
   },
   formDate: {
-    // margin: theme.spacing(2),
-    // marginLeft: theme.spacing(0),
     width: "100%"
   },
   formControlLabel: {

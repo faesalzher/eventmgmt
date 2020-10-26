@@ -1,17 +1,13 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import {makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
   Button,
   Dialog,
   Typography,
-  IconButton,
   Box,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
@@ -28,7 +24,6 @@ import AdjustIcon from '@material-ui/icons/Adjust';
 import { Redirect } from 'react-router';
 
 import {
-  DeleteForm,
   CancelForm
 } from 'components';
 
@@ -82,8 +77,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50
@@ -99,50 +92,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 export default function EventEditModal(props) {
   const classes = useStyles();
   const theme = useTheme();
@@ -150,7 +99,6 @@ export default function EventEditModal(props) {
   const today = new Date()
 
   const [eventForm, setEventForm] = React.useState([]);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [navigate, setNavigate] = useState(false);
 
@@ -199,7 +147,7 @@ export default function EventEditModal(props) {
   const [deleteEvent] = useMutation(DELETE_EVENT);
 
 
-  const handleButton = e => {
+  const handleSaveEditButton = e => {
     props.handleSaveEditButton(eventForm);
     editEvent({
       variables:
@@ -245,14 +193,6 @@ export default function EventEditModal(props) {
     }
   }
 
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  }
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
-
   const handleDelete = () => {
     deleteEvent({ variables: { _id: props.event._id, } });
     setNavigate(true)
@@ -261,7 +201,7 @@ export default function EventEditModal(props) {
   if (navigate) {
     return <Redirect push to={"/project/" + props.project_id} />;
   }
-  
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -273,15 +213,12 @@ export default function EventEditModal(props) {
       }}
       maxWidth={false}
     >
-      <DialogTitle id="edit-event-title" onClose={() => handleCloseModal()}>
-        Edit Event
-          </DialogTitle>
+      <DialogTitle title="Edit Event" onClose={() => handleCloseModal()} />
       <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
           <div className={classes.form} style={fullScreen ? {} : { width: '50%' }}>
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_name"
                 label="Event Name"
@@ -293,7 +230,6 @@ export default function EventEditModal(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_description"
                 label="Description"
@@ -307,7 +243,6 @@ export default function EventEditModal(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
-                autoFocus
                 margin="dense"
                 id="event_location"
                 label="Location"
@@ -364,7 +299,7 @@ export default function EventEditModal(props) {
               />
             </FormControl>
           </div>
-          <div>
+          <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
                 onChange={handleDate}
@@ -375,19 +310,21 @@ export default function EventEditModal(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
-          Delete Event
-          </Button>
-        <DeleteForm
-          open={openDeleteModal}
-          handleDelete={handleDelete}
-          close={handleCloseDeleteModal}
-        />
-        <Button autoFocus color="primary" onClick={handleButton}>
-          Save
-            </Button>
-      </DialogActions>
+      <DialogActionsEdit
+        validation={
+          (
+            eventForm.event_name === "" ||
+            eventForm.event_description === "" ||
+            eventForm.event_start_date === "" ||
+            eventForm.event_end_date === "" ||
+            eventForm.event_location === ""
+          ) ?
+            ("invalid") : ("valid")
+        }
+        submit={() => handleSaveEditButton()}
+        delete={() => handleDelete()}
+        close={() => handleCloseModal()}
+      />
     </Dialog>
   );
 };

@@ -64,8 +64,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50

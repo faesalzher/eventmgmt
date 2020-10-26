@@ -75,7 +75,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     margin: theme.spacing(2),
-    marginTop: 0,
   },
   formControl: {
     width: "100%"
@@ -100,7 +99,7 @@ export default function AddProjectModal(props) {
     cancel: "false",
     project_start_date: new Date().toString(),
     project_end_date: new Date().toString(),
-    picture: "null",
+    picture: " ",
     organization_id: props.organization_id,
   };
 
@@ -217,7 +216,7 @@ export default function AddProjectModal(props) {
               />
             </FormControl>
           </div>
-          <div>
+          <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
                 onChange={handleDate}

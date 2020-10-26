@@ -31,7 +31,7 @@ const StyledTableCell = withStyles(theme => ({
 const StyledTableRow = withStyles(theme => ({
   root: {
     '&:nth-of-type(odd)': {
-      backgroundColor: "theme.palette.background.default",
+      backgroundColor: theme.palette.background.default,
     },
   },
 }))(TableRow);
@@ -55,16 +55,29 @@ export default function Agenda(props) {
 
   return (
     <StyledTableRow hover={true}>
-      <StyledTableCell style={{ width: 115, color: 'blue' }} align="center" component="th" scope="row">
-        <div><AccessTimeIcon style={{ fontSize: 14, verticalAlign: 'middle' }} />
-          {agenda.start_time} -{agenda.end_time}</div>
+      <StyledTableCell align="center" component="th" scope="row">
+        <Typography variant="subtitle2">
+          {props.index + 1}
+        </Typography>
+      </StyledTableCell>
+      <StyledTableCell style={{ width: 115 }} align="center">
+        <div style={{ display: 'flex' }}>
+          <AccessTimeIcon style={{ fontSize: 14, verticalAlign: 'middle', margin: 3 }} />
+          <Typography variant="subtitle2" color="textSecondary">
+            {agenda.start_time} -{agenda.end_time}
+          </Typography>
+        </div>
       </StyledTableCell>
       <StyledTableCell align="left">
-        <Typography variant="subtitle2">
+        <Typography variant="subtitle2" color="textPrimary">
           {agenda.agenda_name}
         </Typography>
       </StyledTableCell>
-      <StyledTableCell align="left">{agenda.details}</StyledTableCell>
+      <StyledTableCell align="left">
+        <Typography variant="body1" color="textPrimary">
+          {agenda.details}
+        </Typography>
+      </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         <Tooltip arrow title="Edit" aria-label="confirm">
           <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>

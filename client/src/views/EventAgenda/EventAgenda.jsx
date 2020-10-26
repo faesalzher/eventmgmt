@@ -8,11 +8,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {
-  Chip,
   Paper,
-  // IconButton,
+  IconButton,
+  Tooltip,
   Snackbar,
-  Button
+  Typography,
 } from '@material-ui/core';
 
 import MuiAlert from '@material-ui/lab/Alert';
@@ -34,7 +34,7 @@ const dataAgenda = [
 
 const useStyles = makeStyles(theme => ({
   table: {
-    minWidth: 700,
+    // minWidth: 100,
   },
   colorSecondary: {
     backgroundColor: theme.palette.primary.main
@@ -52,6 +52,11 @@ const StyledTableCell = withStyles(theme => ({
   },
 }))(TableCell);
 
+const StyledTableRow = withStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.secondary.main,
+  },
+}))(TableRow);
 
 export default function EventAgenda() {
   const classes = useStyles();
@@ -140,61 +145,70 @@ export default function EventAgenda() {
           Succes!
          </MuiAlert>
       </Snackbar>
-      {
-        sortedGroupAgendas.map((rundownDate, index) => (
-          <div style={{ padding: "7px 0px" }} key={index}>
-            <div style={{ display: 'flex', padding: 4, justifyContent: 'center' }}>
-              <Chip
-                // variant="outlined"
-                icon={<CalendarTodayIcon style={{ fontSize: 10, marginLeft: 8 }} />}
-                color="secondary"
-                size="small"
-                label={rundownDate.date} />
-            </div>
-            <TableContainer component={Paper}>
-              <Table size="small" className={classes.table} aria-label="customized table">
-                <TableHead className={classes.colorSecondary}>
-                  <TableRow>
-                    <StyledTableCell align="center">Time</StyledTableCell>
-                    <StyledTableCell align="left">Agenda Name</StyledTableCell>
-                    <StyledTableCell align="left">Details</StyledTableCell>
-                    <StyledTableCell style={{ width: 10 }} align="center">
-                    </StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {
-                    rundownDate.sortedAgendas.map((agenda, index) => {
-                      return <AgendaByDate
-                        key={index}
-                        rundownDate={rundownDate}
-                        agenda={agenda}
-                        index={index}
-                        handleDelete={handleDelete}
-                        handleSaveEditButton={handleSaveEditButton}
-                      />
-                    })
-                  }
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-        ))
-      }
+      <TableContainer component={Paper}>
+        <Table size="small" className={classes.table} aria-label="customized table">
+          <TableHead className={classes.colorSecondary}>
+            <TableRow>
+              <StyledTableCell align="center">No</StyledTableCell>
+              <StyledTableCell align="center">Time</StyledTableCell>
+              <StyledTableCell align="left">Agenda Name</StyledTableCell>
+              <StyledTableCell align="left">Details</StyledTableCell>
+              <StyledTableCell style={{ width: 10 }} align="center">
+                <AddAgendaModal
+                  open={openAddDialog}
+                  handleSaveAgendaButton={handleSaveAgendaButton}
+                  close={handleCloseAddDialog}
+                />
+                <Tooltip arrow title="Add New Agenda" aria-label="confirm">
+                  <IconButton onClick={handleOpenAddDialog} style={{padding:0}}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+                {/* <Button
+                  onClick={handleOpenAddDialog}
+                  variant="contained"
+                  size="small"
+                  color="secondary">
+                  add new agenda    <AddIcon />
+                </Button> */}
+              </StyledTableCell>
+            </TableRow>
+          </TableHead>
+          {
+            sortedGroupAgendas.map((rundownDate, index) => (
+              <TableBody>
+                <StyledTableRow >
+                  <StyledTableCell align="center" colSpan={5}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <CalendarTodayIcon style={{ fontSize: 10, margin: 5, color: 'white' }} />
+                      <Typography variant="subtitle2" style={{ color: 'white' }}>
+                        {rundownDate.date}
+                      </Typography>
+                    </div>
+                  </StyledTableCell>
+                </StyledTableRow>
+                {
+                  rundownDate.sortedAgendas.map((agenda, index) => {
+                    return <AgendaByDate
+                      key={index}
+                      rundownDate={rundownDate}
+                      agenda={agenda}
+                      index={index}
+                      handleDelete={handleDelete}
+                      handleSaveEditButton={handleSaveEditButton}
+                    />
+                  })
+                }
+              </TableBody>
+            )
+            )
+          }
+
+        </Table>
+      </TableContainer>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <AddAgendaModal
-          open={openAddDialog}
-          handleSaveAgendaButton={handleSaveAgendaButton}
-          close={handleCloseAddDialog}
-        />
-        <Button
-          onClick={handleOpenAddDialog}
-          variant="contained" 
-          size="small"
-           color="secondary">
-          add new agenda    <AddIcon />
-        </Button>
+
       </div>
-    </div >
+    </div>
   );
 }

@@ -1,19 +1,26 @@
 import React, { useState } from "react";
 import { makeStyles } from '@material-ui/styles';
 import {
-  ButtonBase,
   Typography,
+  IconButton,
+  Avatar,
 } from "@material-ui/core";
 
 import image from "assets/default-placeholder.png";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
+
 import { EditImageModal } from "components";
 
 const useStyles = makeStyles(theme => ({
+  removeBtn: {
+    color: theme.palette.error.main,
+    marginBottom: 5,
+    width: "-webkit-fill-available",
+  },
   image: {
     position: "relative",
-    height: 200,
-    width: "-webkit-fill-available",
+    // height: 200,
+    // width: "-webkit-fill-available",
     [theme.breakpoints.down("xs")]: {
       width: "100% !important", // Overrides inline-style
       height: 200,
@@ -78,7 +85,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EditImageForm(props) {
+export default function EditAvatarForm(props) {
   const classes = useStyles();
   const [openEditImageModal, setOpenEditImageModal] = useState(false);
 
@@ -100,44 +107,51 @@ export default function EditImageForm(props) {
     handleCloseEditImageModal();
   };
 
+
   return (
-    <div>
-      <ButtonBase
+    <div style={{display:'flex',justifyContent:'center'}}>
+      <IconButton
         focusRipple
-        key={image.title}
-        className={classes.image}
         focusVisibleClassName={classes.focusVisible}
+        className={classes.image}
         style={{
           width: image.width,
+          padding: 0
         }}
-        component="span"
         onClick={handleEditImageModal}
       >
-
-        <span
-          className={classes.imageSrc}
-          style={
-            props.picture === ' ' ?
-              {
-                backgroundColor: '#e0e0e0',
-              } :
-              {
-                backgroundImage: `url(${props.picture})`,
-              }}
-        />
-        <span className={classes.imageBackdrop} />
-        <span className={classes.imageButton}>
-          <Typography
-            component="span"
-            variant="subtitle1"
-            color="inherit"
-            className={classes.imageTitle}
-          >
-            <PhotoCamera />
-            <span className={classes.imageMarked} />
-          </Typography>
-        </span>
-      </ButtonBase>
+        <Avatar
+          style={{
+            margin: 0,
+            width: props.size,
+            height: props.size,
+          }}
+        >
+          <span
+            className={classes.imageSrc}
+            style={
+              props.picture === ' ' ?
+                {
+                  backgroundColor: '#e0e0e0',
+                } :
+                {
+                  backgroundImage: `url(${props.picture})`,
+                }}
+          />
+          <span className={classes.imageBackdrop} />
+          <span className={classes.imageButton}>
+            <Typography
+              component="span"
+              variant="subtitle1"
+              color="inherit"
+              className={classes.imageTitle}
+            >
+              <PhotoCamera />
+              <span className={classes.imageMarked} />
+            </Typography>
+          </span>
+        </Avatar>
+      </IconButton>
       <EditImageModal
         open={openEditImageModal}
         close={handleCloseEditImageModal}

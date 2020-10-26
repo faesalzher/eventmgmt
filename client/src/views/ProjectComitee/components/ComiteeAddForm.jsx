@@ -1,19 +1,13 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
-import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl,
   MenuItem,
-  // Select,
-  // InputLabel,
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
@@ -53,8 +47,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50
@@ -152,6 +144,7 @@ export default function ComiteeAddForm(props) {
     setPosition_id("");
     setStaff_id("");
   }
+
   let checkComiteeStaffId = [];
   props.comitees.map((comitee) =>
     props.staffs.map((staff) => {

@@ -1,17 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
 } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import { DateRange } from 'react-date-range';
@@ -59,8 +53,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50
@@ -75,51 +67,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
   },
 }));
-
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 
 
 export default function RoadmapAddForm(props) {
@@ -183,18 +130,23 @@ export default function RoadmapAddForm(props) {
     props.close();
   }
 
+  
+  const handleCloseModal = () => {
+    props.close();
+    setRoadmapForm(intitialFormState);
+    handleDeleteDate()
+  }
+
   return (
     <Dialog
       fullScreen={fullScreen}
-      onClose={props.close}
+      onClose={()=>handleCloseModal()}
       aria-labelledby="customized-dialog-title"
       open={props.open}
       maxWidth={false}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.onCloseListener}>
-        Add New roadmap
-        </DialogTitle>
-      <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
+      <DialogTitle title="Add New roadmap" onClose={()=>handleCloseModal()}/>
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
           <div className={classes.form} style={fullScreen ? {} : { width: '50%' }}>
             <FormControl className={classes.formControl}>
@@ -212,7 +164,7 @@ export default function RoadmapAddForm(props) {
               />
             </FormControl>
           </div>
-          <div>
+          <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
                 onChange={handleDate}
@@ -223,14 +175,17 @@ export default function RoadmapAddForm(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(roadmapForm.roadmap_name === "") ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        validation={
+          (
+            roadmapForm.roadmap_name === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveButton()}
+        close={()=>handleCloseModal()}
+        />
+        
     </Dialog>
   );
 };

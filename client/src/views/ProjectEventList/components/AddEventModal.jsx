@@ -61,7 +61,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     margin: theme.spacing(2),
-    marginTop: 0,
   },
   formControl: {
     width: "100%"
@@ -183,7 +182,7 @@ export default function AddEventModal(props) {
               />
             </FormControl>
           </div>
-          <div>
+          <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
                 onChange={handleDate}

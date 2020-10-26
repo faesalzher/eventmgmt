@@ -1,23 +1,18 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import {
-  DeleteForm
+  EditImageForm,
+  EditAvatarForm,
 } from 'components';
 
 const useStyles = makeStyles(theme => ({
@@ -26,8 +21,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50
@@ -42,51 +35,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
   },
 }));
-
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 
 
 export default function ExternalEditForm(props) {
@@ -105,7 +53,6 @@ export default function ExternalEditForm(props) {
     picture: props.external.picture,
   }
   const [externalForm, setExternalForm] = useState(intitialFormState);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleSaveEditButton = () => {
     props.handleSaveEditButton(externalForm)
@@ -117,18 +64,27 @@ export default function ExternalEditForm(props) {
     setExternalForm({ ...externalForm, [id]: value })
   }
 
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  }
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
-
   const handleDelete = () => {
     props.handleDelete(props.external._id);
     props.close();
-    // deleteComitee({ variables: { _id: props.comitee._id, } });
+  }
+
+  const uploadImage = (e) => {
+    setExternalForm({
+      ...externalForm,
+      picture: e,
+    });
+  };
+
+  const removeImage = (e) => {
+    setExternalForm({
+      ...externalForm,
+      picture: ' ',
+    });
+  };
+
+  const handleCloseModal = () => {
+    props.close();
   }
 
   return (
@@ -137,15 +93,33 @@ export default function ExternalEditForm(props) {
       onClose={props.close}
       aria-labelledby="customized-dialog-title"
       open={props.open}
-      fullWidth={true}
-      maxWidth={'xs'}
+      maxWidth={false}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Edit {props.type}
-      </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
-        <form noValidate >
-          <div >
+      <DialogTitle title={"Edit " + props.type} onClose={() => handleCloseModal()} />
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
+        <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}>
+          {props.type === "Volunteer" || props.type === "Guest" ?
+            <FormControl style={fullScreen ?
+              { width: '100%', padding: 17} :
+              { width: '50%', padding: '0px 17px', display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+              <EditAvatarForm
+                uploadImage={uploadImage}
+                picture={externalForm.picture}
+                removeImage={removeImage}
+                size={170}
+              />
+            </FormControl>
+            :
+            <FormControl style={fullScreen ? { width: '100%', padding: 17, } : { width: '50%', padding: 17 }}>
+              <EditImageForm
+                uploadImage={uploadImage}
+                picture={externalForm.picture}
+                removeImage={removeImage}
+              // handleDelete={handleDelete}
+              />
+            </FormControl>
+          }
+          <div className={classes.form} style={fullScreen ? {} : { width: "50%" }}  >
             <FormControl className={classes.formControl}>
               <TextField
                 style={{ backgroundColor: 'white' }}
@@ -195,26 +169,23 @@ export default function ExternalEditForm(props) {
               />
             </FormControl>
           </div>
+
         </form>
       </DialogContent>
-      <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
-          Delete {props.type}
-        </Button>
-        <DeleteForm
-          open={openDeleteModal}
-          handleDelete={handleDelete}
-          close={handleCloseDeleteModal}
-        />
-        {(externalForm.external_name === "" ||
-          externalForm.email === "" ||
-          externalForm.phone_number === "" ||
-          externalForm.details === "") ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveEditButton()}>Save</Button>
+      <DialogActionsEdit
+        validation={
+          (
+            externalForm.external_name === "" ||
+            externalForm.email === "" ||
+            externalForm.phone_number === "" ||
+            externalForm.details === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveEditButton()}
+        delete={() => handleDelete()}
+        close={() => handleCloseModal()}
+      />
     </Dialog>
   );
 };

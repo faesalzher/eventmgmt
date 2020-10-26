@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import Typography from '@material-ui/core/Typography';
 import TimeKeeper from 'react-timekeeper';
 
@@ -21,9 +17,6 @@ import { useTheme } from '@material-ui/core/styles';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
-import {
-  DeleteForm
-} from 'components';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -31,7 +24,6 @@ import 'react-day-picker/lib/style.css';
 const useStyles = makeStyles(theme => ({
   form: {
     margin: theme.spacing(2),
-    marginTop: 0,
   },
   formControl: {
     width: "100%",
@@ -51,46 +43,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
   },
 }));
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
-
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 
 export default function EditAgendaModal(props) {
   const classes = useStyles();
@@ -109,7 +61,6 @@ export default function EditAgendaModal(props) {
     end_time: props.agenda.end_time,
   };
   const [agendaForm, setAgendaForm] = useState(initialFormState)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -124,7 +75,7 @@ export default function EditAgendaModal(props) {
     setAgendaForm({ ...agendaForm, end_time: e });
   };
 
-  const handleSaveButton = () => {
+  const handleSaveEditButton = () => {
     props.handleSaveEditButton(agendaForm)
     handleClose();
   };
@@ -157,15 +108,6 @@ export default function EditAgendaModal(props) {
     setPopoverDate(popoverDate ? null : e.currentTarget);
   };
 
-
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  }
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
-
   const handleDelete = () => {
     props.handleDelete(props.agenda._id);
     props.close();
@@ -195,10 +137,8 @@ export default function EditAgendaModal(props) {
       fullWidth={true}
       maxWidth={'sm'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={handleClose} style={{ textAlign: 'center' }}>
-        Edit Agenda
-      </DialogTitle>
-      <DialogContent dividers style={
+      <DialogTitle title="Edit Agenda" onClose={handleClose} style={{ textAlign: 'center' }} />
+      <DialogContent style={
         fullScreen ? {} : { height: 600, flexDirection: 'row', display: 'flex' }}>
         <div className={classes.form} style={fullScreen ? {} : {}}>
           <FormControl className={classes.formControl}>
@@ -259,23 +199,21 @@ export default function EditAgendaModal(props) {
             </div>
           </FormControl>
         </div>
-
       </DialogContent  >
-      <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="outlined" size="small" color="secondary" onClick={handleDeleteModal}>
-          Delete Agenda
-        </Button>
-        <DeleteForm
-          open={openDeleteModal}
-          handleDelete={handleDelete}
-          close={handleCloseDeleteModal}
-        />
-        {(agendaForm.agenda_name === "" || agendaForm.details === "" || agendaForm.date === "") || validateTime === false ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" color="primary" onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsEdit
+        validation={
+          (
+            agendaForm.agenda_name === "" ||
+            agendaForm.details === "" ||
+            agendaForm.date === "" ||
+            validateTime === false
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveEditButton()}
+        delete={() => handleDelete()}
+        close={() => handleClose()}
+      />
       <Popover id={id_date} open={openDate} anchorEl={popoverDate} onClose={handleCloseDate}
         anchorOrigin={{
           vertical: 'bottom',

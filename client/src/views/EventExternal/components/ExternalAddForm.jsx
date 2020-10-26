@@ -1,89 +1,34 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
-  FormControl
+  FormControl,
 } from '@material-ui/core';
+
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
-import client3 from "assets/client-3.png";
+import { EditImageForm,EditAvatarForm } from "components";
 
 const useStyles = makeStyles(theme => ({
   form: {
-    display: 'flex',
-    flexDirection: 'column',
-    // width: '50%',
+    display: "flex",
+    flexDirection: "column",
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
-    // minWidth: 50
     width: "100%"
   },
   formDate: {
-    // margin: theme.spacing(2),
-    // marginLeft: theme.spacing(0),
     width: "100%"
   },
   formControlLabel: {
     marginTop: theme.spacing(1),
   },
 }));
-
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
 
 
 
@@ -101,7 +46,7 @@ export default function ExternalAddForm(props) {
     email: "",
     phone_number: "",
     details: "",
-    picture: client3,
+    picture: " ",
   }
 
   const [externalForm, setExternalForm] = useState(intitialFormState);
@@ -115,22 +60,51 @@ export default function ExternalAddForm(props) {
     const { id, value } = e.target;
     setExternalForm({ ...externalForm, [id]: value })
   }
-  console.log(externalForm)
+
+  const uploadImage = (e) => {
+    setExternalForm({
+      ...externalForm,
+      picture: e,
+    });
+  };
+
+  const handleCloseModal = () => {
+    props.close();
+  }
+  
   return (
     <Dialog
       fullScreen={fullScreen}
       onClose={props.close}
       aria-labelledby="customized-dialog-title"
       open={props.open}
-      fullWidth={true}
-      maxWidth={'xs'}
+      maxWidth={false}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Add New {props.type}
-      </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
-        <form noValidate >
-          <div >
+      <DialogTitle title={"Add New " + props.type} onClose={() => handleCloseModal()} />
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
+        <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}>
+        {props.type === "Volunteer" || props.type === "Guest" ?
+            <FormControl style={fullScreen ?
+              { width: '100%', padding: 17} :
+              { width: '50%', padding: 17, display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+              <EditAvatarForm
+                uploadImage={uploadImage}
+                picture={externalForm.picture}
+                size={170}
+              />
+            </FormControl>
+            :
+            <FormControl style={fullScreen ? 
+            { width: '100%', padding: 17} :
+             { width: '50%', padding: 17 }}>
+              <EditImageForm
+                uploadImage={uploadImage}
+                picture={externalForm.picture}
+              // handleDelete={handleDelete}
+              />
+            </FormControl>
+          }
+          <div className={classes.form} style={fullScreen ? {} : { width: "50%" }} >
             <FormControl className={classes.formControl}>
               <TextField
                 style={{ backgroundColor: 'white' }}
@@ -179,20 +153,22 @@ export default function ExternalAddForm(props) {
                 onChange={handleInputChange}
               />
             </FormControl>
-          </div>
+          </div>       
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(externalForm.external_name === "" ||
-          externalForm.email === "" ||
-          externalForm.phone_number === "" ||
-          externalForm.details === "") ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        validation={
+          (
+            externalForm.external_name === "" ||
+            externalForm.email === "" ||
+            externalForm.phone_number === "" ||
+            externalForm.details === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveButton()}
+        close={() => handleCloseModal()}
+      />
     </Dialog>
   );
 };

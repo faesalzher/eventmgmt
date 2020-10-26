@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import Typography from '@material-ui/core/Typography';
 import TimeKeeper from 'react-timekeeper';
 
@@ -28,7 +24,6 @@ import uuid from 'uuid/v1';
 const useStyles = makeStyles(theme => ({
   form: {
     margin: theme.spacing(2),
-    marginTop: 0,
   },
   formControl: {
     width: "100%",
@@ -48,46 +43,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
   },
 }));
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
-
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 
 export default function AddAgendaModal(props) {
   const classes = useStyles();
@@ -128,6 +83,7 @@ export default function AddAgendaModal(props) {
   const handleClose = () => {
     props.close();
     setAgendaForm(initialFormState);
+    setSelectedDays(undefined)
   };
 
   const handleCloseDate = () => {
@@ -177,13 +133,11 @@ export default function AddAgendaModal(props) {
       fullWidth={true}
       maxWidth={'sm'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={handleClose} style={{ textAlign: 'center' }}>
-        Add New Agenda
-      </DialogTitle>
-      <DialogContent dividers style={
+      <DialogTitle title="Add New Agenda" onClose={handleClose} style={{ textAlign: 'center' }} />
+      <DialogContent style={
         fullScreen ?
-          { backgroundColor: "#e6e8eb" } :
-          { backgroundColor: "#e6e8eb", height: 600, flexDirection: 'row', display: 'flex' }}>
+          {} :
+          { height: 600, flexDirection: 'row', display: 'flex' }}>
         <div className={classes.form} style={fullScreen ? {} : {}}>
           <FormControl className={classes.formControl}>
             <TextField
@@ -245,13 +199,19 @@ export default function AddAgendaModal(props) {
         </div>
 
       </DialogContent  >
-      <DialogActions>
-        {(agendaForm.agenda_name === "" || agendaForm.details === "" || agendaForm.date === "") || validateTime===false ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" color="primary" onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        validation={
+          (
+            agendaForm.agenda_name === "" ||
+            agendaForm.date === "" ||
+            validateTime === false  ||
+            agendaForm.details === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        submit={() => handleSaveButton()}
+        close={() => handleClose()}
+      />
       <Popover id={id_date} open={openDate} anchorEl={popoverDate} onClose={handleCloseDate}
         anchorOrigin={{
           vertical: 'bottom',

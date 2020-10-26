@@ -8,7 +8,8 @@ import { useBouncyShadowStyles } from '@mui-treasury/styles/shadow/bouncy';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import image from 'assets/project.png'
+import image from "assets/default-placeholder.png";
+
 // import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 // import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
@@ -228,7 +229,7 @@ const ProjectCard = (props) => {
           >
             <CardMedia
               className={classes.media}
-              image={props.project.picture === "null" ? image : props.project.picture}
+              image={props.project.picture === " " ? image : props.project.picture}
               title={props.project.project_name}
             />
             <CardContent className={classes.root} style={{ paddingTop: 5 }} >

@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import { makeStyles, useTheme } from "@material-ui/styles";
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from "@material-ui/core/TextField";
-import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import {
   Button,
   Dialog,
   Typography,
   Box,
-  ButtonBase,
 } from "@material-ui/core";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
@@ -25,8 +23,6 @@ import { Redirect } from "react-router";
 
 import { CancelForm, EditImageForm } from "components";
 
-import image from "assets/project.png";
-// import imagesStyles from "assets/jss/material-kit-react/imagesStyles";
 
 const EDIT_PROJECT = gql`
   mutation editProject(
@@ -80,18 +76,12 @@ const useStyles = makeStyles((theme) => ({
   form: {
     display: "flex",
     flexDirection: "column",
-    // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
-    // minWidth: 50
     width: "100%",
   },
   formDate: {
-    // margin: theme.spacing(2),
-    // marginLeft: theme.spacing(0),
     width: "100%",
   },
   formControlLabel: {
@@ -99,78 +89,6 @@ const useStyles = makeStyles((theme) => ({
   },
   media: {
     height: 200,
-  },
-  root: {
-    display: "flex",
-    flexWrap: "wrap",
-    minWidth: 300,
-    width: "100%",
-  },
-  image: {
-    position: "relative",
-    height: 200,
-    width: "-webkit-fill-available",
-    [theme.breakpoints.down("xs")]: {
-      width: "100% !important", // Overrides inline-style
-      height: 100,
-    },
-    "&:hover, &$focusVisible": {
-      zIndex: 1,
-      "& $imageBackdrop": {
-        opacity: 0.15,
-      },
-      "& $imageMarked": {
-        opacity: 0,
-      },
-      "& $imageTitle": {
-        border: "4px solid currentColor",
-      },
-    },
-  },
-  focusVisible: {},
-  imageButton: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: theme.palette.common.white,
-  },
-  imageSrc: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center 40%",
-  },
-  imageBackdrop: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: theme.palette.common.black,
-    opacity: 0,
-    transition: theme.transitions.create("opacity"),
-  },
-  imageTitle: {
-    position: "relative",
-    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 1
-      }px`,
-  },
-  imageMarked: {
-    height: 3,
-    width: 18,
-    backgroundColor: theme.palette.common.white,
-    position: "absolute",
-    bottom: -2,
-    left: "calc(50% - 9px)",
-    transition: theme.transitions.create("opacity"),
   },
 }));
 
@@ -181,7 +99,6 @@ export default function ProjectEditModal(props) {
   const today = new Date();
 
   const [projectForm, setProjectForm] = React.useState([]);
-  const [openEditImageModal, setOpenEditImageModal] = useState(false);
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [navigate, setNavigate] = useState(false);
 
@@ -242,8 +159,11 @@ export default function ProjectEditModal(props) {
         organization_id: props.organization_id,
       },
     });
-    handleCloseModal();
+    console.log(projectForm.picture)
+    props.close();
   };
+
+  console.log(projectForm.picture)
 
   const handleCloseModal = () => {
     props.close();
@@ -282,14 +202,6 @@ export default function ProjectEditModal(props) {
     setNavigate(true);
   };
 
-  const handleEditImageModal = () => {
-    setOpenEditImageModal(true);
-  };
-
-  const handleCloseEditImageModal = () => {
-    setOpenEditImageModal(false);
-  };
-
   const uploadImage = (e) => {
     setProjectForm({
       ...projectForm,
@@ -300,7 +212,7 @@ export default function ProjectEditModal(props) {
   const removeImage = (e) => {
     setProjectForm({
       ...projectForm,
-      picture: "null",
+      picture: " ",
     });
   };
 
@@ -359,47 +271,11 @@ export default function ProjectEditModal(props) {
               />
             </FormControl>
             <FormControl className={classes.formControl}>
-              <ButtonBase
-                focusRipple
-                key={image.title}
-                className={classes.image}
-                focusVisibleClassName={classes.focusVisible}
-                style={{
-                  width: image.width,
-                }}
-                component="span"
-                onClick={handleEditImageModal}
-              >
-                <span
-                  className={classes.imageSrc}
-                  style={
-                    projectForm.picture === 'null' ?
-                      {
-                        backgroundImage: `url(${image})`,
-                      } :
-                      {
-                        backgroundImage: `url(${projectForm.picture})`,
-                      }}
-                />
-                <span className={classes.imageBackdrop} />
-                <span className={classes.imageButton}>
-                  <Typography
-                    component="span"
-                    variant="subtitle1"
-                    color="inherit"
-                    className={classes.imageTitle}
-                  >
-                    <PhotoCamera />
-                    <span className={classes.imageMarked} />
-                  </Typography>
-                </span>
-              </ButtonBase>
               <EditImageForm
-                open={openEditImageModal}
                 uploadImage={uploadImage}
                 removeImage={removeImage}
-                // handleDelete={handleDelete}
-                close={handleCloseEditImageModal}
+                picture={projectForm.picture}
+                type="edit"
               />
             </FormControl>
             <FormControl
@@ -488,7 +364,7 @@ export default function ProjectEditModal(props) {
               />
             </FormControl>
           </div>
-          <div>
+          <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
                 onChange={handleDate}
@@ -511,7 +387,7 @@ export default function ProjectEditModal(props) {
         }
         submit={() => handleButton()}
         delete={() => handleDelete()}
-        close={()=>handleCloseModal()}
+        close={() => handleCloseModal()}
       />
     </Dialog>
   );

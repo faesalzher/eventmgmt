@@ -1,25 +1,17 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
-import CloseIcon from '@material-ui/icons/Close';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-
-import {
-  DeleteForm
-} from 'components';
 
 const DELETE_DIVISION = gql`
 mutation deleteDivision ($_id: String!) {
@@ -43,8 +35,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     // width: '50%',
     margin: theme.spacing(2),
-    marginTop: 0,
-    // marginRight: theme.spacing(0),
   },
   formControl: {
     // minWidth: 50
@@ -75,17 +65,8 @@ export default function DivisionEditForm(props) {
     division_name: props.division.division_name,
   }
   const [divisionForm, setDivisionForm] = useState(intitialFormState);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteDivision] = useMutation(DELETE_DIVISION);
   const [editDivision] = useMutation(EDIT_DIVISION);
-
-  const handleDeleteModal = () => {
-    setOpenDeleteModal(true);
-  }
-
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
 
   const handleSaveEditButton = () => {
     props.handleSaveEditButton(divisionForm)
