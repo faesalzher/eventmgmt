@@ -49,18 +49,23 @@ export default function EditAgendaModal(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const [popoverDate, setPopoverDate] = React.useState(null);
-  const [selectedDays, setSelectedDays] = React.useState(undefined);
 
-  const initialFormState =
-  {
-    _id: props.agenda._id,
-    agenda_name: props.agenda.agenda_name,
-    details: props.agenda.details,
-    date: props.agenda.date,
-    start_time: props.agenda.start_time,
-    end_time: props.agenda.end_time,
-  };
-  const [agendaForm, setAgendaForm] = useState(initialFormState)
+  // const initialFormState =
+  // {
+  //   _id: props.agenda._id,
+  //   agenda_name: props.agenda.agenda_name,
+  //   details: props.agenda.details,
+  //   date: props.agenda.date,
+  //   start_time: props.agenda.start_time,
+  //   end_time: props.agenda.end_time,
+  // };
+
+
+  const [agendaForm, setAgendaForm] = useState(props.agenda)
+  useEffect(() => {
+    setAgendaForm(props.agenda)
+  }, [setAgendaForm, props.agenda])
+  const [selectedDays, setSelectedDays] = React.useState(new Date(props.agenda.date));
 
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -77,12 +82,13 @@ export default function EditAgendaModal(props) {
 
   const handleSaveEditButton = () => {
     props.handleSaveEditButton(agendaForm)
-    handleClose();
+    props.close()
   };
 
   const handleClose = () => {
     props.close();
-    setAgendaForm(initialFormState);
+    setAgendaForm(props.agenda);
+    setSelectedDays(props.agenda.date)
   };
 
   const handleCloseDate = () => {
@@ -125,6 +131,7 @@ export default function EditAgendaModal(props) {
     }
   }, [difference_in_milliseconds])
 
+  console.log(selectedDays)
   const openDate = Boolean(popoverDate);
   const id_date = openDate ? 'AddDateForm' : undefined;
 

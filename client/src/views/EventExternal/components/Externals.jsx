@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Paper,
   IconButton,
@@ -113,17 +113,23 @@ TablePaginationActions.propTypes = {
 
 export default function Externals(props) {
   const classes = useStyles();
-  // const [props.externals, setExternals] = useState(mockData);
-  const externals = (props.externals.filter(function (external) {
+  const [externals, setExternals] = useState(props.externals);
+
+  useEffect(() => {
+    setExternals(props.externals)
+  }, [setExternals, props.externals]);
+
+  const externalsByType = (externals.filter(function (external) {
     if (external.external_type === props.type) {
       return external
     }
     return null;
   }));
+  console.log(externals)
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openAddModal, setOpenAddModal] = useState(false);
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, externals.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, externalsByType.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
     setOpenAddModal(true);
@@ -133,7 +139,6 @@ export default function Externals(props) {
     setOpenAddModal(false);
   };
 
-  console.log(externals)
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -143,7 +148,7 @@ export default function Externals(props) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  console.log(props.type)
+
   return (
     <div>
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
@@ -181,8 +186,8 @@ export default function Externals(props) {
           <TableBody>
             {
               (rowsPerPage > 0
-                ? externals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : externals
+                ? externalsByType.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : externalsByType
               ).map((external, index) => {
                 return <External
                   key={index}
@@ -204,7 +209,7 @@ export default function Externals(props) {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={6}
-                count={externals.length}
+                count={externalsByType.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

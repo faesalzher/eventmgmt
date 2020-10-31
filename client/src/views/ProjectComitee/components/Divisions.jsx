@@ -196,7 +196,7 @@ export default function Divisions(props) {
             }
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={1} />
               </TableRow>
             )}
           </TableBody>

@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles';
 import {
   CardContent,
   Divider,
-  Grid,
+  div,
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
@@ -20,14 +20,19 @@ const useStyles = makeStyles((theme) => ({
   font: {
     fontWeight: 600
   },
-  label: {
-    paddingBottom: '0px'
+  column: {
+    width: '30%',
   },
-  [theme.breakpoints.down('xs')]: {
-    l: {
-      padding: '0px'
-    },
-  }
+  value: {
+    width: '70%',
+  },
+  row: {
+    display: 'flex',
+    padding: '10px 0px',
+    [theme.breakpoints.down('xs')]: {
+      display: 'block'
+    }
+  }, 
 }));
 
 const Profile = props => {
@@ -54,133 +59,106 @@ const Profile = props => {
       noValidate
     >
       <CardContent>
-        <Grid
-          container
-          spacing={4}
-
-        // style={{minHeight:300}}
-        >
-
-          <Grid
-            className={classes.center}
-            item
-            md={3}
-            xs={12}
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
           >
             <Typography variant="subtitle2" className={classes.font}>Name</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
-            className={classes.center}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
           >
             <Typography variant="body1" >{profile.staff_name}</Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
+          </div>
+        </div>
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
           >
             <Typography variant="subtitle2" className={classes.font}>Email</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="body1" style={{ color: 'blue' }}>{profile.email}</Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
+          </div>
+        </div>
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="subtitle2" className={classes.font}>Phone Number</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="body1">{profile.phone_number}</Typography>
 
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
+          </div>
+        </div>
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="subtitle2" className={classes.font}>Position Name</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
-            xs={12}
-            className={classes.center}
           >
             <Typography variant="body1">{profile.position_name}</Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
+          </div>
+        </div>
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="subtitle2" className={classes.font}>Departement</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="body1">
               {
                 props.departement_name
               }
             </Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
+          </div>
+        </div><Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="subtitle2" className={classes.font}>Organization</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
           >
             <Typography variant="body1">
               {
                 props.organization_name
               }
             </Typography>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
+        <Divider />
       </CardContent>
-      <Divider />
     </form >
   );
 };

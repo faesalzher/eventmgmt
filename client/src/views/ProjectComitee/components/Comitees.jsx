@@ -139,7 +139,7 @@ export default function Comitees(props) {
       return division._id === division_id;
     }
   }));
-  
+
   const comiteesByDivision = comitees.filter(function (comitee) {
     if (division_id === "all") {
       return comitee.project_id === props.project_id;
@@ -170,7 +170,6 @@ export default function Comitees(props) {
   const handleChange = (event) => {
     setDivision_id(event.target.value);
   };
-
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>

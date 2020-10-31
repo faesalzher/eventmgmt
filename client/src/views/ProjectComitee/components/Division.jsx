@@ -60,7 +60,7 @@ export default function Volunteer(props) {
         {props.division.division_name}
       </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
-        {props.division.division_name === 'Core' ?
+        {props.division.division_name === 'Core Comitee' ?
           <div></div>
           :
           <>

@@ -5,8 +5,6 @@ import TextField from "@material-ui/core/TextField";
 import {
   Button,
   Dialog,
-  Typography,
-  Box,
 } from "@material-ui/core";
 import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
@@ -18,7 +16,7 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRange } from "react-date-range";
 // import CircularProgress from '@material-ui/core/CircularProgress';
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import AdjustIcon from "@material-ui/icons/Adjust";
+import { StatusBox } from 'components';
 import { Redirect } from "react-router";
 
 import { CancelForm, EditImageForm } from "components";
@@ -29,7 +27,7 @@ const EDIT_PROJECT = gql`
     $_id: String!
     $project_name: String!
     $project_description: String!
-    $cancel: String!
+    $cancel: Boolean!
     $project_start_date: String!
     $project_end_date: String!
     $picture: String!
@@ -96,7 +94,6 @@ export default function ProjectEditModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
-  const today = new Date();
 
   const [projectForm, setProjectForm] = React.useState([]);
   const [openCancelModal, setOpenCancelModal] = useState(false);
@@ -159,11 +156,8 @@ export default function ProjectEditModal(props) {
         organization_id: props.organization_id,
       },
     });
-    console.log(projectForm.picture)
     props.close();
   };
-
-  console.log(projectForm.picture)
 
   const handleCloseModal = () => {
     props.close();
@@ -179,15 +173,15 @@ export default function ProjectEditModal(props) {
   };
 
   const handleCancel = () => {
-    if (projectForm.cancel === "true") {
+    if (projectForm.cancel === true) {
       setProjectForm({
         ...projectForm,
-        cancel: "false",
+        cancel: false,
       });
     } else {
       setProjectForm({
         ...projectForm,
-        cancel: "true",
+        cancel: true,
       });
     }
   };
@@ -217,7 +211,7 @@ export default function ProjectEditModal(props) {
   };
 
 
-
+console.log(projectForm)
   if (navigate) {
     return <Redirect push to="/project" />;
   }
@@ -280,65 +274,19 @@ export default function ProjectEditModal(props) {
             </FormControl>
             <FormControl
               className={classes.formControl}
+              style={{ padding: '5px 0px' }}
+            >
+              <StatusBox
+                style={{ width: 'auto' }}
+                start_date={projectForm.start_date}
+                end_date={projectForm.end_date}
+              />
+            </FormControl>
+            <FormControl
+              className={classes.formControl}
               style={{ display: "flex" }}
             >
-              <div style={{ display: "flex", width: "100%", marginTop: 10 }}>
-                <AdjustIcon className={classes.icon} />
-                <div
-                  className={classes.verticalAlign}
-                  style={{ width: "100%" }}
-                >
-                  {projectForm.cancel === "true" ? (
-                    <Box
-                      borderRadius={4}
-                      style={{
-                        backgroundColor: "grey",
-                        textAlign: "center",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      <Typography variant="body2">Cancelled</Typography>
-                    </Box>
-                  ) : today < new Date(projectForm.project_start_date) ? (
-                    <Box
-                      borderRadius={4}
-                      style={{
-                        backgroundColor: "yellow",
-                        textAlign: "center",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      <Typography variant="body2">Planned</Typography>
-                    </Box>
-                  ) : today < new Date(projectForm.project_end_date) ? (
-                    <Box
-                      borderRadius={4}
-                      style={{
-                        backgroundColor: "green",
-                        textAlign: "center",
-                        width: "100%",
-                        color: "white",
-                      }}
-                    >
-                      <Typography variant="body2">Active</Typography>
-                    </Box>
-                  ) : (
-                          <Box
-                            borderRadius={4}
-                            style={{
-                              backgroundColor: "blue",
-                              textAlign: "center",
-                              width: "100%",
-                              color: "white",
-                            }}
-                          >
-                            <Typography variant="body2">Completed</Typography>
-                          </Box>
-                        )}
-                </div>
-              </div>
+
               {projectForm.cancel === "true" ? (
                 <Button
                   color="primary"

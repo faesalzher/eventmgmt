@@ -1,7 +1,7 @@
 const axios = require("axios");
 const {
   GraphQLObjectType,
-  GraphQLNonNull,
+  GraphQLBoolean,
   GraphQLID,
   GraphQLString,
   GraphQLList,
@@ -28,7 +28,7 @@ const ProjectType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     project_name: { type: GraphQLString },
     project_description: { type: GraphQLString },
-    cancel: { type: GraphQLString },
+    cancel: { type: GraphQLBoolean },
     project_start_date: { type: GraphQLString },
     project_end_date: { type: GraphQLString },
     picture: { type: GraphQLString },
@@ -120,6 +120,21 @@ const RoadmapType = new GraphQLObjectType({
     end_date: { type: GraphQLString },
     color: { type: GraphQLString },
     event_id: { type: GraphQLString },
+  }),
+});
+
+const External = require("./model/External");
+const ExternalType = new GraphQLObjectType({
+  name: "External",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    external_name: { type: GraphQLString },
+    external_type: { type: GraphQLString },
+    email: { type: GraphQLString },
+    event_id: { type: GraphQLString },
+    phone_number: { type: GraphQLString },
+    details: { type: GraphQLString },
+    picture: { type: GraphQLString },
   }),
 });
 
@@ -236,14 +251,6 @@ const RootQuery = new GraphQLObjectType({
         return Division.find({ project_id: args.project_id });
       },
     },
-    // divisionIdByProjectAndName: {
-    //   type: new GraphQLList(DivisionType),
-    //   args: { project_id: { type: GraphQLString } },
-    //   args: { division_name: { type: GraphQLString } },
-    //   resolve(parent, args) {
-    //     return Division.find({ project_id: args.project_id, division_name: args.division_name });
-    //   }
-    // },
     comiteesByProject: {
       type: new GraphQLList(ComiteeType),
       args: { project_id: { type: GraphQLString } },
@@ -278,11 +285,18 @@ const RootQuery = new GraphQLObjectType({
         return Roadmap.find({ event_id: args.event_id });
       },
     },
-      roadmap: {
+    roadmap: {
       type: RoadmapType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Roadmap.findById(args._id);
+      },
+    },
+    externals: {
+      type: new GraphQLList(ExternalType),
+      args: { event_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return External.find({ event_id: args.event_id });
       },
     },
   },
@@ -331,7 +345,7 @@ const Mutation = new GraphQLObjectType({
         _id: { type: GraphQLString },
         project_name: { type: GraphQLString },
         project_description: { type: GraphQLString },
-        cancel: { type: GraphQLString },
+        cancel: { type: GraphQLBoolean },
         project_start_date: { type: GraphQLString },
         project_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
@@ -357,7 +371,7 @@ const Mutation = new GraphQLObjectType({
         _id: { type: GraphQLString },
         project_name: { type: GraphQLString },
         project_description: { type: GraphQLString },
-        cancel: { type: GraphQLString },
+        cancel: { type: GraphQLBoolean },
         project_start_date: { type: GraphQLString },
         project_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
@@ -764,6 +778,80 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let roadmap = Roadmap.findByIdAndDelete(args._id);
         return roadmap;
+      },
+    },
+    
+    addExternal: {
+      type: ExternalType,
+      args: {
+        _id: { type: GraphQLString },
+        external_name: { type: GraphQLString },
+        external_type: { type: GraphQLString },
+        email: { type: GraphQLString },
+        phone_number: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        details: { type: GraphQLString },
+        picture: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let external = new External({
+          _id: args._id,
+          external_name: args.external_name,
+          external_type: args.external_type,
+          email: args.email,
+          phone_number: args.phone_number,
+          event_id: args.event_id,
+          details: args.details,
+          picture: args.picture,
+        });
+        return external.save();
+      },
+    },
+    editExternal: {
+      type: ExternalType,
+      args: {
+        _id: { type: GraphQLString },
+        external_name: { type: GraphQLString },
+        email: { type: GraphQLString },
+        external_type: { type: GraphQLString },
+        phone_number: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        details: { type: GraphQLString },
+        picture: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {};
+        if (args.external_name) {
+          edit.external_name = args.external_name;
+        }
+        if (args.external_type) {
+          edit.external_type = args.external_type;
+        }
+        if (args.email) {
+          edit.email = args.email;
+        }
+        if (args.phone_number) {
+          edit.phone_number = args.phone_number;
+        }
+        if (args.event_id) {
+          edit.event_id = args.event_id;
+        }
+        if (args.details) {
+          edit.details = args.details;
+        }
+        if (args.picture) {
+          edit.picture = args.picture;
+        }
+        let external = External.findByIdAndUpdate(args._id, edit, { new: true });
+        return external;
+      },
+    },
+    deleteExternal: {
+      type: ExternalType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let external = External.findByIdAndDelete(args._id);
+        return external;
       },
     },
   },

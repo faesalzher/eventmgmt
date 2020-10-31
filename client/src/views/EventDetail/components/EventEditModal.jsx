@@ -1,14 +1,12 @@
 
 
 import React, { useState, useEffect } from 'react';
-import {makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
   Button,
   Dialog,
-  Typography,
-  Box,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
@@ -20,11 +18,12 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
 // import CircularProgress from '@material-ui/core/CircularProgress';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import AdjustIcon from '@material-ui/icons/Adjust';
 import { Redirect } from 'react-router';
 
 import {
-  CancelForm
+  CancelForm,
+  StatusBox,
+  EditImageForm,
 } from 'components';
 
 const EDIT_EVENT = gql`
@@ -96,7 +95,6 @@ export default function EventEditModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const today = new Date()
 
   const [eventForm, setEventForm] = React.useState([]);
   const [openCancelModal, setOpenCancelModal] = useState(false);
@@ -198,6 +196,20 @@ export default function EventEditModal(props) {
     setNavigate(true)
   }
 
+  const uploadImage = (e) => {
+    setEventForm({
+      ...eventForm,
+      picture: e,
+    });
+  };
+
+  const removeImage = (e) => {
+    setEventForm({
+      ...eventForm,
+      picture: " ",
+    });
+  };
+
   if (navigate) {
     return <Redirect push to={"/project/" + props.project_id} />;
   }
@@ -254,34 +266,22 @@ export default function EventEditModal(props) {
                 onChange={handleInputChange}
               />
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <EditImageForm
+                uploadImage={uploadImage}
+                removeImage={removeImage}
+                picture={eventForm.picture}
+                type="edit"
+              />
+            </FormControl>
+            <FormControl className={classes.formControl} style={{padding: '5px 0px'}} >
+              <StatusBox
+                style={{ width: 'auto' }}
+                start_date={eventForm.start_date}
+                end_date={eventForm.end_date}
+              />
+            </FormControl>
             <FormControl className={classes.formControl} style={{ display: 'flex' }}>
-              <div style={{ display: 'flex', width: '100%', marginTop: 10 }}>
-                <AdjustIcon className={classes.icon} />
-                <div className={classes.verticalAlign} style={{ width: '100%' }}>
-                  {
-                    (eventForm.cancel === "true") ? (
-                      <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: '100%', color: 'black' }}>
-                        <Typography variant="body2">Cancelled</Typography>
-                      </Box>
-                    ) : (
-                        (today < new Date(eventForm.event_start_date)) ? (
-                          <Box borderRadius={4} style={{ backgroundColor: 'yellow', textAlign: 'center', width: '100%', color: 'black' }}>
-                            <Typography variant="body2">Planned</Typography>
-                          </Box>
-                        ) : (
-                            (today < new Date(eventForm.event_end_date)) ? (
-                              <Box borderRadius={4} style={{ backgroundColor: 'green', textAlign: 'center', width: '100%', color: 'white' }}>
-                                <Typography variant="body2">Active</Typography>
-                              </Box>
-                            ) : (
-                                <Box borderRadius={4} style={{ backgroundColor: 'blue', textAlign: 'center', width: '100%', color: 'white' }}>
-                                  <Typography variant="body2">Completed</Typography>
-                                </Box>
-                              )
-                          ))
-                  }
-                </div>
-              </div>
               {eventForm.cancel === "true" ?
                 <Button color="primary" variant="outlined" onClick={handleCancelModal}>
                   Uncancel Event

@@ -118,7 +118,10 @@ export default function EventRoadmapList(props) {
     <Card style={{ maxHeight: "100%", width: '100%' }} elevation={0} >
       <div className={classes.roadmapHeaderFooter} >
         <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
-          Roadmap List
+          <Typography variant="button"
+            style={{ display: "flex", color:"white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
+            Roadmap List
+          </Typography>
           <div style={{ display: 'flex', width: 50, justifyContent: 'space-between' }}>
             <Tooltip title="Show Roadmap Calendar" arrow>
               <IconButton style={{ padding: 0 }} onClick={handleOpenCalendar}>

@@ -21,7 +21,7 @@ export default function ProjectOverview(props) {
   return (
     <Grid
       container
-      spacing={4}
+      spacing={1}
     >
       <Grid
         item
@@ -50,7 +50,7 @@ export default function ProjectOverview(props) {
       >
         <Grid
           container
-          spacing={4}
+          spacing={1}
         >
           <Grid
             item

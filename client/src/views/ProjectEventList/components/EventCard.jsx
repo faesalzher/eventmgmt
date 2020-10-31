@@ -14,11 +14,10 @@ import {
   Grid,
   Typography,
   Tooltip,
-  LinearProgress,
-  Box,
 } from '@material-ui/core';
 
 import LocationOnIcon from '@material-ui/icons/LocationOn';
+import { StatusBox, StatusProgressBar, Percentage, StatusProgressDays } from 'components';
 
 import { NavLink as RouterLink } from 'react-router-dom';
 
@@ -92,7 +91,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: 11,
     color: 'white'
   },
-  primaryColor:{
+  primaryColor: {
     color: theme.palette.primary.main
   }
 }));
@@ -111,7 +110,6 @@ const EventCard = (props) => {
   const { handleDelete, className, ...rest } = props;
   const classes = useStyles();
   const shadowStyles = useBouncyShadowStyles();
-  const today = new Date();
   const start_date = new Date(props.event.event_start_date);
   const end_date = new Date(props.event.event_end_date);
 
@@ -178,20 +176,28 @@ const EventCard = (props) => {
                 </div>
               </div>
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
-                <Typography
-                  className={classes.status}>
-                  0% Completed
-                       </Typography>
-                <Typography
-                  className={classes.status}>
-                  0/0 Tasks
-                       </Typography>
+                <div style={{ display: 'flex' }}>
+                  <Percentage
+                    cancel={props.event.cancel}
+                    start_date={props.event.event_start_date}
+                    end_date={props.event.event_end_date}
+                  />
+                  <Typography
+                    className={classes.status} style={{ display: 'flex' }}>
+                    % Completed
+                </Typography>
+                </div>
+                <StatusProgressDays
+                  cancel={props.event.cancel}
+                  start_date={props.event.event_start_date}
+                  end_date={props.event.event_end_date}
+                />
               </div>
               <div style={{ justifyContent: 'space-between' }}>
-                <LinearProgress
-                  className={classes.progress}
-                  value={75.5}
-                  variant="determinate"
+                <StatusProgressBar
+                  cancel={props.event.cancel}
+                  start_date={props.event.event_start_date}
+                  end_date={props.event.event_end_date}
                 />
               </div>
             </CardContent>
@@ -205,27 +211,11 @@ const EventCard = (props) => {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          {
-            (props.project.cancel === "true") ? (
-              <Box borderRadius={4} className={[classes.cancelled, classes.boxStatus].join(" ")}>
-                <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
-              </Box>
-            ) : (
-                (today < new Date(props.event.event_start_date)) ? (
-                  <Box borderRadius={4} className={[classes.planned, classes.boxStatus].join(" ")}>
-                    <Typography variant="subtitle2" className={[classes.fontStatus,classes.primaryColor].join(" ")}>Planned</Typography>
-                  </Box>
-                ) : (
-                    (today < new Date(props.event.event_end_date)) ? (
-                      <Box borderRadius={4} className={[classes.active, classes.boxStatus].join(" ")}>
-                        <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
-                      </Box>
-                    ) : (
-                        <Box borderRadius={4} className={[classes.completed, classes.boxStatus].join(" ")}>
-                          <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
-                        </Box>
-                      )
-                  ))}
+          <StatusBox
+            start_date={props.event.event_start_date}
+            end_date={props.event.event_end_date}
+            cancel={props.event.cancel}
+          />
           <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
             <DateRangeIcon className={classes.iconDate} />
             <Typography className={classes.status}>

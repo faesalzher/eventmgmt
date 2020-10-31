@@ -48,7 +48,7 @@ const EventList = (props) => {
 
   const { loading, error, data, refetch } = useQuery(EVENTSBYPROJECT_QUERY,
     {
-      variables: { project_id: props.project._id },
+      variables: { project_id: props.project_id },
     });
 
   useEffect(() => {

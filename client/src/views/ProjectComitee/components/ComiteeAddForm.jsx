@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
+import { AvatarName } from 'components';
+
 import TextField from '@material-ui/core/TextField';
 import {
   Dialog,
@@ -80,10 +82,17 @@ export default function ComiteeAddForm(props) {
 
   const classes = useStyles();
   // const [anchorEl, setAnchorEl] = React.useState(null);
-  const [division_id, setDivision_id] = useState("");
+  const [division_id, setDivision_id] = useState(props.division_id);
+  React.useEffect(() => {
+    if (props.division_id === 'all') {
+      setDivision_id("");
+    } else {
+      setDivision_id(props.division_id);
+    }
+  }, [setDivision_id, props.division_id])
+
   const [position_id, setPosition_id] = useState("");
   const [staff_id, setStaff_id] = useState("");
-
   const intitialFormState = {
     _id: uuid(),
     staff_id: staff_id,
@@ -179,7 +188,6 @@ export default function ComiteeAddForm(props) {
       checkCoreDivisionId.push(division._id)
     return null;
   });
-  // console.log(checkCoreDivisionId[0])
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -210,11 +218,17 @@ export default function ComiteeAddForm(props) {
                   props.staffs.map((staff) => {
                     if (checkComiteeStaffId.indexOf(staff._id) > -1) {
                       return <MenuItem key={staff.staff_name} disabled={true}>
-                        {staff.staff_name}
+                        <AvatarName
+                          name={staff.staff_name}
+                          picture={staff.picture}
+                        />
                       </MenuItem>
                     } else {
                       return < MenuItem key={staff.staff_name} value={staff._id} >
-                        {staff.staff_name}
+                        <AvatarName
+                          name={staff.staff_name}
+                          picture={staff.picture}
+                        />
                       </MenuItem>
                     }
                   })
@@ -225,7 +239,7 @@ export default function ComiteeAddForm(props) {
               {
                 <TextField
                   id="division_id"
-                  multiple select
+                  select
                   size="small"
                   margin="dense"
                   style={{ backgroundColor: 'white' }}
@@ -314,9 +328,9 @@ export default function ComiteeAddForm(props) {
             ("invalid") : ("valid")
         }
         submit={() => handleSaveButton()}
-        close={()=>handleCloseModal()}
-        />
-        
+        close={() => handleCloseModal()}
+      />
+
     </Dialog >
   );
 };

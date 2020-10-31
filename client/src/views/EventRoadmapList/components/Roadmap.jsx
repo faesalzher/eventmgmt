@@ -7,8 +7,8 @@ import {
   LinearProgress,
   Typography,
   ListItem,
+  Grid,
 } from '@material-ui/core';
-import RemoveIcon from '@material-ui/icons/Remove';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 
 import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
@@ -36,14 +36,12 @@ const ColorLinearProgress = withStyles({
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    fontSize: 10,
-    marginTop: 2,
-    color: 'blue'
+    fontSize: 14,
+    margin: 2,
   },
   info: {
-    color: 'blue',
-    fontWeight: 440,
-    fontSize: 10,
+    fontWeight: 450,
+    fontSize: 11,
     letterSpacing: '0.0000em'
   },
   iconbutton: {
@@ -56,47 +54,62 @@ export default function Roadmap(props) {
   const shadowStyles = useSoftRiseShadowStyles();
   const classes = useStyles();
   return (
-    <div className={clsx(shadowStyles.root)}>
+    <div className={clsx(shadowStyles.root)} style={{padding:'2px 0px'}}>
       <div style={{ display: 'flex' }}>
         <div style={{ backgroundColor: props.roadmap.color, width: '1%' }} />
         <ListItem button style={{ padding: 0, display: 'flex', backgroundColor: 'white' }}
           component={CustomRouterLink}
           to={`/project/${props.project_id}/${props.event_id}/${props.roadmap._id}`}
         >
-          <div style={{ padding: "10px 13px", width: '100%', display:'flex'}}>
-            <div style={
-              props.xs?
-              { width:'90%' }
-              :
-              { display: 'flex', justifyContent: 'space-between',width:'90%',marginRight:30  }}>
-              <Typography variant="subtitle2">
-                {props.roadmap.roadmap_name}
-              </Typography>
-              <div style={{ display: 'flex', justifyContent: 'space-between'}}>
-              <div style={{ display: 'flex' }}>
-                <DateRangeIcon className={classes.icon} />
-                <Typography className={classes.info}>
-                  {new Date(props.roadmap.start_date).toString().slice(0, 16)}
+          <div style={{ padding: "10px 13px", width: '100%', display: 'flex' }}>
+            <Grid
+              container
+              spacing={2}
+            >
+              <Grid
+                item
+                sm={8}
+                xs={12}
+              >
+                <Typography variant="h5">
+                  {props.roadmap.roadmap_name}
                 </Typography>
-                <RemoveIcon className={classes.icon} />
-                <Typography className={classes.info}>
-                  {new Date(props.roadmap.end_date).toString().slice(0, 16)}
-                </Typography>
-              </div>
-            </div>
-            </div>  
-            <div style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}>
-                <ColorLinearProgress col={props.roadmap.color} thickness={1} style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }} variant="determinate" value={19} />
-                <div>
-                  <Typography className={classes.info} style={{ color: 'black' }}>
-                    Completed 15 %
-                  </Typography>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex' }}>
+                    <DateRangeIcon className={classes.icon} color="secondary"/>
+                    <Typography className={classes.info} color="secondary">
+                      {new Date(props.roadmap.start_date).toString().slice(0, 16)}
+                      {" - "}
+                      {new Date(props.roadmap.end_date).toString().slice(0, 16)}
+                    </Typography>
+                  </div>
                 </div>
-              </div>       
+              </Grid>
+              <Grid
+              item
+              sm={4}
+              xs={12}
+              style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}
+            >
+              <div style={{display:'flex', justifyContent:"space-between"}}>
+                <Typography className={classes.info}>
+                  15% Completed 
+                  </Typography>
+                  <Typography className={classes.info}>
+                  0/0 Tasks
+                  </Typography>
+              </div>
+              <ColorLinearProgress col={props.roadmap.color} 
+              thickness={1} 
+              style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }} 
+              variant="determinate" value={19} />
+              {/* </div> */}
+            </Grid>
+            </Grid>
           </div>
         </ListItem>
       </div>
       <Divider />
-    </div>
+    </div >
   );
 }

@@ -93,6 +93,9 @@ const useStyles = makeStyles((theme) => ({
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
+  colorPrimary: {
+    backgroundColor: theme.palette.primary.main
+  }
 }));
 
 export default function Organization() {
@@ -211,6 +214,10 @@ export default function Organization() {
 
   return (
     <div>
+      <Paper color="default" position="static" style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
+        <Typography color='textSecondary' variant="button"
+          style={{ display: "flex", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>User Management</Typography>
+      </Paper>
       <div className={classes.root}>
         <Snackbar
           anchorOrigin={{
@@ -224,13 +231,9 @@ export default function Organization() {
             Succes!
          </MuiAlert>
         </Snackbar>
+
         <Paper>
-          <Paper elevation={0} style={{ backgroundColor: 'orange' }}>
-            <Paper elevation={0} style={{ height:40, display: "flex", backgroundColor: "rgb(230 153 11)", flexDirection: "row", justifyContent: "center" }}>
-              <Typography variant="button"
-                style={{ display: "flex", color: "white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>User Management</Typography>
-            </Paper>
-            {/* <Divider /> */}
+          <Paper elevation={0} className={classes.colorPrimary}>
             <Tabs
               value={value}
               onChange={handleChange}

@@ -9,11 +9,55 @@ import {
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 import {
   EditImageForm,
   EditAvatarForm,
 } from 'components';
+
+const EDIT_EXTERNAL = gql`
+  mutation editExternal(
+    $_id: String!,
+    $external_name: String!,
+    $external_type: String!,
+    $email: String!,
+    $event_id: String!,
+    $phone_number: String!,
+    $picture:String!,
+    $details:String!
+    ) {
+    editExternal(
+      _id: $_id,
+      external_name: $external_name,
+      external_type: $external_type,
+      email:$email,
+      event_id:$event_id,
+      phone_number:$phone_number,
+      picture:$picture,
+      details:$details
+      ) {
+      _id
+      external_name
+      external_type
+      email
+      event_id
+      phone_number
+      picture
+      details
+    }
+  }
+`;
+
+
+const DELETE_EXTERNAL = gql`
+  mutation deleteExternal($_id: String!) {
+    deleteExternal(_id: $_id) {
+      _id
+    }
+  }
+`;
+
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -54,10 +98,30 @@ export default function ExternalEditForm(props) {
   }
   const [externalForm, setExternalForm] = useState(intitialFormState);
 
+  const [editExternal] = useMutation(EDIT_EXTERNAL);
+  const [deleteExternal] = useMutation(DELETE_EXTERNAL);
+
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(externalForm)
     // setExternalForm(intitialFormState);
-    props.close();
+    setTimeout(() => {
+      props.handleSaveEditButton(externalForm)
+      props.close();
+      editExternal(
+        {
+          variables:
+          {
+            _id: externalForm._id,
+            external_name: externalForm.external_name,
+            external_type: externalForm.external_type,
+            email: externalForm.email,
+            phone_number: externalForm.phone_number,
+            details: externalForm.details,
+            picture: externalForm.picture,
+            event_id: externalForm.event_id,
+          }
+        });
+      // setExternalForm(initialFormState);
+    }, 400);
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -66,6 +130,7 @@ export default function ExternalEditForm(props) {
 
   const handleDelete = () => {
     props.handleDelete(props.external._id);
+    deleteExternal({ variables: { _id: props.external._id } });
     props.close();
   }
 
@@ -86,7 +151,7 @@ export default function ExternalEditForm(props) {
   const handleCloseModal = () => {
     props.close();
   }
-
+console.log(externalForm)
   return (
     <Dialog
       fullScreen={fullScreen}

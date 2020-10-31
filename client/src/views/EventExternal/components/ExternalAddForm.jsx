@@ -10,8 +10,44 @@ import {
 } from '@material-ui/core';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 import uuid from 'uuid/v1';
-import { EditImageForm,EditAvatarForm } from "components";
+import { EditImageForm, EditAvatarForm } from "components";
+
+
+const ADD_EXTERNAL = gql`
+  mutation addExternal(
+    $_id: String!,
+    $external_name: String!,
+    $external_type: String!,
+    $email: String!,
+    $event_id: String!,
+    $phone_number: String!,
+    $picture:String!,
+    $details:String!
+    ) {
+    addExternal(
+      _id: $_id,
+      external_name: $external_name,
+      external_type: $external_type,
+      email:$email,
+      event_id:$event_id,
+      phone_number:$phone_number,
+      picture:$picture,
+      details:$details
+      ) {
+      _id
+      external_name
+      external_type
+      email
+      event_id
+      phone_number
+      picture
+      details
+    }
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -38,7 +74,7 @@ export default function ExternalAddForm(props) {
 
   const classes = useStyles();
   // const [anchorEl, setAnchorEl] = React.useState(null);
-  const intitialFormState = {
+  const initialFormState = {
     _id: uuid(),
     external_name: "",
     external_type: props.type,
@@ -49,12 +85,30 @@ export default function ExternalAddForm(props) {
     picture: " ",
   }
 
-  const [externalForm, setExternalForm] = useState(intitialFormState);
+  const [externalForm, setExternalForm] = useState(initialFormState);
+  const [addExternal] = useMutation(ADD_EXTERNAL);
 
   const handleSaveButton = () => {
-    props.handleSaveButton(externalForm)
-    setExternalForm(intitialFormState);
-    props.close();
+    setTimeout(() => {
+      props.handleSaveButton(externalForm)
+      props.close();
+      addExternal(
+        {
+          variables:
+          {
+            _id: externalForm._id,
+            external_name: externalForm.external_name,
+            external_type: externalForm.external_type,
+            email: externalForm.email,
+            phone_number: externalForm.phone_number,
+            details: externalForm.details,
+            picture: externalForm.picture,
+            event_id: externalForm.event_id,
+          }
+        });
+      setExternalForm(initialFormState);
+    }, 400);
+
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -71,7 +125,7 @@ export default function ExternalAddForm(props) {
   const handleCloseModal = () => {
     props.close();
   }
-  
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -83,9 +137,9 @@ export default function ExternalAddForm(props) {
       <DialogTitle title={"Add New " + props.type} onClose={() => handleCloseModal()} />
       <DialogContent style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}>
-        {props.type === "Volunteer" || props.type === "Guest" ?
+          {props.type === "Volunteer" || props.type === "Guest" ?
             <FormControl style={fullScreen ?
-              { width: '100%', padding: 17} :
+              { width: '100%', padding: 17 } :
               { width: '50%', padding: 17, display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
               <EditAvatarForm
                 uploadImage={uploadImage}
@@ -94,9 +148,9 @@ export default function ExternalAddForm(props) {
               />
             </FormControl>
             :
-            <FormControl style={fullScreen ? 
-            { width: '100%', padding: 17} :
-             { width: '50%', padding: 17 }}>
+            <FormControl style={fullScreen ?
+              { width: '100%', padding: 17 } :
+              { width: '50%', padding: 17 }}>
               <EditImageForm
                 uploadImage={uploadImage}
                 picture={externalForm.picture}
@@ -153,7 +207,7 @@ export default function ExternalAddForm(props) {
                 onChange={handleInputChange}
               />
             </FormControl>
-          </div>       
+          </div>
         </form>
       </DialogContent>
       <DialogActionsAdd

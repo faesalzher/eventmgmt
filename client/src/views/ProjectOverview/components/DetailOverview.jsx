@@ -4,9 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {
   Paper,
-  Box,
   Divider,
-  Avatar,
   Typography,
   // Divider,
   // IconButton
@@ -17,10 +15,11 @@ import { useQuery } from '@apollo/react-hooks';
 
 import AdjustIcon from '@material-ui/icons/Adjust';
 import EventIcon from '@material-ui/icons/Event';
-
+import { StatusBox, AvatarName } from 'components';
 const HEADOFPROJECT_QUERY = gql`
   query comiteesByHeadProject($project_id: String!,$position_id: String!){
      comiteesByHeadProject(project_id:$project_id,position_id:$position_id) {
+       _id
       staff_id
       }
   }
@@ -33,6 +32,18 @@ query staffById($_id: String!){
       staff_name
       phone_number
       email
+      picture
+      organization_id
+    }
+  }
+`;
+
+const ORGANIZATION_QUERY = gql`
+  query organization($_id: String!) {
+    organization(_id: $_id) {
+      _id
+      organization_name
+      picture
     }
   }
 `;
@@ -64,7 +75,6 @@ const useStyles = makeStyles(() => ({
 
 export default function DetailOverview(props) {
   const classes = useStyles();
-  const today = new Date();
 
   const initialFormState =
   {
@@ -72,114 +82,126 @@ export default function DetailOverview(props) {
     staff_name: "",
     phone_number: "",
     email: "",
+    picture: ""
   };
 
-  const [headOfProjectId, setHeadOfProjectId] = useState([{ staff_id: '0' }]);
-  const [headOfProjectName, setHeadOfProjectName] = useState(initialFormState);
+  const [headOfProjectId, setHeadOfProjectId] = useState("");
+  const [headOfProject, setHeadOfProject] = useState(initialFormState);
+  const [organization, setOrganization] = useState("");
 
 
-  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
+  const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
     {
       variables: { project_id: props.project._id, position_id: '1' },
-      // onCompleted: () => {
-      //   if (headOfProjectIdData.comiteesByHeadProject.length === 0) {
-      //     return setHeadOfProjectId([{ staff_id: '0' }])
-      //   } else {
-      //     return setHeadOfProjectId(headOfProjectIdData.comiteesByHeadProject)
-      //   }
-      // }
     });
 
+
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (headOfProjectIdData !== undefined && headOfProjectIdData.comiteesByHeadProject.length !== 0) {
+        setHeadOfProjectId(data.comiteesByHeadProject[0].staff_id);
+      } else {
+        return setHeadOfProjectId('')
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !headOfProjectIdLoading && !headOfProjectIdError) {
+        onCompleted(headOfProjectIdData);
+      } else if (onError && !headOfProjectIdLoading && headOfProjectIdError) {
+        onError(headOfProjectIdError);
+      }
+    }
+  }, [headOfProjectIdLoading, headOfProjectIdData, headOfProjectIdError]);
+
+  const { loading: headOfProjectLoading, error: headOfProjectError, data: headOfProjectData, refetch: headOfProjectRefetch } = useQuery(STAFFBYID_QUERY,
+    {
+      variables: { _id: headOfProjectId },
+    });
+
+
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (headOfProjectData !== undefined && headOfProjectData.staffById !== null) {
+        setHeadOfProject(data.staffById)
+      } else {
+        setHeadOfProject(initialFormState)
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !headOfProjectLoading && !headOfProjectError) {
+        onCompleted(headOfProjectData);
+      } else if (onError && !headOfProjectLoading && headOfProjectError) {
+        onError(headOfProjectError);
+      }
+    }
+  }, [headOfProjectLoading, headOfProjectData, headOfProjectError,initialFormState,]);
+
+
+  const { data: organizationData, refetch: organizationRefetch } =
+    useQuery(ORGANIZATION_QUERY,
+      {
+        variables: { _id: props.project.organization_id },
+        onCompleted: () => {
+          setOrganization(organizationData.organization)
+        },
+
+      }
+    );
   useEffect(() => {
     refresh()
   });
 
-  useEffect(() => {
-    const onCompleted = (data) => {
-      if (headOfProjectIdData.comiteesByHeadProject.length === 0) {
-        return setHeadOfProjectId([{ staff_id: '0' }])
-      } else {
-        return setHeadOfProjectId(data.comiteesByHeadProject)
-      }
-    };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !loading && !error) {
-        onCompleted(headOfProjectIdData);
-      } else if (onError && !loading && error) {
-        onError(error);
-      }
-    }
-  }, [loading, headOfProjectIdData, error]);
-
-  const { data: headOfProjectNameData, refetch: headOfProjectNameRefetch } = useQuery(STAFFBYID_QUERY,
-    {
-      variables: { _id: headOfProjectId[0].staff_id },
-      // onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staffById) }
-    });
-
-  useEffect(() => {
-    const onCompleted = (data) => {
-      if (data === undefined) {
-        return
-      } else {
-        return setHeadOfProjectName(data.staffById)
-      }
-    };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !loading && !error) {
-        onCompleted(headOfProjectNameData);
-      } else if (onError && !loading && error) {
-        onError(error);
-      }
-    }
-  }, [loading, headOfProjectNameData, error]);
-
-
   const refresh = () => {
     headOfProjectIdRefetch();
-    headOfProjectNameRefetch();
+    headOfProjectRefetch();
+    organizationRefetch();
   };
 
   return (
     <Paper className={(classes.root)}    >
       <div className={classes.content}>
-        <Typography variant="h6">
+        <Typography variant="h4">
           {props.project.project_name}
         </Typography>
       </div>
       <Divider />
       <div className={classes.content}>
-        <Typography variant="body2">
+      <Typography variant="subtitle2">
+          Description
+          </Typography>
+        <Typography variant="body1">
           {props.project.project_description}
         </Typography>
       </div>
       <Divider />
       <div className={classes.content}>
         <Typography variant="subtitle2">
-          Head of Project
+          Organization
           </Typography>
-        <div style={{ display: 'flex' }}>
-          <Avatar style={{width:30, height:30}} src={
-            (headOfProjectName !== null) ?
-              headOfProjectName.picture
-              :
-              ""
-          } />
-          <Typography variant="body2"
-            style={{
-              display: 'flex', flexDirection: 'column', margin: "0px 10px", justifyContent: "center"
-           }}>
-            {(headOfProjectName !== null) ?
-              headOfProjectName.staff_name
-              :
-              "-"
-            }
-          </Typography>
-        </div>
+        <AvatarName
+          name={organization.organization_name}
+          picture={organization.picture}
+        />
       </div>
       <Divider />
+      <div className={classes.content}>
+        <Typography variant="subtitle2">
+          Head of Project
+          </Typography>
+        <AvatarName
+          name={
+            headOfProject.staff_name
+          }
+          picture={
+            headOfProject.picture
+          }
+        />
+      </div>
+      <Divider />    
       <div className={classes.content}>
         <Typography variant="subtitle2">
           Date
@@ -187,8 +209,9 @@ export default function DetailOverview(props) {
         <div style={{ display: 'flex' }}>
           <EventIcon className={classes.icon} />
           <div className={classes.verticalAlign} >
-            <Typography variant="body2">
-              {props.project.project_start_date.toString().slice(0, 16)}-
+            <Typography variant="body1">
+              {props.project.project_start_date.toString().slice(0, 16)}
+              {" - "}
               {props.project.project_end_date.toString().slice(0, 16)}
             </Typography>
           </div>
@@ -202,27 +225,11 @@ export default function DetailOverview(props) {
         <div style={{ display: 'flex' }}>
           <AdjustIcon className={classes.icon} />
           <div className={classes.verticalAlign}>
-            {
-              (props.project.cancel === "true") ? (
-                <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: 110, color: 'black' }}>
-                  <Typography variant="body2">Cancelled</Typography>
-                </Box>
-              ) : (
-                  (today < new Date(props.project.project_start_date)) ? (
-                    <Box borderRadius={4} style={{ backgroundColor: 'yellow', textAlign: 'center', width: 110, color: 'black' }}>
-                      <Typography variant="body2">Planned</Typography>
-                    </Box>
-                  ) : (
-                      (today < new Date(props.project.project_end_date)) ? (
-                        <Box borderRadius={4} style={{ backgroundColor: 'green', textAlign: 'center', width: 110, color: 'white' }}>
-                          <Typography variant="body2">Active</Typography>
-                        </Box>
-                      ) : (
-                          <Box borderRadius={4} style={{ backgroundColor: 'blue', textAlign: 'center', width: 110, color: 'white' }}>
-                            <Typography variant="body2">Completed</Typography>
-                          </Box>
-                        )
-                    ))}
+            <StatusBox
+              start_date={props.project.project_start_date}
+              end_date={props.project.project_end_date}
+              cancel={props.project.cancel}
+            />
           </div>
         </div>
       </div>

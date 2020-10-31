@@ -59,6 +59,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -66,6 +67,7 @@ const ProfileEditForm = props => {
           </Grid>
           <Grid
             item
+            sm={9}
             md={9}
             xs={12}
           >
@@ -81,6 +83,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -89,6 +92,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={9}
+            sm={9}
             xs={12}
           >
             <TextField
@@ -103,6 +107,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -111,6 +116,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={9}
+            sm={9}
             xs={12}
           >
             <TextField
@@ -126,6 +132,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -133,6 +140,7 @@ const ProfileEditForm = props => {
           </Grid>
           <Grid
             item
+            sm={9}
             md={9}
             xs={12}
           >
@@ -149,6 +157,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -157,6 +166,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={9}
+            sm={9}
             xs={12}
           >
             <TextField
@@ -172,6 +182,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={3}
+            sm={3}
             xs={12}
             className={classes.center}
           >
@@ -180,6 +191,7 @@ const ProfileEditForm = props => {
           <Grid
             item
             md={9}
+            sm={9}
             xs={12}
           >
             <TextField

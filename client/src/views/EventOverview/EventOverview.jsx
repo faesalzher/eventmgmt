@@ -1,131 +1,142 @@
-import React from "react";
-
-import { makeStyles } from '@material-ui/styles';
-
+import React, { useState, useEffect } from 'react';
 import {
-  Paper,
   Grid,
-  Box,
+  // CardMedia,
   // CardActions,
-  Typography,
   // Divider,
   // IconButton
 } from '@material-ui/core';
 
-import AdjustIcon from '@material-ui/icons/Adjust';
-import EventIcon from '@material-ui/icons/Event';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-const useStyles = makeStyles(() => ({
-  root: {
-    height: '100%',
-    padding: '0px 12px'
-  },
-  content: {
-    padding: "4px 0px"
-  },
-  image: {
-    height: 48,
-    width: 48
-  },
-  icon: {
-    fontSize: 20,
-    marginRight: 5
-  },
-  actions: {
-    justifyContent: 'flex-end'
-  },
-  verticalAlign: {
-    display: 'flex', flexDirection: 'column', justifyContent: 'center'
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+import {
+  PictureCard,
+  ExternalCard,
+  DetailOverview
+} from './components';
+
+
+const EXTERNALS_QUERY = gql`
+  query externals($event_id:String!){
+    externals(event_id: $event_id){
+      _id,
+      external_name,
+      external_type,
+      email,
+      event_id,
+      phone_number,
+      details,
+      picture,
+    }
   }
-}));
+`;
 
 export default function EventOverview(props) {
-  const classes = useStyles();
-const today = new Date();
+  const [externals, setExternals] = useState([]);
+  const { loading:externalsLoading, error: externalsError, data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
+    {
+      variables: { event_id: props.event._id },
+    }
+  );
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (data !== undefined)
+        setExternals(data.externals)
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !externalsLoading && !externalsError) {
+        onCompleted(externalsData);
+      } else if (onError && !externalsLoading && externalsError) {
+        onError(externalsError);
+      }
+    }
+  }, [externalsLoading, externalsData, externalsError]);
+
+
+  useEffect(() => {
+    refresh()
+  });
+
+  const refresh = () => {
+    externalsRefetch();
+  };
+
   return (
-    <div >
+    <Grid
+      container
+      spacing={1}
+    >
       <Grid
-        container
-        style={{ marginRight: 1 }}
-        spacing={1}
+        item
+        lg={6}
+        md={6}
+        xl={12}
+        xs={12}
       >
-        <Grid item
-          lg={12}
-          sm={12}
-          xl={12}
-          xs={12}
+        <DetailOverview event={props.event} />
+      </Grid>
+      <Grid
+        item
+        lg={6}
+        md={6}
+        xl={12}
+        xs={12}
+      >
+        <PictureCard event={props.event} />
+      </Grid>
+      <Grid
+        item
+        lg={12}
+        md={12}
+        xl={12}
+        xs={12}
+      >
+        <Grid
+          container
+          spacing={1}
         >
-          <Paper
-            className={(classes.root)}
+          <Grid
+            item
+            lg={3}
+            sm={3}
+            xl={6}
+            xs={12}
           >
-            <div className={classes.content}>
-              <Typography variant="h6">
-                {props.event.event_name}
-              </Typography>
-              <Typography variant="body2">
-                {props.event.event_description}
-              </Typography>
-            </div>
-            <div className={classes.content}>
-              <Typography variant="subtitle2">
-                Date
-          </Typography>
-              <div style={{ display: 'flex' }}>
-                <EventIcon className={classes.icon} />
-                <div className={classes.verticalAlign} >
-                  <Typography variant="body2">
-                    {props.event.event_start_date.slice(0, 16)} - {props.event.event_end_date.slice(0, 16)}
-                  </Typography>
-                </div>
-              </div>
-            </div>
-            <div className={classes.content}>
-              <Typography variant="subtitle2">
-                Location
-              </Typography>
-              <div style={{ display: 'flex' }}>
-                <LocationOnIcon className={classes.icon} />
-                <div className={classes.verticalAlign}>
-                  <Typography variant="body2">
-                    {props.event.event_location}
-                  </Typography>
-                </div>
-              </div>
-            </div>
-            <div className={classes.content}>
-              <Typography variant="subtitle2">
-                Status
-             </Typography>
-              <div style={{ display: 'flex' }}>
-                <AdjustIcon className={classes.icon} />
-                <div className={classes.verticalAlign}>
-                  {
-                    (props.event.cancel === "true") ? (
-                      <Box borderRadius={4} style={{ backgroundColor: 'grey', textAlign: 'center', width: 110, color: 'black' }}>
-                        <Typography variant="body2">Cancelled</Typography>
-                      </Box>
-                    ) : (
-                        (today < new Date(props.event.event_start_date)) ? (
-                          <Box borderRadius={4} style={{ backgroundColor: 'yellow', textAlign: 'center', width: 110, color: 'black' }}>
-                            <Typography variant="body2">Planned</Typography>
-                          </Box>
-                        ) : (
-                            (today < new Date(props.event.event_end_date)) ? (
-                              <Box borderRadius={4} style={{ backgroundColor: 'green', textAlign: 'center', width: 110, color: 'white' }}>
-                                <Typography variant="body2">Active</Typography>
-                              </Box>
-                            ) : (
-                                <Box borderRadius={4} style={{ backgroundColor: 'blue', textAlign: 'center', width: 110, color: 'white' }}>
-                                  <Typography variant="body2">Completed</Typography>
-                                </Box>
-                              )
-                          ))}
-                </div>
-              </div>
-            </div>
-          </Paper>
+            <ExternalCard type="Sponsor" externals={externals} />
+          </Grid>
+          <Grid
+            item
+            lg={3}
+            sm={3}
+            xl={6}
+            xs={12}
+          >
+            <ExternalCard type="Volunteer" externals={externals} />
+          </Grid>
+          <Grid
+            item
+            lg={3}
+            sm={3}
+            xl={6}
+            xs={12}
+          >
+            <ExternalCard type="Guest" externals={externals} />
+          </Grid>
+          <Grid
+            item
+            lg={3}
+            sm={3}
+            xl={6}
+            xs={12}
+          >
+            <ExternalCard type="Media Partner" externals={externals} />
+          </Grid>
         </Grid>
-      </Grid >
-    </div>
+      </Grid>
+    </Grid>
+
   );
 }

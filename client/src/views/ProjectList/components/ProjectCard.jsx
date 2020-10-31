@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { useBouncyShadowStyles } from '@mui-treasury/styles/shadow/bouncy';
+import { StatusBox, StatusProgressBar, Percentage, StatusProgressDays } from 'components';
 // import SettingsIcon from '@material-ui/icons/Settings';
 // import AddprojectsModal from '../AddProjectModal';
 import DateRangeIcon from '@material-ui/icons/DateRange';
@@ -21,15 +22,7 @@ import {
   CardMedia,
   Grid,
   Typography,
-  // IconButton,
   Tooltip,
-  LinearProgress,
-  // Popover,
-  // MenuItem,
-  // Paper,
-  Box,
-  // MenuList,
-  // ClickAwayListener,
 } from '@material-ui/core';
 // import { findByLabelText } from '@testing-library/react';
 // import LoadingOverlay from 'react-loading-overlay';
@@ -88,31 +81,6 @@ const useStyles = makeStyles(theme => ({
   },
   media: {
     height: 110,
-  },
-  cancelled: {
-    backgroundColor: theme.palette.error.main
-  },
-  planned: {
-    backgroundColor: theme.palette.warning.main
-  },
-  completed: {
-    backgroundColor: theme.palette.success.main,
-    color: 'white'
-  },
-  active: {
-    backgroundColor: theme.palette.info.main
-  },
-  boxStatus: {
-    textAlign: 'center',
-    width: 110,
-    height: 17,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center'
-  },
-  fontStatus: {
-    fontSize: 11,
-    color: 'white'
   },
   primaryColor: {
     color: theme.palette.primary.main
@@ -194,21 +162,6 @@ const ProjectCard = (props) => {
     headOfProjectNameRefetch();
   };
 
-  const today = new Date();
-  const start_date = new Date(props.project.project_start_date);
-  const end_date = new Date(props.project.project_end_date);
-
-  const plannedDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
-  const activeDays = Math.ceil((today.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
-  const completedDays = Math.ceil((today.getTime() - end_date.getTime()) / (1000 * 3600 * 24));
-  const totalActiveDays = Math.ceil((end_date.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
-
-  const isToday = (someDate) => {
-    return someDate.getDate() === today.getDate() &&
-      someDate.getMonth() === today.getMonth() &&
-      someDate.getFullYear() === today.getFullYear()
-  }
-
   return (
     <Grid
       item
@@ -249,122 +202,59 @@ const ProjectCard = (props) => {
                     }
 
                   </Typography>
-                  <Typography variant="h6" className={classes.content}>
+                  <Typography variant="h5" >
                     {props.project.project_name}
                   </Typography>
                 </div>
               </div>
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
-                <Typography
-                  className={classes.status}>
-                  {
-                    (props.project.cancel === "true") ? (
-                      0
-                    ) : ((today < new Date(props.project.project_start_date)) ? (
-                      0
-                    ) : (
-                        (today < new Date(props.project.project_end_date)) ? (
-                          Math.round(((activeDays) / (totalActiveDays+1)) * 100)
-                        ) : (
-                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
-                              0
-                            ) : (
-                                100
-                              )
-                          )
-                      )
-                      )
-                  }% Completed
-                </Typography>
-                <Typography
-                  className={classes.status}>
-                  {
-                    (props.project.cancel === "true") ? (
-                      " "
-                    ) : ((today < new Date(props.project.project_start_date)) ? (
-                      (plannedDays) + " Days to go"
-                    ) : (
-                        (today < new Date(props.project.project_end_date)) ? (
-                          "Days " + (activeDays) + " of " + (totalActiveDays + 1)
-                        ) : (
-                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
-                              "Days " + (activeDays) + " of " + (totalActiveDays + 1)
-                            ) : (
-                                (completedDays) + " Days ago"
-                              )
-                          )
-                      )
-                      )
-                  }
-                </Typography>
-              </div>
-              <div style={{ justifyContent: 'space-between' }}>
-                <LinearProgress
-                  className={classes.progress}
-                  value={
-                    (props.project.cancel === "true") ? (
-                      0
-                    ) : ((today < new Date(props.project.project_start_date)) ? (
-                      0
-                    ) : (
-                        (today < new Date(props.project.project_end_date)) ? (
-                          ((activeDays) / (totalActiveDays + 1)) * 100
-                        ) : (
-                            (isToday(new Date(props.project.project_start_date)) && isToday(new Date(props.project.project_end_date))) ? (
-                              0
-                            ) : (
-                                100
-                              )
-                          )
-                      )
-                      )
-                  }
-                  variant="determinate"
+                <div style={{display:'flex'}}>
+                <Percentage
+                  cancel={props.project.cancel}
+                  start_date={props.project.project_start_date}
+                  end_date={props.project.project_end_date}
                 />
+                <Typography
+                  className={classes.status} style={{ display: 'flex' }}>
+                  % Completed
+                </Typography>
               </div>
+              <StatusProgressDays
+                cancel={props.project.cancel}
+                start_date={props.project.project_start_date}
+                end_date={props.project.project_end_date}
+              />
+              </div>
+            <div style={{ justifyContent: 'space-between' }}>
+              <StatusProgressBar
+                cancel={props.project.cancel}
+                start_date={props.project.project_start_date}
+                end_date={props.project.project_end_date}
+              />
+            </div>
             </CardContent>
           </CardActionArea>
         </Tooltip>
-        <CardActions style={{
-          paddingLeft: 16,
-          paddingRight: 12,
-          paddingTop: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          {
-            (props.project.cancel === "true") ? (
-              <Box borderRadius={4} className={[classes.cancelled, classes.boxStatus].join(" ")}>
-                <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
-              </Box>
-            ) : (
-                (today < new Date(props.project.project_start_date)) ? (
-                  <Box borderRadius={4} className={[classes.planned, classes.boxStatus].join(" ")}>
-                    <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Planned</Typography>
-                  </Box>
-                ) : (
-                    (today < new Date(props.project.project_end_date) ||
-                      isToday(new Date(props.project.project_start_date)) ||
-                      isToday(new Date(props.project.project_end_date))) ? (
-                        <Box borderRadius={4} className={[classes.active, classes.boxStatus].join(" ")}>
-                          <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
-                        </Box>
-                      ) : (
-                        <Box borderRadius={4} className={[classes.completed, classes.boxStatus].join(" ")}>
-                          <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
-                        </Box>
-                      )
-                  )
-              )
-          }
-          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
-            <DateRangeIcon className={classes.iconDate} />
-            <Typography className={classes.status}>
-              {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
-            </Typography>
-          </div>
-        </CardActions>
+      <CardActions style={{
+        paddingLeft: 16,
+        paddingRight: 12,
+        paddingTop: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <StatusBox
+          start_date={props.project.project_start_date}
+          end_date={props.project.project_end_date}
+          cancel={props.project.cancel}
+        />
+        <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
+          <DateRangeIcon className={classes.iconDate} />
+          <Typography className={classes.status}>
+            {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
+          </Typography>
+        </div>
+      </CardActions>
       </Card>
     </Grid >
   );

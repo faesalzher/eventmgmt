@@ -57,15 +57,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  uploadButton: {
-    // marginRight: theme.spacing(2)
-    fontSize: 10
-  },
   header: {
     backgroundColor: theme.palette.primary.main
   },
@@ -146,7 +137,7 @@ const OrganizationDetailCard = props => {
   const removeImage = (e) => {
     setOrganization({
       ...organization,
-      picture: 'null',
+      picture: ' ',
     });
   };
 

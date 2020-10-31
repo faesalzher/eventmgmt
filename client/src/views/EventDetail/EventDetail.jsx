@@ -6,7 +6,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 // import SwipeableViews from 'react-swipeable-views';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
+import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
@@ -165,7 +165,7 @@ export default function EventDetail() {
 
   return (
     <div className={classes.tabs_root}>
-      <Paper className={classes.tabs_root} style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+      <AppBar elevation={2} position="static" className={classes.tabs_root} color="primary" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
           <div style={{ display: "flex", flexDirection: "row" }}>
             <IconButton className={classes.iconbutton} style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
@@ -177,7 +177,7 @@ export default function EventDetail() {
           value={value}
           onChange={handleChange}
           indicatorColor="secondary"
-          textColor="primary"
+          // textColor="primary"
           variant="scrollable"
           aria-label="full width tabs example"
         >
@@ -198,7 +198,7 @@ export default function EventDetail() {
             event={event}
           />
         </div>
-      </Paper>
+      </AppBar>
       <div className={classes.root}>
         <div style={{ paddingLeft: 30, paddingTop: 8 }}>
           {fullScreen ? <></> :

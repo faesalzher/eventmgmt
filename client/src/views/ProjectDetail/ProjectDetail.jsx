@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Tabs, Tab, Paper, Box, Typography } from '@material-ui/core';
+import { Tabs, Tab, Box, AppBar, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useParams } from "react-router-dom";
@@ -93,11 +93,11 @@ const useStyles = makeStyles(theme => ({
     // backgroundColor: theme.palette.background.paper,
     flexGrow: 1,
   },
-  iconbutton: {
-    "&:hover": {
-      color: 'black'
-    },
-  },
+  appBar: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
 }));
 
 export default function ProjectDetail() {
@@ -112,11 +112,11 @@ export default function ProjectDetail() {
     setValue(newValue);
   };
 
-  const [project, setProject] = React.useState({project_name:""});
+  const [project, setProject] = React.useState({ project_name: "" });
   const [divisions, setDivisions] = useState([]);
   const [openEditModal, setOpenEditModal] = useState(false);
 
- 
+
   const { data } = useQuery(PROJECT_QUERY,
     {
       variables: { project_id: project_id },
@@ -186,9 +186,9 @@ export default function ProjectDetail() {
   ]
   return (
     <div className={classes.tabs_root}>
-      <Paper position="static" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} elevation={1} color="default">
+      <AppBar position="static" className={classes.appBar} elevation={2} color="primary">
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton className={classes.iconbutton} style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
+          <IconButton style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
             <ArrowBackIcon />
           </IconButton>
         </div>
@@ -196,20 +196,20 @@ export default function ProjectDetail() {
         <Tabs
           value={value}
           onChange={handleChange}
-          indicatorColor="primary"
-          textColor="primary"
+          indicatorColor="secondary"
+          // textColor="white"
           variant="scrollable"
           // scrollButtons="auto"
           aria-label="scrollable auto tabs example"
           style={{}}
         >
-          <Tab label="Comitee" {...a11yProps(0)} />
-          <Tab label="Event List" {...a11yProps(1)} />
+          <Tab label="Event List" {...a11yProps(0)} />
+          <Tab label="Comitee" {...a11yProps(1)} />
           <Tab label="Overview Project" {...a11yProps(2)} />
         </Tabs>
         {/* </div> */}
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
+          <IconButton onClick={handleOpenEditModal} >
             <SettingsIcon />
           </IconButton>
           <ProjectEditModal
@@ -221,27 +221,25 @@ export default function ProjectDetail() {
             project={project}
           />
         </div>
-      </Paper>
+      </AppBar>
       <div className={classes.root}>
         <div style={{ paddingLeft: 30, paddingTop: 8 }}>
           <BreadCrumbs breadcrumb_item={breadcrumb_item} />
         </div>
-        <div style={{ overflowX: 'auto', }}>
-          <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px', paddingBottom: 10 }}>
-            <ProjectComitee
-              project_id={project_id}
-              divisions={divisions}
-              handleSaveEditButton={handleSaveEditDivisionButton}
-              handleSaveButton={handleSaveDivisionButton}
-              handleDeleteDivision={handleDeleteDivision}
-            />
-          </TabPanel>
-        </div>
-        <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px' }}>
-          <ProjectEventList project={project}/>
+        <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px' }}>
+          <ProjectEventList project={project} project_id={project_id} />
+        </TabPanel>
+        <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px', paddingBottom: 10 }}>
+          <ProjectComitee
+            project_id={project_id}
+            divisions={divisions}
+            handleSaveEditButton={handleSaveEditDivisionButton}
+            handleSaveButton={handleSaveDivisionButton}
+            handleDeleteDivision={handleDeleteDivision}
+          />
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction} style={{ padding: '0px 30px' }} >
-          <ProjectOverview project={project} divisions={divisions}/>
+          <ProjectOverview project={project} divisions={divisions} />
         </TabPanel>
       </div>
     </div>

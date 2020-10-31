@@ -111,7 +111,12 @@ export default function EventAgenda() {
     setOpenSnackbar(false);
   };
 
-  const sortedAgendas = (agendas.slice().sort((a, b) => new Date(new Date().toString().slice(0, 16) + a.start_time) - new Date(new Date().toString().slice(0, 16) + b.start_time)));
+  const sortedAgendas = (
+    agendas.slice().sort((a, b) =>
+      new Date(new Date().toString().slice(0, 16) + a.start_time) -
+      new Date(new Date().toString().slice(0, 16) + b.start_time)
+    )
+  );
 
   const groupByDate = sortedAgendas.reduce((groupByDate, agenda) => {
     const date = agenda.date;
@@ -160,7 +165,7 @@ export default function EventAgenda() {
                   close={handleCloseAddDialog}
                 />
                 <Tooltip arrow title="Add New Agenda" aria-label="confirm">
-                  <IconButton onClick={handleOpenAddDialog} style={{padding:0}}>
+                  <IconButton onClick={handleOpenAddDialog} style={{ padding: 0 }}>
                     <AddIcon />
                   </IconButton>
                 </Tooltip>

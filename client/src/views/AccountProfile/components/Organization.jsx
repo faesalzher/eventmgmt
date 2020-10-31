@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/styles';
 import {
   CardContent,
   Divider,
-  Grid,
   Typography,
   useMediaQuery,
 } from '@material-ui/core';
@@ -20,15 +19,22 @@ const useStyles = makeStyles((theme) => ({
   font: {
     fontWeight: 600
   },
-  label: {
-    paddingBottom: '0px'
+  column: {
+    width: '30%',
   },
-  [theme.breakpoints.down('xs')]: {
-    l: {
-      padding: '0px'
-    },
-  }
-}));
+  value: {
+    width: '70%',
+  },
+  row: {
+    display: 'flex',
+    padding: '10px 0px',
+    [theme.breakpoints.down('xs')]: {
+      display: 'block'
+    }
+  }, 
+}
+)
+);
 
 const Organization = props => {
 
@@ -54,68 +60,55 @@ const Organization = props => {
       noValidate
     >
       <CardContent>
-        <Grid
-          container
-          spacing={4}
-
-        // style={{minHeight:300}}
-        >
-
-          <Grid
-            className={classes.center}
-            item
-            md={3}
-            xs={12}
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
           >
             <Typography variant="subtitle2" className={classes.font}>Name</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
-            className={classes.center}
+          </div>
+          <div
+            className={[classes.center, classes.value].join(" ")}
             style={sm ? { paddingTop: 0 } : {}}
           >
             <Typography variant="body1" >{organization.organization_name}</Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
+          </div>
+        </div>
+        <Divider />
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
           >
             <Typography variant="subtitle2" className={classes.font}>Email</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
+            className={[classes.center, classes.value].join(" ")}
+
           >
             <Typography variant="body1" style={{ color: 'blue' }}>{organization.email}</Typography>
-          </Grid>
-          <Grid
-            item
-            md={3}
-            xs={12}
-            className={classes.center}
+          </div>
+        </div>
+        <Divider />
+
+        <div className={classes.row}>
+          <div
+            className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
           >
             <Typography variant="subtitle2" className={classes.font}>Description</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            xs={12}
+          </div>
+          <div
             style={sm ? { paddingTop: 0 } : {}}
-            className={classes.center}
+            className={[classes.center, classes.value].join(" ")}
+
           >
             <Typography variant="body1" style={{ color: 'blue' }}>{organization.Description}</Typography>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
+        <Divider />
       </CardContent>
       <Divider />
     </form >

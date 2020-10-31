@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     // width: "-webkit-fill-available",
     [theme.breakpoints.down("xs")]: {
       width: "100% !important", // Overrides inline-style
-      height: 200,
+      // height: 200,
     },
     "&:hover, &$focusVisible": {
       zIndex: 1,
@@ -71,8 +71,9 @@ const useStyles = makeStyles(theme => ({
   },
   imageTitle: {
     position: "relative",
-    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 1
-      }px`,
+    padding: '10px 12px 1px'
+    // `${theme.spacing(2)}px ${theme.spacing(4)}px ${theme.spacing(1) + 1
+    //   }px`,
   },
   imageMarked: {
     height: 3,
@@ -109,7 +110,7 @@ export default function EditAvatarForm(props) {
 
 
   return (
-    <div style={{display:'flex',justifyContent:'center'}}>
+    <div>
       <IconButton
         focusRipple
         focusVisibleClassName={classes.focusVisible}

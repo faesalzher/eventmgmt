@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles} from '@material-ui/styles';
+import { makeStyles } from '@material-ui/styles';
 import {
   Card,
   CardHeader,
@@ -10,18 +10,17 @@ import {
   IconButton,
   Avatar,
   Typography,
-  Button,
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
+import { EditAvatarForm } from 'components';
 import {
   ProfileEditForm,
   Profile
 } from '.';
-import { EditImageForm } from "components";
 
 
 const STAFFSBYID_QUERY = gql`
@@ -63,28 +62,22 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    [theme.breakpoints.down('xs')]: {
+      textAlign: 'center'
+    }
   },
   avatar: {
-    margin: 10,
-    marginBottom: 0,
+    // margin: 10,
+    // marginBottom: 0,
     height: 100,
     width: 100,
-    flexShrink: 0,
-    flexGrow: 0
+    // flexShrink: 0,
+    // flexGrow: 0,
   },
   organization: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  uploadButton: {
-    // marginRight: theme.spacing(2)
-    fontSize: 10
   },
   header: {
     backgroundColor: theme.palette.primary.main,
@@ -101,9 +94,10 @@ const useStyles = makeStyles(theme => ({
     },
     avatarHeader: {
       display: 'flex',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      marginLeft: 16
     },
-    center: {
+    title: {
       textAlign: 'center'
     }
   }
@@ -189,15 +183,6 @@ const ProfileDetailCard = props => {
     setOpenEditPage(false);
   };
 
-  const [openEditImageModal, setOpenEditImageModal] = useState(false);
-  const handleEditImageModal = () => {
-    setOpenEditImageModal(true);
-  };
-
-  const handleCloseEditImageModal = () => {
-    setOpenEditImageModal(false);
-  };
-
   const uploadImage = (e) => {
     setProfile({
       ...profile,
@@ -208,7 +193,7 @@ const ProfileDetailCard = props => {
   const removeImage = (e) => {
     setProfile({
       ...profile,
-      picture: 'null',
+      picture: ' ',
     });
   };
 
@@ -217,13 +202,6 @@ const ProfileDetailCard = props => {
       {...rest}
       className={clsx(classes.root, className)}
     >
-      <EditImageForm
-        open={openEditImageModal}
-        uploadImage={uploadImage}
-        removeImage={removeImage}
-        // handleDelete={handleDelete}
-        close={handleCloseEditImageModal}
-      />
       <CardHeader
         className={classes.header}
         subheader={
@@ -263,24 +241,24 @@ const ProfileDetailCard = props => {
             </div>
         }
         avatar={
-          <div>
-            <div className={classes.avatarHeader}>
-              <Avatar
-                className={classes.avatar}
-                src={profile.picture}
-              />
-            </div>
+          <div style={{ padding: 10 }}>
             {openEditPage ?
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button className={classes.uploadButton}
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  onClick={() => handleEditImageModal()}
-                >
-                  Upload a picture
-          </Button>
-              </div> : <div></div>}
+              <div className={classes.avatarHeader}>
+                <EditAvatarForm
+                  uploadImage={uploadImage}
+                  picture={profile.picture}
+                  removeImage={removeImage}
+                  size={100}
+                />
+              </div>
+              :
+              <div className={classes.avatarHeader}>
+                <Avatar
+                  className={classes.avatar}
+                  src={profile.picture}
+                />
+              </div>
+            }
           </div>
         }
       >

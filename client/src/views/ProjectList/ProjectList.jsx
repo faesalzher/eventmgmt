@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {
   Grid,
-  // Fade, 
+  Paper,
   Typography
 } from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/react-hooks';
@@ -10,15 +10,11 @@ import { gql } from 'apollo-boost';
 import CircularProgress from '@material-ui/core/CircularProgress';
 // import { NotificationContainer, NotificationManager } from "react-light-notifications";
 // import "react-light-notifications/lib/main.css";
-// import AppBar from '@material-ui/core/AppBar';
+// import Paper from '@material-ui/core/Paper';
 import {
   ProjectCard,
   AddProjectCard,
 } from './components';
-import Paper from '@material-ui/core/Paper';
-// import Tabs from '@material-ui/core/Tabs';
-// import Tab from '@material-ui/core/Tab';
-// import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import jwtDecode from "jwt-decode";
@@ -50,6 +46,9 @@ mutation deleteProject ($_id: String!) {
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(4),
+  },
+  tabs_root: {
+    flexGrow: 1
   },
   loading: {
     paddingTop: 100,
@@ -83,9 +82,11 @@ const ProjectList = () => {
     variables: { organization_id: decodedToken.organization_id },
     // onCompleted: () => { setProjects(data.projects) }
   });
+
   useEffect(() => {
     refresh();
   });
+  
   useEffect(() => {
     const onCompleted = (data) => { setProjects(data.projects) };
     const onError = (error) => { /* magic */ };
@@ -125,8 +126,8 @@ const ProjectList = () => {
   // console.log(decodedToken.organization_id)
 
   return (
-    <div>
-      <Paper style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
+    <div className={classes.tabs_root}>
+      <Paper color="default" position="static" style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
         <Typography color='textSecondary' variant="button"
           style={{ display: "flex", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>Project List</Typography>
       </Paper>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Paper,
   Tabs,
@@ -11,10 +11,28 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import PropTypes from 'prop-types';
 
-import { makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { Externals } from './components';
-import mockData from './dataExternal';
+
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+const EXTERNALS_QUERY = gql`
+  query externals($event_id:String!){
+    externals(event_id: $event_id){
+      _id,
+      external_name,
+      external_type,
+      email,
+      event_id,
+      phone_number,
+      details,
+      picture,
+    }
+  }
+`;
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -59,7 +77,28 @@ export default function EventExternal(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const [externals, setExternals] = useState(mockData);
+
+  const [externals, setExternals] = useState([]);
+
+  const { data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
+    {
+      variables: { event_id: props.event_id },
+      onCompleted: () => {
+        if (externalsData !== undefined)
+          setExternals(externalsData.externals)
+      },
+    }
+  );
+
+  useEffect(() => {
+    refresh()
+  });
+
+  const refresh = () => {
+    externalsRefetch();
+  };
+  console.log(externalsData)
+  console.log(externals)
 
   const handleSaveButton = (e) => {
     setExternals([...externals, e])
@@ -77,6 +116,7 @@ export default function EventExternal(props) {
     }
     setOpenSnackbar(false);
   };
+
 
   const handleSaveEditButton = (e) => {
     const temp = [...externals];
