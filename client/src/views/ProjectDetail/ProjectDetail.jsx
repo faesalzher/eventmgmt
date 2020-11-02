@@ -239,7 +239,7 @@ export default function ProjectDetail() {
           />
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction} style={{ padding: '0px 30px' }} >
-          <ProjectOverview project={project} divisions={divisions} />
+          <ProjectOverview project={project} project_id={project_id} divisions={divisions} />
         </TabPanel>
       </div>
     </div>

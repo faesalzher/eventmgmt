@@ -175,6 +175,7 @@ export default function StaffEditForm(props) {
       }
     });
   }
+  
   const handleInputChange = e => {
     const { id, value } = e.target;
     setStaffForm({ ...staffForm, [id]: value })

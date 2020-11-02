@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import {
   Divider,
-  TextareaAutosize,
+  TextField,
   ButtonGroup,
   Chip,
   Avatar,
@@ -14,12 +14,40 @@ import {
 import EscapeOutside from "react-escape-outside"
 import AddIcon from '@material-ui/icons/Add';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import PeopleIcon from '@material-ui/icons/People';
 import { DatetimePicker } from 'rc-datetime-picker';
+import 'rc-datetime-picker/dist/picker.css';
 import moment from 'moment';
 import EditIcon from '@material-ui/icons/Edit';
+import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+import { AvatarName } from 'components';
 
-const useStyles = makeStyles({
+const ORGANIZATION_QUERY = gql`
+  query organization($_id: String!) {
+    organization(_id: $_id) {
+      _id
+      email
+      organization_name
+      picture
+    }
+  }
+`;
+
+const STAFF_QUERY = gql`
+  query staffById($staff_id: String!) {
+    staffById(_id: $staff_id) {
+      _id
+      staff_name
+      email
+      position_name
+      picture
+    }
+  }
+`;
+
+const useStyles = makeStyles(theme => ({
   row: {
     display: "flex",
     padding: 20
@@ -36,14 +64,66 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     marginRight: 7,
+  },
+  assigned: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
   }
-});
+}));
 
 export default function TaskProperties(props) {
   const classes = useStyles();
 
 
   const [taskForm, setTaskForm] = useState(props.task);
+
+  useEffect(() => {
+    setTaskForm(props.task)
+  }, [setTaskForm, props.task]);
+
+
+  const [createdBy, setCreatedBy] = useState([]);
+
+  const [staff, { data: dataStaff }] = useLazyQuery(STAFF_QUERY, {
+    variables: { staff_id: taskForm.created_by },
+  });
+
+  const { data: dataOrganization, refetch: refetchOrganization } = useQuery(
+    ORGANIZATION_QUERY,
+    {
+      variables: { _id: taskForm.created_by },
+      onCompleted: () => {
+        if (dataOrganization.organization !== null) {
+          setCreatedBy(dataOrganization.organization);
+        } else {
+          staff();
+        }
+      },
+    }
+  );
+
+
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    refetchOrganization();
+  }
+
+  useEffect(() => {
+    if (dataStaff) {
+      setCreatedBy(dataStaff.staffById);
+    }
+  }, [dataStaff])
+
+  console.log(taskForm.created_by)
+  console.log(dataOrganization)
+  console.log(createdBy)
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showEditIcon, setShowEditIcon] = React.useState(false);
   const [descriptionForm, setDescriptionForm] = React.useState(false);
@@ -119,13 +199,19 @@ export default function TaskProperties(props) {
     <div>
       {descriptionForm ?
         <EscapeOutside onEscapeOutside={onEscapeOutside}>
-          <TextareaAutosize autoFocus aria-label="empty textarea"
-            onKeyDown={onPressEnter}
-            value={taskForm.task_description}
+          <TextField
             id="task_description"
+            label="Description"
+            autoFocus
+            onKeyDown={onPressEnter}
+            multiline
+            rowsMax={4}
+            value={taskForm.task_description}
             onChange={handleChangeTask}
-            placeholder="Add A Description"
-            style={{ width: "-webkit-fill-available", minHeight: 27, fontSize: 15, }} />
+            variant="outlined"
+            size="small"
+            style={{ width: "-webkit-fill-available", fontSize: 17, }}
+          />
         </EscapeOutside>
         :
         <Button
@@ -136,11 +222,11 @@ export default function TaskProperties(props) {
           onMouseLeave={() => setShowEditIcon(false)}
           style={{ justifyContent: "space-between", display: 'flex', textTransform: "none", marginBottom: 10, width: "-webkit-fill-available" }}>
           {taskForm.task_description === "" ?
-            <Typography variant="body2" style={{ color: 'blue' }}>
+            <Typography variant="body1" color="secondary">
               Add a Description
             </Typography>
             :
-            <Typography variant="body2" style={{ textAlign: 'left' }}>
+            <Typography variant="body1" style={{ textAlign: 'left' }}>
               {taskForm.task_description}
             </Typography>
           }
@@ -152,24 +238,52 @@ export default function TaskProperties(props) {
       <div className={classes.row}>
         <div className={classes.label}>
           <div className={classes.verticalAlign} >
-            <CalendarTodayIcon />
+            <AddCircleOutlineIcon />
           </div>
           <Typography className={classes.verticalAlign} variant="body2">
-            Due Date
+            Created by
           </Typography>
         </div>
         <div className={classes.field}>
-          {taskForm.due_date === "" ?
-            <Button onClick={handleOpenCalendar} variant="contained" size="small" color="primary">
-              <AddIcon />
-            </Button>
+          {createdBy.__typename === "Staff" ?
+            <AvatarName
+              name={createdBy.staff_name}
+              picture={createdBy.picture}
+            />
             :
-            <ButtonGroup variant="contained" size="small" color="primary">
-              <Button onClick={handleOpenCalendar} style={mins >= 0 ? { backgroundColor: 'red', textTransform: "none" } : { textTransform: "none" }}>{taskForm.due_date}</Button>
-              <Button onClick={handleDeleteDueDate} style={mins >= 0 ? { backgroundColor: 'red' } : {}}><CloseIcon /></Button>
-            </ButtonGroup>
+            <AvatarName
+              name={createdBy.organization_name}
+              picture={createdBy.picture}
+            />
           }
-
+        </div>
+      </div>
+      <div className={classes.row}>
+        <div className={classes.label}>
+          <div className={classes.verticalAlign} >
+            <CalendarTodayIcon />
+          </div>
+          <Typography className={classes.verticalAlign} variant="body2">
+            {taskForm.completed === true ? "Completed On" : "Due Date"}
+          </Typography>
+        </div>
+        <div className={classes.field}>
+          {
+            taskForm.completed === true ?
+              <Typography className={classes.verticalAlign} style={{ fontWeight: 500 }} variant="body1">
+                {taskForm.completed_date.slice(0, 21)}
+              </Typography>
+              :
+              taskForm.due_date === "" ?
+                <Button onClick={handleOpenCalendar} variant="outlined" disableElevation size="small" color="secondary">
+                  <AddIcon />
+                </Button>
+                :
+                <ButtonGroup variant="contained" size="small" color="secondary">
+                  <Button onClick={handleOpenCalendar} style={mins >= 0 ? { backgroundColor: 'red', textTransform: "none" } : { textTransform: "none" }}>{taskForm.due_date}</Button>
+                  <Button onClick={handleDeleteDueDate} style={mins >= 0 ? { backgroundColor: 'red' } : {}}><CloseIcon /></Button>
+                </ButtonGroup>
+          }
         </div>
         <Popover
           id={id}
@@ -203,58 +317,37 @@ export default function TaskProperties(props) {
             Assigned To
           </Typography>
         </div>
-        {/* <Button variant="contained" size="small" ><AddIcon/></Button> */}
-        <div className={classes.field}>
+        <div className={[classes.field, classes.assigned].join(" ")}>
           <Chip
-            size="small"
             avatar={<Avatar src="/static/images/avatar/1.jpg" />}
             label="Skinnyfabs"
-            clickable
-            variant='outlined'
+            size="small"
             color="primary"
-            onClick={() => console.log('succes')}
+            variant="outlined"
             onDelete={() => console.log('succes')}
           />
           <Chip
-            size="small"
             avatar={<Avatar src="/static/images/avatar/1.jpg" />}
             label="Danarjon"
-            clickable
-            variant='outlined'
             color="primary"
-            onClick={() => console.log('succes')}
+            size="small"
+            variant="outlined"
             onDelete={() => console.log('succes')}
           />
           <Chip
-            size="small"
             avatar={<Avatar src="/static/images/avatar/1.jpg" />}
             label="Ahmad Sobari"
-            clickable
-            variant='outlined'
             color="primary"
-            onClick={() => console.log('succes')}
-            onDelete={() => console.log('succes')}
-          />
-          <Chip
+            variant="outlined"
             size="small"
-            avatar={<Avatar src="/static/images/avatar/1.jpg" />}
-            label="Bambang"
-            clickable
-            variant='outlined'
-            color="primary"
-            onClick={() => console.log('succes')}
             onDelete={() => console.log('succes')}
           />
-          <Chip
+          {/* <Chip
             size="small"
-            avatar={<Avatar src="/static/images/avatar/1.jpg" />}
-            label="Dimas"
             clickable
-            variant='outlined'
-            color="primary"
-            onClick={() => console.log('succes')}
-            onDelete={() => console.log('succes')}
-          />
+            onClick={()=>console.log('do ')}
+            label={<AddIcon />}
+          /> */}
         </div>
       </div>
 
@@ -267,7 +360,6 @@ export default function TaskProperties(props) {
             Priority
           </Typography>
         </div>
-        {/* <Button variant="contained" size="small" ><AddIcon/></Button> */}
         <div className={classes.field}>
           <ButtonGroup variant="contained" style={{ width: '70%' }} size="small" aria-label="outlined primary button group">
             {taskForm.priority === "low" ?

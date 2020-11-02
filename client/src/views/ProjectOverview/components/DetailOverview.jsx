@@ -76,23 +76,14 @@ const useStyles = makeStyles(() => ({
 export default function DetailOverview(props) {
   const classes = useStyles();
 
-  const initialFormState =
-  {
-    _id: "",
-    staff_name: "",
-    phone_number: "",
-    email: "",
-    picture: ""
-  };
-
   const [headOfProjectId, setHeadOfProjectId] = useState("");
-  const [headOfProject, setHeadOfProject] = useState(initialFormState);
+  const [headOfProject, setHeadOfProject] = useState([]);
   const [organization, setOrganization] = useState("");
 
 
   const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
     {
-      variables: { project_id: props.project._id, position_id: '1' },
+      variables: { project_id: props.project_id, position_id: '1' },
     });
 
 
@@ -127,7 +118,7 @@ export default function DetailOverview(props) {
       if (headOfProjectData !== undefined && headOfProjectData.staffById !== null) {
         setHeadOfProject(data.staffById)
       } else {
-        setHeadOfProject(initialFormState)
+        setHeadOfProject([])
       }
     };
     const onError = (error) => { /* magic */ };
@@ -138,19 +129,18 @@ export default function DetailOverview(props) {
         onError(headOfProjectError);
       }
     }
-  }, [headOfProjectLoading, headOfProjectData, headOfProjectError,initialFormState,]);
+  }, [headOfProjectLoading, headOfProjectData, headOfProjectError]);
 
 
-  const { data: organizationData, refetch: organizationRefetch } =
-    useQuery(ORGANIZATION_QUERY,
-      {
-        variables: { _id: props.project.organization_id },
-        onCompleted: () => {
-          setOrganization(organizationData.organization)
-        },
+  const { data: organizationData } = useQuery(ORGANIZATION_QUERY,
+    {
+      variables: { _id: props.project.organization_id },
+      onCompleted: () => {
+        setOrganization(organizationData.organization)
+      },
+    }
+  );
 
-      }
-    );
   useEffect(() => {
     refresh()
   });
@@ -158,7 +148,6 @@ export default function DetailOverview(props) {
   const refresh = () => {
     headOfProjectIdRefetch();
     headOfProjectRefetch();
-    organizationRefetch();
   };
 
   return (
@@ -170,7 +159,7 @@ export default function DetailOverview(props) {
       </div>
       <Divider />
       <div className={classes.content}>
-      <Typography variant="subtitle2">
+        <Typography variant="subtitle2">
           Description
           </Typography>
         <Typography variant="body1">
@@ -201,7 +190,7 @@ export default function DetailOverview(props) {
           }
         />
       </div>
-      <Divider />    
+      <Divider />
       <div className={classes.content}>
         <Typography variant="subtitle2">
           Date

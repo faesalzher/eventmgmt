@@ -30,7 +30,7 @@ export default function ProjectOverview(props) {
         xl={12}
         xs={12}
       >
-        <DetailOverview project={props.project} />
+        <DetailOverview project={props.project} project_id={props.project_id} />
       </Grid>
       <Grid
         item

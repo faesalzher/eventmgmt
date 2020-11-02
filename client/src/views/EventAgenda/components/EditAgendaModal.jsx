@@ -17,9 +17,50 @@ import { useTheme } from '@material-ui/core/styles';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
+import { useMutation } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
+
+const EDIT_AGENDA = gql`
+  mutation editAgenda(
+    $_id: String!
+    $agenda_name: String!
+    $date: String!
+    $start_time: String!
+    $end_time: String!
+    $details: String!
+    $event_id: String!
+  ) {
+    editAgenda(
+      _id: $_id
+      agenda_name: $agenda_name
+      date: $date
+      start_time: $start_time
+      end_time: $end_time
+      details: $details
+      event_id: $event_id
+    ) {
+      _id
+      agenda_name
+      date
+      start_time
+      end_time
+      details
+      event_id
+    }
+  }
+`;
+
+const DELETE_AGENDA = gql`
+  mutation deleteAgenda($_id: String!) {
+    deleteAgenda(_id: $_id) {
+      _id
+    }
+  }
+`;
+
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -61,6 +102,9 @@ export default function EditAgendaModal(props) {
   // };
 
 
+  const [editAgenda] = useMutation(EDIT_AGENDA);
+  const [deleteAgenda] = useMutation(DELETE_AGENDA);
+
   const [agendaForm, setAgendaForm] = useState(props.agenda)
   useEffect(() => {
     setAgendaForm(props.agenda)
@@ -82,7 +126,18 @@ export default function EditAgendaModal(props) {
 
   const handleSaveEditButton = () => {
     props.handleSaveEditButton(agendaForm)
-    props.close()
+    editAgenda({
+      variables: {
+        _id: agendaForm._id,
+        agenda_name: agendaForm.agenda_name,
+        date: agendaForm.date,
+        start_time: agendaForm.start_time,
+        end_time: agendaForm.end_time,
+        details: agendaForm.details,
+        event_id: agendaForm.event_id,
+      },
+    });
+    props.close();
   };
 
   const handleClose = () => {
@@ -115,6 +170,7 @@ export default function EditAgendaModal(props) {
   };
 
   const handleDelete = () => {
+    deleteAgenda({ variables: { _id: agendaForm._id } });
     props.handleDelete(props.agenda._id);
     props.close();
     // deleteComitee({ variables: { _id: props.comitee._id, } });

@@ -1,4 +1,4 @@
-import React, { } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -18,19 +18,29 @@ import {
 import MuiAlert from '@material-ui/lab/Alert';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
 import {
   AgendaByDate,
   AddAgendaModal,
 } from './components';
 
 
-const dataAgenda = [
-  { _id: '0', agenda_name: "tanggal 21", details: "Details goes in this section", start_time: "12:50", date: "Sat Mar 21 2020", end_time: '15:20' },
-  { _id: '2', agenda_name: "aaa", details: "Details goes in this section", start_time: "14:30", date: "Sun Mar 22 2020", end_time: '17:50' },
-  { _id: '1', agenda_name: "tanggal 21", details: "Details goes in this section", start_time: "10:30", date: "Sat Mar 21 2020", end_time: '12:50' },
-  { _id: '3', agenda_name: "aaa", details: "Details goes in this section", start_time: "10:30", date: "Sun Mar 22 2020", end_time: '12:50' },
-  // { _id: 4, agenda_name: "z", start_time: "10:30", date: "Tue Jun 09 2020", end_time: '12:50' },
-];
+const AGENDAS_QUERY = gql`
+  query agendas($event_id:String!){
+    agendas(event_id: $event_id){
+      _id,
+      agenda_name,
+      date,
+      start_time,
+      end_time,
+      details,
+      event_id,
+    }
+  }
+`;
+
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -58,10 +68,40 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
-export default function EventAgenda() {
+export default function EventAgenda(props) {
   const classes = useStyles();
-  const [agendas, setAgendas] = React.useState(dataAgenda);
+  const [agendas, setAgendas] = useState([]);
   // const sortedRundownDates = (rundownDates.slice().sort((a, b) => new Date(a.date) - new Date(b.date)));
+  const { loading: agendasLoading, error: agendasError, data: agendasData, refetch: agendasRefetch } = useQuery(AGENDAS_QUERY,
+    {
+      variables: { event_id: props.event_id },
+    }
+  );
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (data !== undefined)
+        setAgendas(data.agendas)
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !agendasLoading && !agendasError) {
+        onCompleted(agendasData);
+      } else if (onError && !agendasLoading && agendasError) {
+        onError(agendasError);
+      }
+    }
+  }, [agendasLoading, agendasData, agendasError]);
+
+
+  useEffect(() => {
+    refresh()
+  });
+
+  const refresh = () => {
+    agendasRefetch();
+  };
+
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
 
   const handleOpenAddDialog = () => {
@@ -161,6 +201,7 @@ export default function EventAgenda() {
               <StyledTableCell style={{ width: 10 }} align="center">
                 <AddAgendaModal
                   open={openAddDialog}
+                  event_id={props.event_id}
                   handleSaveAgendaButton={handleSaveAgendaButton}
                   close={handleCloseAddDialog}
                 />
@@ -169,44 +210,48 @@ export default function EventAgenda() {
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
-                {/* <Button
-                  onClick={handleOpenAddDialog}
-                  variant="contained"
-                  size="small"
-                  color="secondary">
-                  add new agenda    <AddIcon />
-                </Button> */}
               </StyledTableCell>
             </TableRow>
           </TableHead>
           {
-            sortedGroupAgendas.map((rundownDate, index) => (
+            agendas.length === 0 ?
               <TableBody>
                 <StyledTableRow >
-                  <StyledTableCell align="center" colSpan={5}>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <CalendarTodayIcon style={{ fontSize: 10, margin: 5, color: 'white' }} />
-                      <Typography variant="subtitle2" style={{ color: 'white' }}>
-                        {rundownDate.date}
+                  <StyledTableCell style={{ backgroundColor: "white", padding: 20 }} align="center" colSpan={5}>
+                    <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                      There is no rundown yet
                       </Typography>
-                    </div>
                   </StyledTableCell>
                 </StyledTableRow>
-                {
-                  rundownDate.sortedAgendas.map((agenda, index) => {
-                    return <AgendaByDate
-                      key={index}
-                      rundownDate={rundownDate}
-                      agenda={agenda}
-                      index={index}
-                      handleDelete={handleDelete}
-                      handleSaveEditButton={handleSaveEditButton}
-                    />
-                  })
-                }
               </TableBody>
-            )
-            )
+              :
+              sortedGroupAgendas.map((rundownDate, index) => (
+                <TableBody key={index} >
+                  <StyledTableRow >
+                    <StyledTableCell align="center" colSpan={5}>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <CalendarTodayIcon style={{ fontSize: 10, margin: 5, color: 'white' }} />
+                        <Typography variant="subtitle2" style={{ color: 'white' }}>
+                          {rundownDate.date}
+                        </Typography>
+                      </div>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                  {
+                    rundownDate.sortedAgendas.map((agenda, index) => {
+                      return <AgendaByDate
+                        key={index}
+                        rundownDate={rundownDate}
+                        agenda={agenda}
+                        index={index}
+                        handleDelete={handleDelete}
+                        handleSaveEditButton={handleSaveEditButton}
+                      />
+                    })
+                  }
+                </TableBody>
+              )
+              )
           }
 
         </Table>

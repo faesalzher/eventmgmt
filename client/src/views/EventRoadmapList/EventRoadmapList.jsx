@@ -7,7 +7,8 @@ import {
   IconButton,
   Tooltip,
   Paper,
-  Typography
+  Typography,
+  CircularProgress,
 } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -50,6 +51,10 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.main,
     color: 'white',
     padding: '10px 9px',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: 20
   }
 }));
 
@@ -119,7 +124,7 @@ export default function EventRoadmapList(props) {
       <div className={classes.roadmapHeaderFooter} >
         <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
           <Typography variant="button"
-            style={{ display: "flex", color:"white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
+            style={{ display: "flex", color: "white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
             Roadmap List
           </Typography>
           <div style={{ display: 'flex', width: 50, justifyContent: 'space-between' }}>
@@ -154,27 +159,33 @@ export default function EventRoadmapList(props) {
           { padding: 0, backgroundColor: "rgba(0, 0, 0, 0.12)" }
           :
           { padding: 0, backgroundColor: "rgba(0, 0, 0, 0.12)", overflowY: "auto", maxHeight: 490 }} >
-        {roadmaps.length === 0 ?
-          (
-            <Paper style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
-                there is no roadmap yet
+
+        {
+          (roadmapsLoading) ? <div className={classes.loading}><CircularProgress /></div> :
+            <div>
+              {
+                roadmaps.length === 0 ?
+                  (
+                    <Paper style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                        there is no roadmap yet
             </Typography>
-            </Paper>
-          ) : (
-            roadmaps.map((roadmap, index) => (
-              <Roadmap
-                xs={props.xs}
-                key={index}
-                roadmap={roadmap}
-                project_id={props.project_id}
-                event_id={props.event_id}
-              />
-            ))
+                    </Paper>
+                  ) : (
+                    roadmaps.map((roadmap, index) => (
+                      <Roadmap
+                        xs={props.xs}
+                        key={index}
+                        roadmap={roadmap}
+                        project_id={props.project_id}
+                        event_id={props.event_id}
+                      />
+                    ))
 
-          )
+                  )
+              }
+            </div>
         }
-
       </CardContent>
       {/* <div
         style={{

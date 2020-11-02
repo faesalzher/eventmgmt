@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import { useBouncyShadowStyles } from '@mui-treasury/styles/shadow/bouncy';
 import DateRangeIcon from '@material-ui/icons/DateRange';
-import image from 'assets/project.png'
+import image from "assets/default-placeholder.png";
 
 import {
   Avatar,
@@ -136,16 +136,11 @@ const EventCard = (props) => {
             component={CustomRouterLink}
             to={`/project/${props.project._id}/${props.event._id}`}
           >
-            {/* <CardMedia
-              className={classes.media}
-              image={image}
-              title="Contemplative Reptile"
-            /> */}
             <CardContent className={classes.root} >
               <div style={{ display: 'flex' }}>
                 <Avatar
                   className={classes.avatar}
-                  src={image}
+                  src={props.event.picture === " " ? image : props.event.picture}
                 />
                 <div className={[classes.root, classes.verticalCenter].join(" ")} style={{ justifyContent: 'end' }}>
                   <div style={{ width: 'fit-content' }} >

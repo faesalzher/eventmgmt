@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import { Divider, TextField, TextareaAutosize, Grid, Checkbox } from '@material-ui/core';
+import { Divider, TextField, Grid, Checkbox, Tooltip, IconButton } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -20,38 +18,53 @@ import Tab from '@material-ui/core/Tab';
 import EditIcon from '@material-ui/icons/Edit';
 import SendIcon from '@material-ui/icons/Send';
 
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
 import EscapeOutside from "react-escape-outside";
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import { TaskProperties, TaskChatBubble } from '.';
+import {
+  DeleteForm
+} from 'components';
 
-const AntTabs = withStyles({
+const DELETE_TASK = gql`
+mutation deleteTask ($_id: String!) {
+  deleteTask(_id:$_id){
+    _id
+  }
+}
+`;
+
+const AntTabs = withStyles(theme => (({
   root: {
     borderBottom: '1px solid #e8e8e8',
+    backgroundColor: theme.palette.primary.main
   },
   indicator: {
-    backgroundColor: '#1890ff',
+    backgroundColor: theme.palette.secondary.main,
   },
-})(Tabs);
+})))(Tabs);
 
 const AntTab = withStyles(theme => ({
   root: {
     padding: 0,
     textTransform: 'none',
+    color: 'white',
     minWidth: 72,
     fontWeight: theme.typography.fontWeightRegular,
     marginRight: theme.spacing(4),
     '&:hover': {
-      color: '#40a9ff',
+      color: theme.palette.secondary.main,
       opacity: 1,
     },
     '&$selected': {
-      color: '#1890ff',
+      color: theme.palette.secondary.main,
       fontWeight: theme.typography.fontWeightMedium,
     },
     '&:focus': {
-      color: '#40a9ff',
+      color: theme.palette.secondary.main,
     },
   },
   selected: {},
@@ -61,50 +74,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
-  checkbox_root: {
-    '&:hover': {
-      backgroundColor: 'transparent',
-    },
-  },
-  small: {
-    width: 25,
-    height: 25,
-  },
-  icon: {
-    borderRadius: 3,
-    width: 16,
-    height: 16,
-    boxShadow: 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
-    backgroundColor: '#f5f8fa',
-    backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
-    '$root.Mui-focusVisible &': {
-      outline: '2px auto rgba(19,124,189,.6)',
-      outlineOffset: 2,
-    },
-    'input:hover ~ &': {
-      backgroundColor: '#ebf1f5',
-    },
-    'input:disabled ~ &': {
-      boxShadow: 'none',
-      background: 'rgba(206,217,224,.5)',
-    },
-  },
-  checkedIcon: {
-    backgroundColor: '#137cbd',
-    backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
-    '&:before': {
-      display: 'block',
-      width: 16,
-      height: 16,
-      backgroundImage:
-        "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
-        " fill-rule='evenodd' clip-rule='evenodd' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 " +
-        "1.003 0 00-1.42 1.42l3 3c.18.18.43.29.71.29s.53-.11.71-.29l5-5A1.003 1.003 0 0012 5z' fill='%23fff'/%3E%3C/svg%3E\")",
-      content: '""',
-    },
-    'input:hover ~ &': {
-      backgroundColor: '#106ba3',
-    },
+  input: {
+    // color: "#2EFF22",
+    backgroundColor: 'white'
   },
 }));
 
@@ -112,6 +84,7 @@ const styles = theme => ({
   root: {
     margin: 0,
     padding: theme.spacing(2),
+    backgroundColor: theme.palette.primary.main
   },
   closeButton: {
     position: 'absolute',
@@ -125,7 +98,7 @@ const DialogTitle = withStyles(styles)(props => {
   const { children, classes, onClose, ...other } = props;
   return (
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: 'center' }}>{children}</Typography>
+      <Typography variant="h6" style={{ textAlign: 'center', color: 'white' }}>{children}</Typography>
       {onClose ? (
         <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
@@ -172,21 +145,7 @@ function TabPanel(props) {
     </Typography>
   );
 }
-function StyledCheckbox(props) {
-  const classes = useStyles();
 
-  return (
-    <Checkbox
-      className={classes.checkbox_root}
-      disableRipple
-      color="default"
-      checkedIcon={<span className={clsx(classes.icon, classes.checkedIcon)} />}
-      icon={<span className={classes.icon} />}
-      inputProps={{ 'aria-label': 'decorative checkbox' }}
-      {...props}
-    />
-  );
-}
 const chatData = [
   { chat_id: '2', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
   { chat_id: '3', user_id: 1, task_id: 1, content: "Ini Percobaan chat", chat_date: "Mon Mar 16 2020 19:33" },
@@ -196,6 +155,8 @@ const chatData = [
   { chat_id: '7', user_id: 3, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
   { chat_id: '8', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: new Date().toString() },
 ]
+
+
 export default function TaskDetailModal(props) {
   const classes = useStyles();
   const theme = useTheme();
@@ -205,10 +166,18 @@ export default function TaskDetailModal(props) {
   const [task, setTask] = useState(props.task);
   const [showEditIcon, setShowEditIcon] = useState(false);
   const [chat, setChat] = useState(chatData);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteTask] = useMutation(DELETE_TASK);
+
+  React.useEffect(() => {
+    setTask(props.task)
+  }, [setTask, props.task]);
+
   React.useEffect(() => {
     const elem = document.getElementById(`item_${chat.length}`);
     elem && elem.scrollIntoView({ behavior: "smooth" });
   });
+
   const initialChatFormState =
   {
     chat_id: Math.random(),
@@ -247,32 +216,46 @@ export default function TaskDetailModal(props) {
     }
   }
 
-  // console.log(chat)
   const handleCompletedChange = () => {
     if (!task.completed) {
-      task.completed_date = new Date().toString();
-      task.completed = !task.completed;
-      props.handleCompletedChange(task);
+      setTask({ ...task, completed: !task.completed, completed_date: new Date().toString() });
     } else {
-      task.completed_date = "";
-      task.completed = !task.completed;
-      props.handleCompletedChange(task);
+      setTask({ ...task, completed: !task.completed, completed_date: "" });
     }
   };
 
   const handleSaveChange = () => {
     props.handleCompletedChange(task);
-    setShowEditIcon(false)
   }
+
   const onEscapeOutside = (e) => {
     handleCloseTaskNameForm();
     handleSaveChange();
+    setShowEditIcon(false)
   }
   const onPressEnter = (e) => {
     if (e.key === 'Enter') {
-      handleSaveChange();
-      handleCloseTaskNameForm();
+      onEscapeOutside();
     }
+  }
+
+  const handleDeleteModal = () => {
+    setOpenDeleteModal(true);
+  }
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
+  const handleDelete = () => {
+    props.handleDelete(task._id);
+    props.closeDialogDetail();
+    deleteTask({ variables: { _id: task._id } });
+  }
+
+  const handleCloseModal = () => {
+    props.handleCompletedChange(task);
+    props.closeDialogDetail();
   }
 
   React.useEffect(() => {
@@ -290,55 +273,78 @@ export default function TaskDetailModal(props) {
     <div>
       <Dialog
         fullScreen={fullScreen}
-        onClose={props.closeDialogDetail}
+        onClose={handleCloseModal}
         aria-labelledby="customized-dialog-title"
         open={props.openDialogDetail}
         maxWidth={'sm'}
       >
+        <DeleteForm
+          open={openDeleteModal}
+          handleDelete={handleDelete}
+          close={handleCloseDeleteModal}
+        />
         {/* <div style={{width:700,height:700}}> */}
-        <DialogTitle id="customized-dialog-title" onClose={props.closeDialogDetail} style={{ paddingBottom: 0 }}>
+        <DialogTitle id="customized-dialog-title" onClose={handleCloseModal} style={{ paddingBottom: 0 }}>
           {taskNameForm ?
             <EscapeOutside onEscapeOutside={onEscapeOutside}>
-              <TextareaAutosize autoFocus aria-label="empty textarea"
+              <TextField
+                id="task_name"
+                autoFocus
                 onKeyDown={onPressEnter}
                 value={task.task_name}
-                id="task_name"
                 onChange={handleChangeTaskName}
-                placeholder="Add Task Name"
-                style={{ textAlign: 'center', width: "80%", minHeight: 27, fontSize: 18, fontWeight: 600 }} />
+                variant="outlined"
+                size="small"
+                InputProps={{
+                  className: classes.input
+                }}
+                inputProps={{ min: 0, style: { textAlign: 'center', fontSize: 15, height: 'auto', fontWeight: 500 } }}
+                style={{ width: "72%" }} />
             </EscapeOutside>
             :
             <div style={{ display: "flex" }}>
-              <div style={{ width: "10%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                {task.completed === true ?
-                  <StyledCheckbox checked={true} onChange={handleCompletedChange} />
-                  :
-                  <div><StyledCheckbox onChange={handleCompletedChange} /></div>
-                }
+              <div style={{ width: "12%", display: 'flex', justifyContent: 'space-between' }}>
+                <Tooltip title={task.completed ? "Mark as uncomplete" : "Mark as complete"}>
+                  <Checkbox
+                    checked={task.completed}
+                    onChange={handleCompletedChange}
+                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                    style={{ padding: 5 }}
+                  />
+                </Tooltip>
+                <Tooltip title="Delete this task">
+                  <IconButton aria-label="delete"
+                    style={{ padding: 5 }}
+                    onClick={handleDeleteModal}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </div>
               <Button
-                elevation={0}
+                variant="contained"
+                color="primary"
                 size="small"
+                disableElevation
                 onMouseEnter={() => setShowEditIcon(true)}
                 onMouseLeave={() => setShowEditIcon(false)}
                 onClick={handleOpenTaskNameForm}
-                style={{ textAlign: 'center', textTransform: 'none', flexGrow: 3, width: "80%" }} >
-                <Typography variant="h6" style={{ textAlign: 'center' }}>
+                style={{ textAlign: 'center', textTransform: 'none', flexGrow: 3, width: "72%" }}
+              >
+                <Typography variant="h6" style={{ textAlign: 'center', color: 'white' }}>
                   {task.task_name}
                 </Typography>
               </Button>
-              {showEditIcon ? <div style={{ width: "10%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}><EditIcon /></div> : <div style={{ width: "10%" }}></div>}
+              {showEditIcon ?
+                <div style={{ width: "12%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <EditIcon />
+                </div>
+                : <div style={{ width: "12%" }}></div>}
             </div>
           }
           <div style={{ display: 'flex', marginLeft: 6, justifyContent: 'center' }}>
-            <Typography color='textSecondary' style={{ fontSize: 10, }}>
-              Created by
-            </Typography>
-            <Typography color='textSecondary' style={{ fontSize: 10, fontWeight: 500, paddingLeft: 4, }}>
-              Faesal
-            </Typography>
-            <Typography color='textSecondary' style={{ fontSize: 10, paddingLeft: 4, }}>
-              on Sun 15 May 2020 18:00
+            <Typography style={{ fontSize: 10, color: 'white' }}>
+              Created on Sun 15 May 2020 18:00
             </Typography>
           </div>
         </DialogTitle>
@@ -349,27 +355,16 @@ export default function TaskDetailModal(props) {
         </AntTabs>
         <TabPanel value={value} index={0} style={
           fullScreen ?
-            { minWidth: 10, height: '100%', backgroundColor: 'rgb(230, 232, 235)' } :
-            { width: 580, height: 440, backgroundColor: 'rgb(230, 232, 235)' }
+            { minWidth: 10, height: '100%' } :
+            { width: 580, height: 440 }
         } >
           <DialogContent dividers style={
             fullScreen ?
-              { height: '90%' } :
-              { height: '88%' }
+              { height: '100%' } :
+              { height: '100%' }
           } >
-            <TaskProperties task={props.task} handleCompletedChange={props.handleCompletedChange} />
+            <TaskProperties task={task} handleCompletedChange={props.handleCompletedChange} />
           </DialogContent  >
-          <DialogActions style={{ background: "white" }}>
-            {task.completed ?
-              <Button autoFocus color="primary" onClick={handleCompletedChange} >
-                Mark as Uncomplete
-            </Button>
-              :
-              <Button color="primary" onClick={handleCompletedChange}>
-                Mark as Complete
-              </Button>
-            }
-          </DialogActions>
         </TabPanel>
         <TabPanel value={value} index={1} style={
           fullScreen ?
@@ -411,7 +406,7 @@ export default function TaskDetailModal(props) {
             </DialogContent>
           }
           <Divider />
-          <DialogActions style={{ height: '16%' }}>
+          <DialogActions style={{ height: '12%' }}>
             <TextField
               id="content"
               multiline

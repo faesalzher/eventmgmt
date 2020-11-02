@@ -96,7 +96,6 @@ export default function RoadmapEditForm(props) {
 
   const [date, setDate] = useState(initialDateRange);
 
-  console.log(roadmapForm.start_date)
   React.useEffect(() => {
     if (roadmapForm.start_date !== undefined) {
       setDate([

@@ -138,6 +138,37 @@ const ExternalType = new GraphQLObjectType({
   }),
 });
 
+const Agenda = require("./model/Agenda");
+const AgendaType = new GraphQLObjectType({
+  name: "Agenda",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    agenda_name: { type: GraphQLString },
+    date: { type: GraphQLString },
+    start_time: { type: GraphQLString },
+    end_time: { type: GraphQLString },
+    details: { type: GraphQLString },
+    event_id: { type: GraphQLString },
+  }),
+});
+
+const Task = require("./model/Task");
+const TaskType = new GraphQLObjectType({
+  name: "Task",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    task_name: { type: GraphQLString },
+    priority: { type: GraphQLString },
+    completed: { type: GraphQLBoolean },
+    task_description: { type: GraphQLString },
+    due_date: { type: GraphQLString },
+    completed_date: { type: GraphQLString },
+    created_at: { type: GraphQLString },
+    created_by: { type: GraphQLString },
+    roadmap_id: { type: GraphQLString },
+  }),
+});
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -299,6 +330,20 @@ const RootQuery = new GraphQLObjectType({
         return External.find({ event_id: args.event_id });
       },
     },
+    agendas: {
+      type: new GraphQLList(AgendaType),
+      args: { event_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Agenda.find({ event_id: args.event_id });
+      },
+    },
+    tasks: {
+      type: new GraphQLList(TaskType),
+      args: { roadmap_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Task.find({ roadmap_id: args.roadmap_id });
+      },
+    },
   },
 });
 
@@ -378,28 +423,15 @@ const Mutation = new GraphQLObjectType({
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.project_name) {
-          edit.project_name = args.project_name;
-        }
-        if (args.project_description) {
-          edit.project_description = args.project_description;
-        }
-        if (args.cancel) {
-          edit.cancel = args.cancel;
-        }
-        if (args.project_start_date) {
-          edit.project_start_date = args.project_start_date;
-        }
-        if (args.project_end_date) {
-          edit.project_end_date = args.project_end_date;
-        }
-        if (args.picture) {
-          edit.picture = args.picture;
-        }
-        if (args.organization_id) {
-          edit.organization_id = args.organization_id;
-        }
+        let edit = {
+          project_name: args.project_name,
+          project_description: args.project_description,
+          cancel: args.cancel,
+          project_start_date: args.project_start_date,
+          project_end_date: args.project_end_date,
+          picture: args.picture,
+          organization_id: args.organization_id,
+        };
         let project = Project.findByIdAndUpdate(args._id, edit, { new: true });
         return project;
       },
@@ -780,7 +812,7 @@ const Mutation = new GraphQLObjectType({
         return roadmap;
       },
     },
-    
+
     addExternal: {
       type: ExternalType,
       args: {
@@ -842,7 +874,9 @@ const Mutation = new GraphQLObjectType({
         if (args.picture) {
           edit.picture = args.picture;
         }
-        let external = External.findByIdAndUpdate(args._id, edit, { new: true });
+        let external = External.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
         return external;
       },
     },
@@ -852,6 +886,145 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let external = External.findByIdAndDelete(args._id);
         return external;
+      },
+    },
+
+    addAgenda: {
+      type: AgendaType,
+      args: {
+        _id: { type: GraphQLString },
+        agenda_name: { type: GraphQLString },
+        start_time: { type: GraphQLString },
+        end_time: { type: GraphQLString },
+        date: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        details: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let external = new Agenda({
+          _id: args._id,
+          agenda_name: args.agenda_name,
+          start_time: args.start_time,
+          end_time: args.end_time,
+          date: args.date,
+          event_id: args.event_id,
+          details: args.details,
+        });
+        return external.save();
+      },
+    },
+    editAgenda: {
+      type: AgendaType,
+      args: {
+        _id: { type: GraphQLString },
+        agenda_name: { type: GraphQLString },
+        end_time: { type: GraphQLString },
+        start_time: { type: GraphQLString },
+        date: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        details: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {};
+        if (args.agenda_name) {
+          edit.agenda_name = args.agenda_name;
+        }
+        if (args.start_time) {
+          edit.start_time = args.start_time;
+        }
+        if (args.end_time) {
+          edit.end_time = args.end_time;
+        }
+        if (args.date) {
+          edit.date = args.date;
+        }
+        if (args.event_id) {
+          edit.event_id = args.event_id;
+        }
+        if (args.details) {
+          edit.details = args.details;
+        }
+        let external = Agenda.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
+        return external;
+      },
+    },
+    deleteAgenda: {
+      type: AgendaType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let external = Agenda.findByIdAndDelete(args._id);
+        return external;
+      },
+    },
+
+    addTask: {
+      type: TaskType,
+      args: {
+        _id: { type: GraphQLString },
+        task_name: { type: GraphQLString },
+        priority: { type: GraphQLString },
+        completed: { type: GraphQLBoolean },
+        task_description: { type: GraphQLString },
+        due_date: { type: GraphQLString },
+        completed_date: { type: GraphQLString },
+        created_at: { type: GraphQLString },
+        created_by: { type: GraphQLString },
+        roadmap_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let task = new Task({
+          _id: args._id,
+          task_name: args.task_name,
+          priority: args.priority,
+          completed: args.completed,
+          task_description: args.task_description,
+          due_date: args.due_date,
+          completed_date: args.completed_date,
+          created_at: args.created_at,
+          created_by: args.created_by,
+          roadmap_id: args.roadmap_id,
+        });
+        return task.save();
+      },
+    },
+    editTask: {
+      type: TaskType,
+      args: {
+        _id: { type: GraphQLString },
+        task_name: { type: GraphQLString },
+        priority: { type: GraphQLString },
+        completed: { type: GraphQLBoolean },
+        task_description: { type: GraphQLString },
+        due_date: { type: GraphQLString },
+        completed_date: { type: GraphQLString },
+        created_at: { type: GraphQLString },
+        created_by: { type: GraphQLString },
+        roadmap_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {
+          task_name: args.task_name,
+          priority: args.priority,
+          completed: args.completed,
+          task_description: args.task_description,
+          due_date: args.due_date,
+          completed_date: args.completed_date,
+          created_at: args.created_at,
+          created_by: args.created_by,
+          roadmap_id: args.roadmap_id,
+        };
+        let task = Task.findByIdAndUpdate(args._id, edit, { new: true });
+        return task;
+      },
+    },
+    deleteTask: {
+      type: TaskType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let task = Task.findByIdAndDelete(args._id);
+        return task;
       },
     },
   },

@@ -60,7 +60,7 @@ export default function StatusBox(props) {
 
 
   return (
-    (props.cancel === "true") ? (
+    (props.cancel === true) ? (
       <Box borderRadius={4} style={props.style} className={[classes.cancelled, classes.boxStatus].join(" ")}>
         <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
       </Box>

@@ -211,7 +211,6 @@ export default function ProjectEditModal(props) {
   };
 
 
-console.log(projectForm)
   if (navigate) {
     return <Redirect push to="/project" />;
   }
@@ -278,6 +277,7 @@ console.log(projectForm)
             >
               <StatusBox
                 style={{ width: 'auto' }}
+                cancel={projectForm.cancel}
                 start_date={projectForm.start_date}
                 end_date={projectForm.end_date}
               />
@@ -287,7 +287,7 @@ console.log(projectForm)
               style={{ display: "flex" }}
             >
 
-              {projectForm.cancel === "true" ? (
+              {projectForm.cancel === true ? (
                 <Button
                   color="primary"
                   variant="outlined"

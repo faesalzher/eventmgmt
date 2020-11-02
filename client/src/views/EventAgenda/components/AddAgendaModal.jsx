@@ -17,9 +17,43 @@ import { useTheme } from '@material-ui/core/styles';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 import uuid from 'uuid/v1';
+
+
+const ADD_AGENDA = gql`
+  mutation addAgenda(
+    $_id: String!,
+    $agenda_name: String!,
+    $date: String!,
+    $start_time: String!,
+    $end_time: String!,
+    $details:String!,
+    $event_id:String!
+    ) {
+    addAgenda(
+      _id: $_id,
+      agenda_name: $agenda_name,
+      date: $date,
+      start_time:$start_time,
+      end_time:$end_time,
+      details:$details,
+      event_id:$event_id
+      ) {
+      _id
+      agenda_name
+      date
+      start_time
+      end_time
+      details
+      event_id
+    }
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -59,8 +93,11 @@ export default function AddAgendaModal(props) {
     date: "",
     start_time: "00:00",
     end_time: "00:00",
+    event_id: props.event_id
   };
   const [agendaForm, setAgendaForm] = useState(initialFormState)
+
+  const [addAgenda] = useMutation(ADD_AGENDA);
 
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -76,8 +113,28 @@ export default function AddAgendaModal(props) {
   };
 
   const handleSaveButton = () => {
-    props.handleSaveAgendaButton(agendaForm)
-    handleClose();
+
+    setTimeout(() => {
+      props.handleSaveAgendaButton(agendaForm)
+      handleClose();
+      addAgenda(
+        {
+          variables:
+          {
+            _id: agendaForm._id,
+            agenda_name: agendaForm.agenda_name,
+            date: agendaForm.date,
+            start_time: agendaForm.start_time,
+            end_time: agendaForm.end_time,
+            details: agendaForm.details,
+            event_id: agendaForm.event_id,
+          }
+        });
+
+      setAgendaForm(initialFormState);
+    }, 400);
+
+
   };
 
   const handleClose = () => {
@@ -204,7 +261,7 @@ export default function AddAgendaModal(props) {
           (
             agendaForm.agenda_name === "" ||
             agendaForm.date === "" ||
-            validateTime === false  ||
+            validateTime === false ||
             agendaForm.details === ""
           ) ?
             ("invalid") : ("valid")

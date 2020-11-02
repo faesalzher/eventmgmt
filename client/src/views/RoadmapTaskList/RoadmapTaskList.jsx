@@ -129,20 +129,6 @@ export default function RoadamapTaskList() {
 
   const [openEditModal, setOpenEditModal] = useState(false);
 
-  // const [divisions, setDivisions] = useState([]);
-
-  // const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
-  //   variables: { project_id: project_id },
-  //   onCompleted: () => {
-  //     setDivisions(
-  //       divisionsData.divisionsByProject
-  //     )
-  //   }
-  // }
-  // );
-
-
-
   const [project, setProject] = React.useState({ project_name: "" });
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {

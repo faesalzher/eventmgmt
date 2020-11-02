@@ -95,9 +95,7 @@ const Profile = (props) => {
     refetchStaff();
   };
 
-  // console.log(decodedToken._id)
-  console.log(profileOrganization.picture);
-  console.log(decodedToken);
+
   const classes = useStyles();
   return (
     <div style={props.collapsed !== "true" ? {} : { display: "flex" }}>

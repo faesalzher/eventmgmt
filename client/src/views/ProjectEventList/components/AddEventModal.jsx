@@ -87,7 +87,7 @@ export default function AddEventModal(props) {
     cancel: "false",
     event_start_date: new Date().toString(),
     event_end_date: new Date().toString(),
-    picture: "",
+    picture: " ",
     project_id: props.project_id,
   };
 
