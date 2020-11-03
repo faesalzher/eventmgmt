@@ -78,6 +78,16 @@ const useStyles = makeStyles(theme => ({
     // color: "#2EFF22",
     backgroundColor: 'white'
   },
+  center: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  titleButton: {
+    textAlign: 'center',
+    textTransform: 'none',
+    flexGrow: 3
+  }
 }));
 
 const styles = theme => ({
@@ -299,11 +309,15 @@ export default function TaskDetailModal(props) {
                   className: classes.input
                 }}
                 inputProps={{ min: 0, style: { textAlign: 'center', fontSize: 15, height: 'auto', fontWeight: 500 } }}
-                style={{ width: "72%" }} />
+                style={fullScreen ? { width: "60%" } : { width: "72%" }} />
             </EscapeOutside>
             :
             <div style={{ display: "flex" }}>
-              <div style={{ width: "12%", display: 'flex', justifyContent: 'space-between' }}>
+              <div style={
+                fullScreen ?
+                  { width: '20%', display: 'flex', justifyContent: 'space-between' } :
+                  { width: "12%", display: 'flex', justifyContent: 'space-between' }
+              }>
                 <Tooltip title={task.completed ? "Mark as uncomplete" : "Mark as complete"}>
                   <Checkbox
                     checked={task.completed}
@@ -329,17 +343,20 @@ export default function TaskDetailModal(props) {
                 onMouseEnter={() => setShowEditIcon(true)}
                 onMouseLeave={() => setShowEditIcon(false)}
                 onClick={handleOpenTaskNameForm}
-                style={{ textAlign: 'center', textTransform: 'none', flexGrow: 3, width: "72%" }}
+                style={
+                  fullScreen ? { width: "60%" } : { width: "72%" }
+                }
+                className={classes.titleButton}
               >
                 <Typography variant="h6" style={{ textAlign: 'center', color: 'white' }}>
                   {task.task_name}
                 </Typography>
               </Button>
               {showEditIcon ?
-                <div style={{ width: "12%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={fullScreen ? { width: '20%' } : { width: "12%" }} className={classes.center}>
                   <EditIcon />
                 </div>
-                : <div style={{ width: "12%" }}></div>}
+                : <div style={fullScreen ? { width: '20%' } : { width: "12%" }}></div>}
             </div>
           }
           <div style={{ display: 'flex', marginLeft: 6, justifyContent: 'center' }}>
@@ -363,7 +380,13 @@ export default function TaskDetailModal(props) {
               { height: '100%' } :
               { height: '100%' }
           } >
-            <TaskProperties task={task} handleCompletedChange={props.handleCompletedChange} />
+            <TaskProperties
+              task={task}
+              handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
+              handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+              handleCompletedChange={props.handleCompletedChange}
+              tasksAssignedTo={props.tasksAssignedTo}
+            />
           </DialogContent  >
         </TabPanel>
         <TabPanel value={value} index={1} style={

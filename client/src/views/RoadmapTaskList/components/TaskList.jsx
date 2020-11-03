@@ -128,33 +128,6 @@ const EDIT_TASK = gql`
   }
 `;
 
-// const COMITEESBYPROJECT_QUERY = gql`
-//   query comiteesByProject($project_id: String!){
-//      comiteesByProject(project_id:$project_id) {
-//       _id
-//       staff_id
-//       position_id
-//       division_id
-//       project_id
-//     }
-//   }
-// `;
-
-// const STAFFS_QUERY = gql`
-// {
-//   staffs{
-//       _id
-//       staff_name
-//       position_name
-//       email
-//       phone_number
-//       password
-//       picture
-//       departement_id
-//   }
-// }
-// `;
-
 const useStyles = makeStyles(theme => ({
   root: {
     maxHeight: 500,
@@ -212,7 +185,6 @@ export default function TaskList(props) {
     {
       variables: { roadmap_id: props.roadmap_id },
     });
-
 
   useEffect(() => {
     const onCompleted = (tasksData) => { setTasks(tasksData.tasks) };

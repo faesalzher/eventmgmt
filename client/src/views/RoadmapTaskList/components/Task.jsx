@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Avatar,
-  Tooltip,
-
 } from '@material-ui/core';
 import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
@@ -12,42 +9,100 @@ import ListItem from '@material-ui/core/ListItem';
 import { useSoftRiseShadowStyles } from '@mui-treasury/styles/shadow/softRise';
 import clsx from 'clsx';
 import { CustomizedCheckbox } from 'components';
-
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
 import {
-  TaskDetailModal
+  TaskDetailModal, AssigneeAvatar
 } from '.';
 
-const useStyles = makeStyles({
+
+
+const TASKS_ASSIGNED_TO_QUERY = gql`
+query tasks_assigned_to($task_id:String!){
+  tasks_assigned_to(task_id: $task_id){
+      _id
+      task_id
+      comitee_id
+  }
+}
+`;
+
+const useStyles = makeStyles(theme => ({
+  list: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    [theme.breakpoints.down('xs')]: {
+      display: 'block'
+    }
+  },
+  chat: {
+    padding: '0px 15px',
+    [theme.breakpoints.down('xs')]: {
+      padding: 0,
+    }
+  },
   small: {
     width: 25,
-    height: 25,
-  },
-});
+    height: 25
+  }
+}));
 
 
 
 export default function Task(props) {
   const classes = useStyles();
   const shadowStyles = useSoftRiseShadowStyles();
+  const dueDate = new Date(props.task.due_date);
+  const todayDate = new Date();
+  const msec = (todayDate - dueDate);
+  const mins = Math.floor(msec / 60000);
+  const hrs = Math.floor(mins / 60);
+  const days = Math.floor(hrs / 24);
+  const minutes = mins % 60;
+  const hours = hrs % 24;
 
+  const [openDialogDetail, setOpenDialogDetail] = React.useState(false);
   const [task, setTask] = useState(props.task)
+
+
+  const [tasksAssignedTo, setTasksAssignedTo] = useState([])
+  const [chatCount, setChatCount] = useState(0);
+
+
   React.useEffect(() => {
     setTask(props.task)
   }, [setTask, props.task])
 
-  const [chatCount, setChatCount] = useState(0);
-  // const handleChangeChecked = id => e => {
-  //   let newArr = { ...task };
-  //   newArr.completed = true;
-  //   newArr.completed_date = new Date().toString();
-  //   setTask({ ...task, completed: true, completed_date: new Date().toString() })
-  // };
+  const {
+    loading: tasksAssignedToLoading,
+    error: tasksAssignedToError,
+    data: tasksAssignedToData,
+    refetch: tasksAssignedToRefetch
+  } = useQuery(TASKS_ASSIGNED_TO_QUERY,
+    {
+      variables: { task_id: task._id },
+    });
 
-  // const handleChangeUnchecked = id => e => {
-  //   let newArr = { ...task };
+  useEffect(() => {
+    const onCompleted = (tasksAssignedToData) => { setTasksAssignedTo(tasksAssignedToData.tasks_assigned_to) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !tasksAssignedToLoading && !tasksAssignedToError) {
+        onCompleted(tasksAssignedToData);
+      } else if (onError && !tasksAssignedToLoading && tasksAssignedToError) {
+        onError(tasksAssignedToError);
+      }
+    }
+  }, [tasksAssignedToLoading, tasksAssignedToData, tasksAssignedToError]);
 
-  // };
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    tasksAssignedToRefetch();
+  };
 
   const handleChangeChecked = () => {
     let newArr = { ...task };
@@ -64,18 +119,6 @@ export default function Task(props) {
     }
   };
 
-
-  const dueDate = new Date(props.task.due_date);
-  const todayDate = new Date();
-  const msec = (todayDate - dueDate);
-  const mins = Math.floor(msec / 60000);
-  const hrs = Math.floor(mins / 60);
-  const days = Math.floor(hrs / 24);
-  const minutes = mins % 60;
-  const hours = hrs % 24;
-
-  const [openDialogDetail, setOpenDialogDetail] = React.useState(false);
-
   const handleClickOpenDialogDetail = () => {
     setOpenDialogDetail(true);
   };
@@ -91,6 +134,20 @@ export default function Task(props) {
     setChatCount(e);
   }
 
+  const handleAddTaskAssignedTo = (e) => {
+    // setTasksAssignedTo([...tasksAssignedTo, e]);
+    setTasksAssignedTo([...tasksAssignedTo, e]);
+  }
+
+  const handleDeleteTaskAssignedTo = e => {
+    const temp = [...tasksAssignedTo];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setTasksAssignedTo(temp);
+  }
+
   return (
     <div
       style={props.task.completed === true ?
@@ -104,14 +161,13 @@ export default function Task(props) {
             { backgroundColor: "#a3cd3b" } : (props.task.priority === "high") ?
               { backgroundColor: "#ff4943" } : { backgroundColor: "#e2e2e2" }
       } >
-          <CustomizedCheckbox
-            checked={task.completed}
-            onChange={handleChangeChecked}
-            // inputProps={{ 'aria-label': 'primary checkbox' }}
-          />
+        <CustomizedCheckbox
+          checked={task.completed}
+          onChange={handleChangeChecked}
+        // inputProps={{ 'aria-label': 'primary checkbox' }}
+        />
       </div>
-      <ListItem button onClick={handleClickOpenDialogDetail}
-        style={{ display: 'flex', justifyContent: 'space-between' }}      >
+      <ListItem button onClick={handleClickOpenDialogDetail} className={classes.list}>
         <div>
           <Typography variant="h6" style={task.completed ? { textDecoration: 'line-through' } : {}}>{props.task.task_name}</Typography>
           {props.task.due_date !== "" && props.task.completed === false ?
@@ -144,26 +200,26 @@ export default function Task(props) {
         </div>
         <div style={{ display: 'flex' }}>
           {chatCount === 0 ? <div></div> :
-            <div style={{ display: 'flex', padding: '0px 15px' }}>
+            <div style={{ display: 'flex' }} className={classes.chat}>
               <ChatBubbleOutlineIcon style={{ fontSize: 15, margin: '4px 0px' }} />
               <Typography style={{ fontSize: 13, paddingLeft: 4 }}>{chatCount}</Typography>
             </div>}
           <AvatarGroup spacing={8} style={{ flexGrow: 1, justifyContent: 'flex-end' }}>
-            <Avatar src="/static/images/avatar/1.jpg" className={classes.small} />
-            <Avatar src="/static/images/avatar/2.jpg" className={classes.small} />
-            <Avatar src="/static/images/avatar/3.jpg" className={classes.small} />
-            <Avatar src="/static/images/avatar/3.jpg" className={classes.small} />
-            <Tooltip title="Foo • Bar • Baz">
-              <Avatar className={classes.small}><Typography style={{ fontSize: 10 }}>+4</Typography></Avatar>
-            </Tooltip>
+            {
+              tasksAssignedTo.map((taskAssignedTo, index) => {
+                return <AssigneeAvatar key={index} taskAssignedTo={taskAssignedTo} type="avatar" />
+              })
+            }
           </AvatarGroup>
         </div>
       </ListItem>
       <TaskDetailModal
         openDialogDetail={openDialogDetail}
+        handleAddTaskAssignedTo={handleAddTaskAssignedTo}
         closeDialogDetail={handleClose}
+        handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
         // closeAfterTransition
-        handleDelete={props.handleDelete}
+        tasksAssignedTo={tasksAssignedTo}
         handleChangeChecked={handleChangeChecked}
         handleCompletedChange={handleCompletedChange}
         task={props.task}

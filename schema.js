@@ -169,6 +169,16 @@ const TaskType = new GraphQLObjectType({
   }),
 });
 
+const Task_assigned_to = require("./model/Task_assigned_to");
+const Task_assigned_toType = new GraphQLObjectType({
+  name: "Task_assigned_to",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    task_id: { type: GraphQLString },
+    comitee_id: { type: GraphQLString },
+  }),
+});
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
@@ -275,6 +285,13 @@ const RootQuery = new GraphQLObjectType({
         return Position.find({});
       },
     },
+    position: {
+      type: PositionType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Position.findById(args._id);
+      },
+    },
     divisionsByProject: {
       type: new GraphQLList(DivisionType),
       args: { project_id: { type: GraphQLString } },
@@ -287,6 +304,13 @@ const RootQuery = new GraphQLObjectType({
       args: { project_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Comitee.find({ project_id: args.project_id });
+      },
+    },
+    comitee: {
+      type: ComiteeType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Comitee.findById(args._id);
       },
     },
     comiteesByHeadProject: {
@@ -342,6 +366,13 @@ const RootQuery = new GraphQLObjectType({
       args: { roadmap_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Task.find({ roadmap_id: args.roadmap_id });
+      },
+    },
+    tasks_assigned_to: {
+      type: new GraphQLList(Task_assigned_toType),
+      args: { task_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Task_assigned_to.find({ task_id: args.task_id });
       },
     },
   },
@@ -1027,6 +1058,32 @@ const Mutation = new GraphQLObjectType({
         return task;
       },
     },
+
+    addTask_assigned_to: {
+      type: Task_assigned_toType,
+      args: {
+        _id: { type: GraphQLString },
+        task_id: { type: GraphQLString },
+        comitee_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let task_assigned_to = new Task_assigned_to({
+          _id: args._id,
+          task_id: args.task_id,
+          comitee_id: args.comitee_id,
+        });
+        return task_assigned_to.save();
+      },
+    },
+    deleteTask_assigned_to: {
+      type: Task_assigned_toType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let task_assigned_to = Task_assigned_to.findByIdAndDelete(args._id);
+        return task_assigned_to;
+      },
+    },
+
   },
 });
 

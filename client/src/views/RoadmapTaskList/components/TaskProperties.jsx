@@ -8,7 +8,6 @@ import {
   TextField,
   ButtonGroup,
   Chip,
-  Avatar,
   Popover
 } from '@material-ui/core';
 import EscapeOutside from "react-escape-outside"
@@ -20,9 +19,10 @@ import { DatetimePicker } from 'rc-datetime-picker';
 import 'rc-datetime-picker/dist/picker.css';
 import moment from 'moment';
 import EditIcon from '@material-ui/icons/Edit';
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { AvatarName } from 'components';
+import { AssigneesDivision, AssigneeAvatar } from '.';
 
 const ORGANIZATION_QUERY = gql`
   query organization($_id: String!) {
@@ -45,6 +45,14 @@ const STAFF_QUERY = gql`
       picture
     }
   }
+`;
+
+const DELETE_TASK_ASSIGNED_TO = gql`
+mutation deleteTaskAssignedTo ($_id: String!) {
+  deleteTask_assigned_to(_id:$_id){
+    _id
+  }
+}
 `;
 
 const useStyles = makeStyles(theme => ({
@@ -73,6 +81,7 @@ const useStyles = makeStyles(theme => ({
     },
   }
 }));
+
 
 export default function TaskProperties(props) {
   const classes = useStyles();
@@ -121,9 +130,6 @@ export default function TaskProperties(props) {
     }
   }, [dataStaff])
 
-  console.log(taskForm.created_by)
-  console.log(dataOrganization)
-  console.log(createdBy)
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showEditIcon, setShowEditIcon] = React.useState(false);
   const [descriptionForm, setDescriptionForm] = React.useState(false);
@@ -194,6 +200,23 @@ export default function TaskProperties(props) {
     setTaskForm({ ...taskForm, priority: e });
     props.handleCompletedChange(taskForm);
   };
+
+  const [openComitees, setOpenComitees] = React.useState(false);
+
+  const handleOpenComitees = () => {
+    setOpenComitees(true);
+  };
+
+  const handleCloseComitees = () => {
+    setOpenComitees(false);
+  };
+
+  const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
+
+  const handleDeleteTaskAssignedTo = (e) => {
+    props.handleDeleteTaskAssignedTo(e);
+    deleteTaskAssignedTo({ variables: { _id: e, } });
+  }
 
   return (
     <div>
@@ -318,36 +341,32 @@ export default function TaskProperties(props) {
           </Typography>
         </div>
         <div className={[classes.field, classes.assigned].join(" ")}>
+          {
+            props.tasksAssignedTo.map((taskAssignedTo, index) => {
+              return <AssigneeAvatar
+                type="chip"
+                key={index}
+                handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+                taskAssignedTo={taskAssignedTo} />
+            })
+          }
           <Chip
-            avatar={<Avatar src="/static/images/avatar/1.jpg" />}
-            label="Skinnyfabs"
             size="small"
-            color="primary"
+            color="secondary"
             variant="outlined"
-            onDelete={() => console.log('succes')}
-          />
-          <Chip
-            avatar={<Avatar src="/static/images/avatar/1.jpg" />}
-            label="Danarjon"
-            color="primary"
-            size="small"
-            variant="outlined"
-            onDelete={() => console.log('succes')}
-          />
-          <Chip
-            avatar={<Avatar src="/static/images/avatar/1.jpg" />}
-            label="Ahmad Sobari"
-            color="primary"
-            variant="outlined"
-            size="small"
-            onDelete={() => console.log('succes')}
-          />
-          {/* <Chip
-            size="small"
             clickable
-            onClick={()=>console.log('do ')}
-            label={<AddIcon />}
-          /> */}
+            onClick={handleOpenComitees}
+            icon={<AddIcon />}
+            label="More"
+          />
+          <AssigneesDivision
+            task={props.task}
+            handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
+            handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+            handleCloseComitees={handleCloseComitees}
+            openComitees={openComitees}
+            tasksAssignedTo={props.tasksAssignedTo}
+          />
         </div>
       </div>
 
