@@ -32,7 +32,7 @@ export function Percentage(props) {
   return (
     <Typography className={classes.status}>
       {
-        (props.cancel === "true") ? (
+        (props.cancel === true) ? (
           0
         ) : ((today < start_date) ? (
           0
@@ -73,7 +73,7 @@ export function StatusProgressDays(props) {
   return (
     <Typography className={classes.status}>
       {
-        (props.cancel === "true") ? (
+        (props.cancel === true) ? (
           " "
         ) : ((today < start_date) ? (
           (plannedDays) + " Days to go"
@@ -115,7 +115,7 @@ export default function StatusProgressBar(props) {
         <LinearProgress
           className={classes.progress}
           value={
-            (props.cancel === "true") ? (
+            (props.cancel === true) ? (
               0
             ) : ((today < start_date) ? (
               0

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Paper,
   IconButton,
-  TableFooter,
   TablePagination,
   Toolbar,
   Tooltip,
@@ -45,7 +44,7 @@ const useStyles1 = makeStyles((theme) => ({
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 500,
+    // minWidth: 500,
   },
 });
 
@@ -200,7 +199,7 @@ export default function Divisions(props) {
               </TableRow>
             )}
           </TableBody>
-          <TableFooter>
+          {/* <TableFooter>
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
@@ -217,9 +216,24 @@ export default function Divisions(props) {
                 ActionsComponent={TablePaginationActions}
               />
             </TableRow>
-          </TableFooter>
+          </TableFooter> */}
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+        // colSpan={6}
+        component="div"
+        count={divisions.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        // SelectProps={{
+        //   inputProps: { 'aria-label': 'rows per page' },
+        //   native: true,
+        // }}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      // ActionsComponent={TablePaginationActions}
+      />
     </div>
   );
 }

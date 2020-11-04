@@ -70,7 +70,7 @@ const EventType = new GraphQLObjectType({
     event_name: { type: GraphQLString },
     event_description: { type: GraphQLString },
     event_location: { type: GraphQLString },
-    cancel: { type: GraphQLString },
+    cancel: { type: GraphQLBoolean },
     event_start_date: { type: GraphQLString },
     event_end_date: { type: GraphQLString },
     picture: { type: GraphQLString },
@@ -84,7 +84,7 @@ const PositionType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     position_name: { type: GraphQLString },
-    core: { type: GraphQLString },
+    core: { type: GraphQLBoolean },
   }),
 });
 
@@ -415,6 +415,30 @@ const Mutation = new GraphQLObjectType({
         return organization.save();
       },
     },
+    editOrganization: {
+      type: OrganizationType,
+      args: {
+        _id: { type: GraphQLString },
+        organization_name: { type: GraphQLString },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+        description: { type: GraphQLString },
+        picture: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {
+          organization_name: args.organization_name,
+          email: args.email,
+          password: args.password,
+          description: args.description,
+          picture: args.picture,
+        };
+        let organization = Organization.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
+        return organization;
+      },
+    },
     addProject: {
       type: ProjectType,
       args: {
@@ -613,7 +637,7 @@ const Mutation = new GraphQLObjectType({
         event_name: { type: GraphQLString },
         event_description: { type: GraphQLString },
         event_location: { type: GraphQLString },
-        cancel: { type: GraphQLString },
+        cancel: { type: GraphQLBoolean },
         event_start_date: { type: GraphQLString },
         event_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
@@ -641,38 +665,23 @@ const Mutation = new GraphQLObjectType({
         event_name: { type: GraphQLString },
         event_description: { type: GraphQLString },
         event_location: { type: GraphQLString },
-        cancel: { type: GraphQLString },
+        cancel: { type: GraphQLBoolean },
         event_start_date: { type: GraphQLString },
         event_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
         project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.event_name) {
-          edit.event_name = args.event_name;
-        }
-        if (args.event_description) {
-          edit.event_description = args.event_description;
-        }
-        if (args.event_location) {
-          edit.event_location = args.event_location;
-        }
-        if (args.cancel) {
-          edit.cancel = args.cancel;
-        }
-        if (args.event_start_date) {
-          edit.event_start_date = args.event_start_date;
-        }
-        if (args.event_end_date) {
-          edit.event_end_date = args.event_end_date;
-        }
-        if (args.picture) {
-          edit.picture = args.picture;
-        }
-        if (args.project_id) {
-          edit.project_id = args.project_id;
-        }
+        let edit = {
+          event_name: args.event_name,
+          event_description: args.event_description,
+          event_location: args.event_location,
+          cancel: args.cancel,
+          event_start_date: args.event_start_date,
+          event_end_date: args.event_end_date,
+          picture: args.picture,
+          project_id: args.project_id,
+        };
         let event = Event.findByIdAndUpdate(args._id, edit, { new: true });
         return event;
       },
@@ -1083,7 +1092,6 @@ const Mutation = new GraphQLObjectType({
         return task_assigned_to;
       },
     },
-
   },
 });
 

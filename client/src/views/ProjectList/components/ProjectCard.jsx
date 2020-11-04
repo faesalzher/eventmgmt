@@ -162,6 +162,13 @@ const ProjectCard = (props) => {
     headOfProjectNameRefetch();
   };
 
+  const start_date = new Date(props.project.project_start_date);
+  const end_date = new Date(props.project.project_end_date);
+  const sameDays = (start_date.getDate() === end_date.getDate() &&
+    start_date.getMonth() === end_date.getMonth() &&
+    start_date.getFullYear() === end_date.getFullYear()
+  )
+
   return (
     <Grid
       item
@@ -208,53 +215,58 @@ const ProjectCard = (props) => {
                 </div>
               </div>
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
-                <div style={{display:'flex'}}>
-                <Percentage
+                <div style={{ display: 'flex' }}>
+                  <Percentage
+                    cancel={props.project.cancel}
+                    start_date={props.project.project_start_date}
+                    end_date={props.project.project_end_date}
+                  />
+                  <Typography
+                    className={classes.status} style={{ display: 'flex' }}>
+                    % Completed
+                </Typography>
+                </div>
+                <StatusProgressDays
                   cancel={props.project.cancel}
                   start_date={props.project.project_start_date}
                   end_date={props.project.project_end_date}
                 />
-                <Typography
-                  className={classes.status} style={{ display: 'flex' }}>
-                  % Completed
-                </Typography>
               </div>
-              <StatusProgressDays
-                cancel={props.project.cancel}
-                start_date={props.project.project_start_date}
-                end_date={props.project.project_end_date}
-              />
+              <div style={{ justifyContent: 'space-between' }}>
+                <StatusProgressBar
+                  cancel={props.project.cancel}
+                  start_date={props.project.project_start_date}
+                  end_date={props.project.project_end_date}
+                />
               </div>
-            <div style={{ justifyContent: 'space-between' }}>
-              <StatusProgressBar
-                cancel={props.project.cancel}
-                start_date={props.project.project_start_date}
-                end_date={props.project.project_end_date}
-              />
-            </div>
             </CardContent>
           </CardActionArea>
         </Tooltip>
-      <CardActions style={{
-        paddingLeft: 16,
-        paddingRight: 12,
-        paddingTop: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <StatusBox
-          start_date={props.project.project_start_date}
-          end_date={props.project.project_end_date}
-          cancel={props.project.cancel}
-        />
-        <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
-          <DateRangeIcon className={classes.iconDate} />
-          <Typography className={classes.status}>
-            {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
-          </Typography>
-        </div>
-      </CardActions>
+        <CardActions style={{
+          paddingLeft: 16,
+          paddingRight: 12,
+          paddingTop: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <StatusBox
+            start_date={props.project.project_start_date}
+            end_date={props.project.project_end_date}
+            cancel={props.project.cancel}
+          />
+          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
+            <DateRangeIcon className={classes.iconDate} />
+            {
+              (sameDays) ?
+                <Typography className={classes.status}>{props.project.project_start_date.slice(4, 15)}</Typography>
+                :
+                <Typography className={classes.status}>
+                  {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
+                </Typography>
+            }
+          </div>
+        </CardActions>
       </Card>
     </Grid >
   );

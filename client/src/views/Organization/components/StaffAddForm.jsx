@@ -1,17 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl,
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -80,49 +74,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
 
 export default function StaffAddForm(props) {
   const theme = useTheme();
@@ -181,6 +132,11 @@ export default function StaffAddForm(props) {
     setDepartement_id(event.target.value);
   };
 
+  const handleCloseModal = e => {
+    props.close();
+    setStaffForm(intitialFormState)
+  }
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -190,10 +146,8 @@ export default function StaffAddForm(props) {
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Add New Staff
-        </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
+      <DialogTitle title="Add New Staff" onClose={props.close}/>
+      <DialogContent dividers >
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
@@ -299,19 +253,19 @@ export default function StaffAddForm(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(staffForm.staff_name === "" ||
-          staffForm.departement_id === "" ||
-          staffForm.position_name === "" ||
-          staffForm.email === "" ||
-          staffForm.phone_number === ""
-        ) ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        validation={
+          (
+            staffForm.staff_name === "" ||
+            staffForm.departement_id === "" ||
+            staffForm.position_name === "" ||
+            staffForm.email === "" ||
+            staffForm.phone_number === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
+        close={()=>handleCloseModal()}
+        submit={() => handleSaveButton()} />
     </Dialog>
   );
 };

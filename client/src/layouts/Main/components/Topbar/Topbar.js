@@ -1,14 +1,38 @@
-import React from "react";
-// import { Link as RouterLink } from 'react-router-dom';
-// import clsx from 'clsx';
-// import PropTypes from 'prop-types';
+import React, { useEffect, useState } from "react";
+
 import { makeStyles } from "@material-ui/styles";
-import { IconButton, Typography, Tooltip } from "@material-ui/core";
-// import MenuIcon from '@material-ui/icons/Menu';
-// import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
-import InputIcon from "@material-ui/icons/Input";
+import { Typography,useMediaQuery } from "@material-ui/core";
+
 import { useAuth } from "context/auth.jsx";
+import CustomizedMenus from "./components/CustomizedMenus/CustomizedMenus";
 import jwtDecode from "jwt-decode";
+import { useTheme } from "@material-ui/core/styles";
+
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+const ORGANIZATION_QUERY = gql`
+  query organization($_id: String!) {
+    organization(_id: $_id) {
+      _id
+      email
+      organization_name
+      picture
+    }
+  }
+`;
+
+const STAFF_QUERY = gql`
+  query staffById($staff_id: String!) {
+    staffById(_id: $staff_id) {
+      _id
+      staff_name
+      email
+      position_name
+      picture
+    }
+  }
+`;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,13 +48,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Topbar = (props) => {
-  // const { className } = props;
-  // const breadcrumb_item = [
-  //   { name: 'Project List', link: '/project' },
-  //   { name: "Projec List", link: '/project' }
-  // ]
   const { setAuthTokens } = useAuth();
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
+  const theme = useTheme();
+  const xs = useMediaQuery(theme.breakpoints.down("xs"));
 
   function logOut() {
     setAuthTokens();
@@ -39,41 +60,91 @@ const Topbar = (props) => {
 
   const classes = useStyles();
 
+  const [profileOrganization, setProfileOrganization] = useState({});
+  const [profileStaff, setProfileStaff] = useState({});
+
+  const {
+    data: dataOrganization,
+    loading: loadingOrganization,
+    error: organizationError,
+    refetch: refetchOrganization,
+  } = useQuery(ORGANIZATION_QUERY, {
+    variables: { _id: decodedToken.organization_id },
+    // onCompleted: () => {
+    //   setProfileOrganization(dataOrganization.organization);
+    // },
+  });
+
+  const {
+    data: dataStaff,
+    loading: loadingStaff,
+    error: staffError,
+    refetch: refetchStaff,
+  } = useQuery(STAFF_QUERY, {
+    variables: { staff_id: decodedToken.staff_id },
+    // onCompleted: () => {
+    //   setProfileStaff(dataStaff.staffById);
+    // },
+  });
+
+  useEffect(() => {
+    refresh();
+  });
+
+  useEffect(() => {
+    const onCompleted = (dataOrganization) => {
+      setProfileOrganization(dataOrganization.organization);
+    };
+    const onError = (error) => {
+      /* magic */
+    };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingOrganization && !organizationError) {
+        onCompleted(dataOrganization);
+      } else if (onError && !loadingOrganization && organizationError) {
+        onError(organizationError);
+      }
+    }
+  }, [loadingOrganization, dataOrganization, organizationError]);
+
+  useEffect(() => {
+    const onCompleted = (dataStaff) => {
+      setProfileStaff(dataStaff.staffById);
+    };
+    const onError = (error) => {
+      /* magic */
+    };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingStaff && !staffError) {
+        onCompleted(dataStaff);
+      } else if (onError && !loadingStaff && staffError) {
+        onError(staffError);
+      }
+    }
+  }, [loadingStaff, dataStaff, staffError]);
+
+  const refresh = () => {
+    refetchOrganization();
+    refetchStaff();
+  };
+
   // const [notifications] = useState([]);
   return (
     <div className={classes.root}>
       <div className={classes.root}>
-        <Typography variant="h6">
+        <Typography variant="h6" style={xs ? {fontSize:14 } : {}}>
           Event Management
           {decodedToken.user_type === "organization" ? " (Admin)" : ""}
         </Typography>
-        {/* <BreadCrumbs breadcrumb_item={breadcrumb_item}/> */}
       </div>
-      {/* <IconButton color="inherit">
-        <Badge
-          badgeContent={notifications.length}
-          color="primary"
-          variant="dot"
-        >
-          <NotificationsIcon />
-        </Badge>
-      </IconButton> */}
-      <Tooltip arrow title="Logout" aria-label="confirm">
-        <IconButton
-          className={classes.signOutButton}
-          color="inherit"
-          onClick={() => logOut()}
-        >
-          <InputIcon />
-        </IconButton>
-      </Tooltip>
+      <CustomizedMenus
+        logOut={logOut}
+        profileOrganization={profileOrganization}
+        profileStaff={profileStaff}
+        decodedToken={decodedToken}
+      />
     </div>
   );
 };
-
-// Topbar.propTypes = {
-//   className: PropTypes.string,
-//   onSidebarOpen: PropTypes.func
-// };
 
 export default Topbar;

@@ -47,7 +47,7 @@ export default function DetailOverview(props) {
       </div>
       <Divider />
       <div className={classes.content}>
-      <Typography variant="subtitle2">
+        <Typography variant="subtitle2">
           Description
           </Typography>
         <Typography variant="body1">
@@ -63,7 +63,7 @@ export default function DetailOverview(props) {
           <LocationOnIcon className={classes.icon} />
           <div className={classes.verticalAlign} >
             <Typography variant="body1">
-            {props.event.event_location}
+              {props.event.event_location}
             </Typography>
           </div>
         </div>

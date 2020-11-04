@@ -13,47 +13,12 @@ import {
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 
-import { useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
 import { EditAvatarForm } from 'components';
 import {
   ProfileEditForm,
   Profile
 } from '.';
 
-
-const STAFFSBYID_QUERY = gql`
-query staffById($staff_id: String!){
-  staffById(_id:$staff_id) {
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
-  }
-}
-`;
-
-const DEPARTEMENT_QUERY = gql`
-query departememt($departement_id: String!){
-  departement(_id:$departement_id) {
-      departement_name
-  }
-}
-`;
-
-const ORGANIZATION_QUERY = gql`
-  query organization($_oid: String!) {
-    organization(_id: $_oid) {
-      organization_name
-    }
-  }
-`;
 
 
 const useStyles = makeStyles(theme => ({
@@ -105,76 +70,17 @@ const useStyles = makeStyles(theme => ({
 
 
 const ProfileDetailCard = props => {
-  const { className, decodedToken, ...rest } = props;
+  const { className, decodedToken,profile, departement, organization, handleSaveEditButton,...rest } = props;
   const classes = useStyles();
 
-  const initialFormState = {
-    staff_name: '',
-    position_name: '',
-    departement_id: '',
-    email: '',
-    phone_number: '',
-    organization_id: ""
-  }
-
-  const [profile, setProfile] = useState(initialFormState)
-  const [departement, setDepartement] = useState({});
-  const [organization, setOrganization] = useState({});
-
-  const { data: staffsData } = useQuery(STAFFSBYID_QUERY, {
-    variables: { staff_id: decodedToken.staff_id },
-    onCompleted: () => {
-      if (decodedToken.user_type === 'organization') {
-
-      } else {
-        setProfile(
-          staffsData.staffById
-        )
-        org();
-        dept();
-      }
-    }
-  }
-  );
-
-  const [org, { data: dataOrganization }] = useLazyQuery(ORGANIZATION_QUERY, {
-    variables: { _oid: profile.organization_id },
-    onCompleted: () => {
-      if (dataOrganization.organization !== null) {
-        setOrganization(dataOrganization.organization);
-      }
-    },
-  });
-
-  const [dept, { data: departementData }] = useLazyQuery(DEPARTEMENT_QUERY, {
-    variables: { departement_id: profile.departement_id },
-    onCompleted: () => {
-      if (departementData.departement !== null) {
-        setDepartement(departementData.departement)
-      }
-
-    }
-  }
-  );
-
+  const [profileForm, setProfileForm] = useState(props.profile);
   useEffect(() => {
-    org();
-    dept();
-  }, [org, dept]);
+    setProfileForm(props.profile)
+  }, [setProfileForm, props.profile]);
 
-  // const refresh = () => {
-  //   staffsRefetch();
-  // };
-  // console.log(organization)
-  // console.log(dataOrganization)
-
-  // useEffect(() => {
-  //   setProfile(props.profile)
-  // }, [props.profile, profile]);
 
   const [openEditPage, setOpenEditPage] = useState(false)
   // const [openEditModal, setOpenEditModal] = useState(false);
-
   const handleOpenEditPage = () => {
     setOpenEditPage(true);
   };
@@ -183,20 +89,31 @@ const ProfileDetailCard = props => {
     setOpenEditPage(false);
   };
 
+  const handleChange = event => {
+    setProfileForm({
+      ...profileForm,
+      [event.target.name]: event.target.value
+    });
+  };
+
   const uploadImage = (e) => {
-    setProfile({
-      ...profile,
+    setProfileForm({
+      ...profileForm,
       picture: e,
     });
   };
 
   const removeImage = (e) => {
-    setProfile({
-      ...profile,
+    setProfileForm({
+      ...profileForm,
       picture: ' ',
     });
   };
 
+  const handleCancel = () => {
+    handleCloseEditPage();
+    setProfileForm(props.profile)
+  }
   return (
     <Card
       {...rest}
@@ -207,24 +124,24 @@ const ProfileDetailCard = props => {
         subheader={
           <div>
             <Typography variant="body2" className={[classes.subheader, classes.center].join(" ")} color="textSecondary" component="p">
-              {profile.position_name}{" of "}{departement.departement_name}{" departement"}
+              {profileForm.position_name}{" of "}{props.departement.departement_name}{" departement"}
             </Typography>
             <Typography
               className={[classes.organization, classes.subheader, classes.center].join(" ")}
               color="textSecondary"
               variant="body1"
             >
-              {organization.organization_name}
+              {props.organization.organization_name}
             </Typography>
           </div>
         }
         title={
           <div>
             <Typography gutterBottom variant="h5" component="h2" className={[classes.title, classes.center].join(" ")}>
-              {profile.staff_name}
+              {profileForm.staff_name}
             </Typography>
             <Typography gutterBottom variant="body2" className={[classes.center].join(" ")} style={{ color: "cornflowerblue" }} component="p">
-              {profile.email}
+              {profileForm.email}
             </Typography>
           </div>
         }
@@ -246,7 +163,7 @@ const ProfileDetailCard = props => {
               <div className={classes.avatarHeader}>
                 <EditAvatarForm
                   uploadImage={uploadImage}
-                  picture={profile.picture}
+                  picture={profileForm.picture}
                   removeImage={removeImage}
                   size={100}
                 />
@@ -255,7 +172,7 @@ const ProfileDetailCard = props => {
               <div className={classes.avatarHeader}>
                 <Avatar
                   className={classes.avatar}
-                  src={profile.picture}
+                  src={profileForm.picture}
                 />
               </div>
             }
@@ -267,15 +184,18 @@ const ProfileDetailCard = props => {
       {
         openEditPage ?
           <ProfileEditForm
-            profile={profile}
-            departement_name={departement.departement_name}
-            organization_name={organization.organization_name}
+            profileForm={profileForm}
+            departement_name={props.departement.departement_name}
+            organization_name={props.organization.organization_name}
+            handleSaveEditButton={props.handleSaveEditButton}
+            handleChange={handleChange}
+            handleCancel={handleCancel}
             handleCloseEditPage={handleCloseEditPage} />
           :
           <Profile
-            profile={profile}
-            organization_name={organization.organization_name}
-            departement_name={departement.departement_name}
+            profile={profileForm}
+            organization_name={props.organization.organization_name}
+            departement_name={props.departement.departement_name}
           />
       }
     </Card >

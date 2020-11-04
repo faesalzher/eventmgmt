@@ -13,8 +13,6 @@ import {
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 
-import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   OrganizationEditForm,
@@ -23,18 +21,6 @@ import {
 import { EditAvatarForm } from "components";
 
 
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      organization_name
-      email
-      description
-      password
-      picture
-    }
-  }
-`;
 
 
 const useStyles = makeStyles(theme => ({
@@ -67,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     avatarHeader: {
       display: 'flex',
       justifyContent: 'center',
-    marginLeft: 16
+      marginLeft: 16
     },
     title: {
       textAlign: 'center'
@@ -77,37 +63,40 @@ const useStyles = makeStyles(theme => ({
 
 
 const OrganizationDetailCard = props => {
-  const { className, decodedToken, ...rest } = props;
+  const { className, decodedToken, handleSaveEditButton,...rest } = props;
 
   const classes = useStyles();
 
-  const initialFormState = {
-    organization_name: '',
-    description: '',
-    picture: '',
-    email: '',
-  }
+  // const initialFormState = {
+  //   organization_name: '',
+  //   description: '',
+  //   picture: '',
+  //   email: '',
+  // }
 
-  const [organization, setOrganization] = useState(initialFormState)
-
-
-  const { data: dataOrganization, refetch: organizationRefetch } = useQuery(ORGANIZATION_QUERY, {
-    variables: { _id: decodedToken.organization_id },
-    onCompleted: () => {
-      if (dataOrganization.organization !== null) {
-        setOrganization(dataOrganization.organization);
-      }
-    },
-  });
-
-
+  const [organizationForm, setOrganizationForm] = useState(props.organization);
   useEffect(() => {
-    refresh();
-  });
+    setOrganizationForm(props.organization)
+  }, [setOrganizationForm, props.organization]);
 
-  const refresh = () => {
-    organizationRefetch();
-  };
+
+  // const { data: dataOrganization, refetch: organizationRefetch } = useQuery(ORGANIZATION_QUERY, {
+  //   variables: { _id: decodedToken.organization_id },
+  //   onCompleted: () => {
+  //     if (dataOrganization.organization !== null) {
+  //       setOrganization(dataOrganization.organization);
+  //     }
+  //   },
+  // });
+
+
+  // useEffect(() => {
+  //   refresh();
+  // });
+
+  // const refresh = () => {
+  //   organizationRefetch();
+  // };
   // console.log(organization)
   // console.log(dataOrganization)
 
@@ -126,20 +115,33 @@ const OrganizationDetailCard = props => {
     setOpenEditPage(false);
   };
 
+  const handleChange = event => {
+    setOrganizationForm({
+      ...organizationForm,
+      [event.target.name]: event.target.value
+    });
+  };
+
+  const handleCancel = () => {
+    handleCloseEditPage();
+    setOrganizationForm(props.organization)
+  }
+
   const uploadImage = (e) => {
-    setOrganization({
-      ...organization,
+    setOrganizationForm({
+      ...organizationForm,
       picture: e,
     });
   };
-  console.log(organization.picture)
+
 
   const removeImage = (e) => {
-    setOrganization({
-      ...organization,
+    setOrganizationForm({
+      ...organizationForm,
       picture: ' ',
     });
   };
+
 
   return (
     <Card
@@ -150,7 +152,7 @@ const OrganizationDetailCard = props => {
         className={classes.header}
         subheader={
           <div>
-            <Typography variant="body2" className={classes.title} style={{color:'white'}} component="p">
+            <Typography variant="body2" className={classes.title} style={{ color: 'white' }} component="p">
               {'Admin account '}
             </Typography>
             {/* <Typography
@@ -164,11 +166,11 @@ const OrganizationDetailCard = props => {
         }
         title={
           <div>
-            <Typography gutterBottom variant="h5" component="h2" className={classes.title} style={{color:'white'}}>
-              {organization.organization_name}
+            <Typography gutterBottom variant="h5" component="h2" className={classes.title} style={{ color: 'white' }}>
+              {organizationForm.organization_name}
             </Typography>
             <Typography gutterBottom variant="body2" className={classes.title} style={{ color: "cornflowerblue" }} component="p">
-              {organization.email}
+              {organizationForm.email}
             </Typography>
           </div>
         }
@@ -190,7 +192,7 @@ const OrganizationDetailCard = props => {
               <div className={classes.avatarHeader}>
                 <EditAvatarForm
                   uploadImage={uploadImage}
-                  picture={organization.picture}
+                  picture={organizationForm.picture}
                   removeImage={removeImage}
                   size={100}
                 />
@@ -199,7 +201,7 @@ const OrganizationDetailCard = props => {
               <div className={classes.avatarHeader}>
                 <Avatar
                   className={classes.avatar}
-                  src={organization.picture}
+                  src={organizationForm.picture}
                 />
               </div>
             }
@@ -211,11 +213,14 @@ const OrganizationDetailCard = props => {
       {
         openEditPage ?
           <OrganizationEditForm
-            organization={organization}
+            handleSaveEditButton={props.handleSaveEditButton}
+            handleChange={handleChange}
+            handleCancel={handleCancel}
+            organizationForm={organizationForm}
             handleCloseEditPage={handleCloseEditPage} />
           :
           <Organization
-            organization={organization}
+            organization={organizationForm}
           />
       }
     </Card >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -11,9 +11,48 @@ import {
   Typography
 } from '@material-ui/core';
 
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
 import {
   PasswordChangeForm
 } from '.';
+
+const EDIT_STAFF = gql`
+  mutation editStaff(
+    $_id: String!,
+    $staff_name: String!,
+    $position_name: String!,
+    $email: String!,
+    $phone_number: String!,
+    $password: String!,
+    $picture: String!,
+    $departement_id: String!,
+    $organization_id: String!,
+    ){
+    editStaff(
+      _id: $_id,
+      staff_name: $staff_name,
+      position_name: $position_name,
+      email:$email,
+      phone_number:$phone_number,
+      password:$password,
+      picture:$picture,
+      departement_id:$departement_id,
+      organization_id:$organization_id,
+    ){
+      _id
+      staff_name
+      position_name
+      email
+      phone_number
+      password
+      picture
+      departement_id
+      organization_id
+    }
+  }
+`;
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -28,6 +67,8 @@ const ProfileEditForm = props => {
 
   const classes = useStyles();
   const [openEditModal, setOpenEditModal] = useState(false);
+  // const [profileForm, setProfileForm] = useState(props.profileForm);
+  const [editStaff] = useMutation(EDIT_STAFF);
 
   const handleOpenEditModal = () => {
     setOpenEditModal(true);
@@ -36,14 +77,32 @@ const ProfileEditForm = props => {
   const handleCloseEditModal = () => {
     setOpenEditModal(false);
   };
-  const [profile, setProfile] = useState(props.profile);
 
-  const handleChange = event => {
-    setProfile({
-      ...profile,
-      [event.target.name]: event.target.value
+
+
+  const handleSaveEditButton = () => {
+    props.handleSaveEditButton(props.profileForm)
+    // setOrganizationForm(intitialFormState);
+    props.handleCloseEditPage();
+    editStaff({
+      variables:
+      {
+        _id: props.profileForm._id,
+        staff_name: props.profileForm.staff_name,
+        position_name: props.profileForm.position_name,
+        email: props.profileForm.email,
+        phone_number: props.profileForm.phone_number,
+        password: props.profileForm.password,
+        picture: props.profileForm.picture,
+        departement_id: props.profileForm.departement_id,
+        organization_id: props.profileForm.organization_id,
+      }
     });
-  };
+  }
+
+  const handleCancel = () => {
+    props.handleCancel()
+  }
 
   return (
     <form
@@ -75,8 +134,8 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="staff_name"
-              onChange={handleChange}
-              value={profile.staff_name}
+              onChange={props.handleChange}
+              value={props.profileForm.staff_name}
               variant="outlined"
             />
           </Grid>
@@ -99,8 +158,8 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="email"
-              onChange={handleChange}
-              value={profile.email}
+              onChange={props.handleChange}
+              value={props.profileForm.email}
               variant="outlined"
             />
           </Grid>
@@ -123,9 +182,9 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="phone_number"
-              onChange={handleChange}
+              onChange={props.handleChange}
               type="number"
-              value={profile.phone_number}
+              value={props.profileForm.phone_number}
               variant="outlined"
             />
           </Grid>
@@ -148,9 +207,9 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="position_name"
-              onChange={handleChange}
+              onChange={props.handleChange}
               disabled
-              value={profile.position_name}
+              value={props.profileForm.position_name}
               variant="outlined"
             />
           </Grid>
@@ -173,7 +232,7 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="departement_id"
-              onChange={handleChange}
+              onChange={props.handleChange}
               disabled
               value={props.departement_name}
               variant="outlined"
@@ -198,7 +257,7 @@ const ProfileEditForm = props => {
               fullWidth
               margin="dense"
               name="organization_id"
-              onChange={handleChange}
+              onChange={props.handleChange}
               disabled
               value={props.organization_name}
               variant="outlined"
@@ -219,16 +278,17 @@ const ProfileEditForm = props => {
           {
             <div>
               <Button
-                color="primary"
-                onClick={() => props.handleCloseEditPage()}
+                onClick={() => handleCancel()}
               >
                 Cancel
-            </Button>
+               </Button>
               <Button
-                color="primary"
+                color="secondary"
+                variant="contained"
+                onClick={() => handleSaveEditButton()}
               >
                 Save
-             </Button>
+              </Button>
             </div>
           }
           <PasswordChangeForm

@@ -105,7 +105,7 @@ const Organization = props => {
             className={[classes.center, classes.value].join(" ")}
 
           >
-            <Typography variant="body1" style={{ color: 'blue' }}>{organization.Description}</Typography>
+            <Typography variant="body1" style={{ color: 'blue' }}>{organization.description}</Typography>
           </div>
         </div>
         <Divider />

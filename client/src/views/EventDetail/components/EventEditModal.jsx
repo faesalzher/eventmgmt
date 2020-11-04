@@ -32,7 +32,7 @@ const EDIT_EVENT = gql`
     $event_name: String!,
     $event_description: String!,
     $event_location: String!,
-    $cancel: String!,
+    $cancel: Boolean!,
     $event_start_date: String!,
     $event_end_date: String!,
     $picture:String!,
@@ -178,15 +178,15 @@ export default function EventEditModal(props) {
   };
 
   const handleCancel = () => {
-    if (eventForm.cancel === "true") {
+    if (eventForm.cancel === true) {
       setEventForm({
         ...eventForm,
-        cancel: "false"
+        cancel: false
       })
     } else {
       setEventForm({
         ...eventForm,
-        cancel: "true"
+        cancel: true
       })
     }
   }
@@ -274,15 +274,16 @@ export default function EventEditModal(props) {
                 type="edit"
               />
             </FormControl>
-            <FormControl className={classes.formControl} style={{padding: '5px 0px'}} >
+            <FormControl className={classes.formControl} style={{ padding: '5px 0px' }} >
               <StatusBox
+                cancel={eventForm.cancel}
                 style={{ width: 'auto' }}
                 start_date={eventForm.start_date}
                 end_date={eventForm.end_date}
               />
             </FormControl>
             <FormControl className={classes.formControl} style={{ display: 'flex' }}>
-              {eventForm.cancel === "true" ?
+              {eventForm.cancel === true ?
                 <Button color="primary" variant="outlined" onClick={handleCancelModal}>
                   Uncancel Event
                   </Button>

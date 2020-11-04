@@ -82,22 +82,22 @@ export default function ComiteeAddForm(props) {
 
   const classes = useStyles();
   // const [anchorEl, setAnchorEl] = React.useState(null);
-  const [division_id, setDivision_id] = useState(props.division_id);
-  React.useEffect(() => {
-    if (props.division_id === 'all') {
-      setDivision_id("");
-    } else {
-      setDivision_id(props.division_id);
-    }
-  }, [setDivision_id, props.division_id])
+  const [division_id, setDivision_id] = useState("");
+  // React.useEffect(() => {
+  //   if (props.division_id === 'all') {
+  //     setDivision_id("");
+  //   } else {
+  //     setDivision_id(props.division_id);
+  //   }
+  // }, [setDivision_id, props.division_id])
 
   const [position_id, setPosition_id] = useState("");
   const [staff_id, setStaff_id] = useState("");
   const intitialFormState = {
     _id: uuid(),
-    staff_id: staff_id,
-    position_id: position_id,
-    division_id: division_id,
+    staff_id: "",
+    position_id: "",
+    division_id: "",
     project_id: props.project_id,
   }
   const [comiteeForm, setComiteeForm] = useState(intitialFormState);
@@ -131,9 +131,13 @@ export default function ComiteeAddForm(props) {
 
   const handleChangeDivision = (event) => {
     comiteeForm.division_id = event.target.value;
+    // setAgendaForm({ ...agendaForm, date: day.toString().slice(0, 16) })
+    // setComiteeForm({...comiteeForm, division_id: '1'})
     setDivision_id(event.target.value);
     setPosition_id("");
-    comiteeForm.position_id = "";
+    setComiteeForm({...comiteeForm, position_id: ""})
+    // comiteeForm.position_id = "";
+    console.log(event.target.value)
   };
 
   const handleChangePosition = (event) => {
@@ -142,7 +146,8 @@ export default function ComiteeAddForm(props) {
   };
 
   const handleChangeStaff = (event) => {
-    comiteeForm.staff_id = event.target.value;
+    // comiteeForm.staff_id = event.target.value;
+    setComiteeForm({...comiteeForm, staff_id: event.target.value})
     setStaff_id(event.target.value);
   };
 
@@ -188,6 +193,11 @@ export default function ComiteeAddForm(props) {
       checkCoreDivisionId.push(division._id)
     return null;
   });
+
+  console.log(comiteeForm)
+  console.log(division_id)
+  console.log(position_id)
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -260,7 +270,7 @@ export default function ComiteeAddForm(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               {
-                comiteeForm.division_id === "" ?
+                comiteeForm.division_id === "" || comiteeForm.division_id === "all" ?
                   <TextField
                     style={{ backgroundColor: 'white' }}
                     margin="dense"
@@ -285,7 +295,7 @@ export default function ComiteeAddForm(props) {
                     {
                       division_id === checkCoreDivisionId[0] ?
                         props.positions.map((position) => {
-                          if (position.core === "true")
+                          if (position.core === true)
                             if (checkComiteePositionId.indexOf(position._id) > -1)
                               return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
@@ -298,7 +308,7 @@ export default function ComiteeAddForm(props) {
                         })
                         :
                         props.positions.map((position) => {
-                          if (position.core === "false")
+                          if (position.core === false)
                             if (checkComiteePositionId.indexOf(position._id) > -1)
                               return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
@@ -322,8 +332,8 @@ export default function ComiteeAddForm(props) {
           (
             comiteeForm._id === "" ||
             comiteeForm.staff_id === "" ||
-            comiteeForm.position_id === "" ||
-            comiteeForm.division_id === ""
+            comiteeForm.position_id === "" || position_id === "" ||
+            comiteeForm.division_id === "" || division_id === ""
           ) ?
             ("invalid") : ("valid")
         }

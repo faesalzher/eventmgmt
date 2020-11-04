@@ -6,7 +6,7 @@ const Event = new Schema({
   event_name: String,
   event_description: String,
   event_location: String,
-  cancel: String,
+  cancel: Boolean,
   event_start_date: String,
   event_end_date: String,
   picture: String,

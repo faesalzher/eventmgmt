@@ -231,7 +231,7 @@ export default function ComiteeEditForm(props) {
                   {
                     division_id === checkDivisionCore[0] ?
                       props.positions.map((position) => {
-                        if (position.core === "true")
+                        if (position.core === true)
                           if (checkComiteePositionId.indexOf(position._id) > -1)
                             if (props.comitee.position_id === position._id)
                               return <MenuItem key={position.position_name} value={position._id}>
@@ -249,7 +249,7 @@ export default function ComiteeEditForm(props) {
                       })
                       :
                       props.positions.map((position) => {
-                        if (position.core === "false")
+                        if (position.core === false)
                           if (checkComiteePositionId.indexOf(position._id) > -1)
                             if (props.comitee.position_id === position._id)
                               return <MenuItem key={position.position_name} value={position._id}>

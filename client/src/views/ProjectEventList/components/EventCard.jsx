@@ -114,10 +114,17 @@ const EventCard = (props) => {
   const end_date = new Date(props.event.event_end_date);
 
   // To calculate the time difference of two dates 
-  const timeDifference = start_date.getTime() - end_date.getTime();
+  const timeDifference = end_date.getTime() - start_date.getTime();
 
   // To calculate the no. of days between two dates 
   const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+  const sameDays = (start_date.getDate() === end_date.getDate() &&
+    start_date.getMonth() === end_date.getMonth() &&
+    start_date.getFullYear() === end_date.getFullYear()
+  )
+
+  console.log(sameDays)
   return (
     <Grid
       item
@@ -213,9 +220,14 @@ const EventCard = (props) => {
           />
           <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
             <DateRangeIcon className={classes.iconDate} />
-            <Typography className={classes.status}>
-              {props.event.event_start_date.slice(4, 10)} - {props.event.event_end_date.slice(4, 15)}
-            </Typography>
+            {
+              (sameDays) ?
+                <Typography className={classes.status}>{props.event.event_start_date.slice(4, 15)}</Typography>
+                :
+                <Typography className={classes.status}>
+                  {props.event.event_start_date.slice(4, 10)} - {props.event.event_end_date.slice(4, 15)}
+                </Typography>
+            }
           </div>
         </CardActions>
       </Card>

@@ -7,6 +7,8 @@ import { Avatar, Typography } from "@material-ui/core";
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import jwtDecode from "jwt-decode";
+import PersonIcon from "@material-ui/icons/Person";
+import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 
 const ORGANIZATION_QUERY = gql`
   query organization($_id: String!) {
@@ -46,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
   name: {
     marginTop: theme.spacing(1),
     display: "flex",
+    textAlign: "center",
   },
 }));
 
@@ -57,51 +60,77 @@ const Profile = (props) => {
   const [profileOrganization, setProfileOrganization] = useState({});
   const [profileStaff, setProfileStaff] = useState({});
 
-  const { data: dataOrganization, refetch: refetchOrganization } = useQuery(
-    ORGANIZATION_QUERY,
-    {
-      variables: { _id: decodedToken.organization_id },
-      onCompleted: () => {
-        setProfileOrganization(dataOrganization.organization);
-      },
-    }
-  );
+  const {
+    data: dataOrganization,
+    loading: loadingOrganization,
+    error: organizationError,
+    refetch: refetchOrganization,
+  } = useQuery(ORGANIZATION_QUERY, {
+    variables: { _id: decodedToken.organization_id },
+    // onCompleted: () => {
+    //   setProfileOrganization(dataOrganization.organization);
+    // },
+  });
 
-  const { data: dataStaff, refetch: refetchStaff } = useQuery(STAFF_QUERY, {
+  const {
+    data: dataStaff,
+    loading: loadingStaff,
+    error: staffError,
+    refetch: refetchStaff,
+  } = useQuery(STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id },
-    onCompleted: () => {
-      setProfileStaff(dataStaff.staffById);
-    },
+    // onCompleted: () => {
+    //   setProfileStaff(dataStaff.staffById);
+    // },
   });
 
   useEffect(() => {
     refresh();
   });
 
-  // useEffect(() => {
-  //   const onCompleted = (data) => { setOrganization(data.check_organization) };
-  //   const onError = (error) => { /* magic */ };
-  //   if (onCompleted || onError) {
-  //     if (onCompleted && !loadingCheck && !error) {
-  //       onCompleted(data);
-  //     } else if (onError && !loadingCheck && error) {
-  //       onError(error);
-  //     }
-  //   }
-  // }, [loadingCheck, data, error]);
+  useEffect(() => {
+    const onCompleted = (dataOrganization) => {
+      setProfileOrganization(dataOrganization.organization);
+    };
+    const onError = (error) => {
+      /* magic */
+    };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingOrganization && !organizationError) {
+        onCompleted(dataOrganization);
+      } else if (onError && !loadingOrganization && organizationError) {
+        onError(organizationError);
+      }
+    }
+  }, [loadingOrganization, dataOrganization, organizationError]);
+
+  useEffect(() => {
+    const onCompleted = (dataStaff) => {
+      setProfileStaff(dataStaff.staffById);
+    };
+    const onError = (error) => {
+      /* magic */
+    };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingStaff && !staffError) {
+        onCompleted(dataStaff);
+      } else if (onError && !loadingStaff && staffError) {
+        onError(staffError);
+      }
+    }
+  }, [loadingStaff, dataStaff, staffError]);
 
   const refresh = () => {
     refetchOrganization();
     refetchStaff();
   };
 
-
   const classes = useStyles();
   return (
     <div style={props.collapsed !== "true" ? {} : { display: "flex" }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Avatar
-          alt="Person"
+          // alt="Person"
           className={classes.avatar}
           component={RouterLink}
           src={
@@ -109,7 +138,7 @@ const Profile = (props) => {
               ? profileOrganization.picture
               : profileStaff.picture
           }
-          to="/settings"
+          to="/account"
         />
       </div>
       <div>
@@ -121,6 +150,11 @@ const Profile = (props) => {
           </Typography>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
+          {decodedToken.user_type === "staff" ? (
+            <PersonIcon style={{ padding: '8px 2px',fontSize: 18 }} />
+          ) : (
+            <SupervisorAccountIcon style={{ padding: '8px 2px',fontSize: 18 }} />
+          )}
           <Typography variant="body2" className={classes.name}>
             {decodedToken.user_type === "organization"
               ? "Admin"

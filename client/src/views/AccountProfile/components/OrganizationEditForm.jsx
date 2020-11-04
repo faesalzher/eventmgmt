@@ -15,6 +15,36 @@ import {
   PasswordChangeForm
 } from '.';
 
+import { useMutation } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+const EDIT_ORGANIZATION = gql`
+mutation editOrganization(
+  $_id: String!,
+  $organization_name: String!,
+  $email: String!,
+  $password: String!,
+  $description: String!,
+  $picture: String!,
+  ){
+  editOrganization(
+    _id: $_id,
+    organization_name: $organization_name,
+    email: $email,
+    password:$password,
+    description:$description,
+    picture:$picture
+  ){
+    _id
+    organization_name
+    email
+    password
+    description
+    picture
+  }
+}
+`;
+
 const useStyles = makeStyles(() => ({
   root: {},
   center: {
@@ -36,14 +66,33 @@ const OrganizationEditForm = props => {
   const handleCloseEditModal = () => {
     setOpenEditModal(false);
   };
-  const [organization, setOrganization] = useState(props.organization);
+  const [editOrganization] = useMutation(EDIT_ORGANIZATION);
 
-  const handleChange = event => {
-    setOrganization({
-      ...organization,
-      [event.target.name]: event.target.value
+
+  const handleSaveEditButton = () => {
+    props.handleSaveEditButton(props.organizationForm)
+    // setOrganizationForm(intitialFormState);
+    props.handleCloseEditPage();
+    editOrganization({
+      variables:
+      {
+        _id: props.organizationForm._id,
+        organization_name: props.organizationForm.organization_name,
+        email: props.organizationForm.email,
+        password: props.organizationForm.password,
+        description: props.organizationForm.description,
+        picture: props.organizationForm.picture,
+      }
     });
-  };
+  }
+
+  const handleCancel = () => {
+    props.handleCancel()
+  }
+
+  const handleChange = e => {
+    props.handleChange(e)
+  }
 
   return (
     <form
@@ -74,7 +123,7 @@ const OrganizationEditForm = props => {
               margin="dense"
               name="organization_name"
               onChange={handleChange}
-              value={organization.organization_name}
+              value={props.organizationForm.organization_name}
               variant="outlined"
             />
           </Grid>
@@ -96,7 +145,7 @@ const OrganizationEditForm = props => {
               margin="dense"
               name="email"
               onChange={handleChange}
-              value={organization.email}
+              value={props.organizationForm.email}
               variant="outlined"
             />
           </Grid>
@@ -118,7 +167,7 @@ const OrganizationEditForm = props => {
               margin="dense"
               name="description"
               onChange={handleChange}
-              value={organization.description}
+              value={props.organizationForm.description}
               variant="outlined"
             />
           </Grid>
@@ -137,13 +186,14 @@ const OrganizationEditForm = props => {
           {
             <div>
               <Button
-                color="primary"
-                onClick={() => props.handleCloseEditPage()}
+                onClick={() => handleCancel()}
               >
                 Cancel
             </Button>
               <Button
-                color="primary"
+                color="secondary"
+                variant="contained"
+                onClick={() => handleSaveEditButton()}
               >
                 Save
              </Button>

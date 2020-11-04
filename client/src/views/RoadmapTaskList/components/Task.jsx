@@ -218,6 +218,7 @@ export default function Task(props) {
         handleAddTaskAssignedTo={handleAddTaskAssignedTo}
         closeDialogDetail={handleClose}
         handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+        handleDelete={props.handleDelete}
         // closeAfterTransition
         tasksAssignedTo={tasksAssignedTo}
         handleChangeChecked={handleChangeChecked}
