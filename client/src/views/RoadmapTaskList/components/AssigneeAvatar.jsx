@@ -83,7 +83,7 @@ export default function StatusBox(props) {
   if (props.type === "chip") {
     return <div>
       <ConfirmationDialog
-        type="Delete"
+        type="delete"
         name={staff.staff_name}
         content="Assigned"
         open={openConfirmationDialog}

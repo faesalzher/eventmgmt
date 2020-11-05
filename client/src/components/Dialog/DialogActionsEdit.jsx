@@ -58,7 +58,7 @@ export default function DialogActionsEdit(props) {
             className={classes.deleteBtn}
             onClick={handleDeleteModal}>
             Delete
-    </Button>
+        </Button>
         <ConfirmationDialog
             content={props.content}
             type="delete"

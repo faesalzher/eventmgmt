@@ -158,7 +158,7 @@ export default function ComiteeDialog(props) {
   return (
     <div>
       <ConfirmationDialog
-        type="Delete"
+        type="delete"
         name={staff.staff_name}
         content="Assigned"
         open={openConfirmationDialog}

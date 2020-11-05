@@ -295,7 +295,7 @@ export default function TaskDetailModal(props) {
         maxWidth={'sm'}
       >
         <ConfirmationDialog
-          type="Delete"
+          type="delete"
           name={task.task_name}
           content="Task"
           open={openDeleteModal}
