@@ -210,8 +210,8 @@ export default function AddEventModal(props) {
               <StatusBox
                 style={{ width: 'auto' }}
                 cancel={eventForm.cancel}
-                start_date={eventForm.project_start_date}
-                end_date={eventForm.project_end_date}
+                start_date={eventForm.event_start_date}
+                end_date={eventForm.event_end_date}
               />
             </FormControl>
           </div>
