@@ -46,7 +46,7 @@ export default function Comitees(props) {
   const classes = useStyles();
   const [comitees, setComitees] = useState(props.comitees);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [divisions, setDivisions] = React.useState(props.divisions);
   const [division_id, setDivision_id] = React.useState('all');

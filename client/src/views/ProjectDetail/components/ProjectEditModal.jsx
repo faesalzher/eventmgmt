@@ -278,8 +278,8 @@ export default function ProjectEditModal(props) {
               <StatusBox
                 style={{ width: 'auto' }}
                 cancel={projectForm.cancel}
-                start_date={projectForm.start_date}
-                end_date={projectForm.end_date}
+                start_date={projectForm.project_start_date}
+                end_date={projectForm.project_end_date}
               />
             </FormControl>
             <FormControl

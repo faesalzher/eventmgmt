@@ -1,17 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { withStyles, makeStyles, useTheme } from '@material-ui/styles';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
   Dialog,
-  Typography,
-  IconButton,
   FormControl
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -60,51 +54,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-
-});
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose, ...other } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
-      <Typography variant="h6" style={{ textAlign: "center", color:"white" }}>{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-    // width: 700,
-    // minWidth: 20
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
-
-
-
 export default function DepartementAddForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -114,7 +63,7 @@ export default function DepartementAddForm(props) {
   const intitialFormState = {
     _id: uuid(),
     departement_name: "",
-    organization_id:props.organization_id
+    organization_id: props.organization_id
   }
   console.log(props.organization_id)
 
@@ -140,6 +89,12 @@ export default function DepartementAddForm(props) {
     setDepartementForm({ ...departementForm, [id]: value })
   }
 
+  const handleCloseModal = e => {
+    props.close();
+    setDepartementForm(intitialFormState)
+  }
+
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -149,10 +104,8 @@ export default function DepartementAddForm(props) {
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle id="customized-dialog-title" onClose={props.close}>
-        Add New Departement
-        </DialogTitle>
-      <DialogContent dividers style={{ backgroundColor: '#d8dce3' }}>
+      <DialogTitle title="Add New Departement" onClose={props.close} />
+      <DialogContent dividers >
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
@@ -170,15 +123,16 @@ export default function DepartementAddForm(props) {
           </div>
         </form>
       </DialogContent>
-      <DialogActions>
-        {/* <Button size="small" className={classes.iconbutton} onClick={() => props.setAddRoadmapForm(false)} style={{ color: 'grey' }}>Cancel</Button> */}
-        {(departementForm.departement_name === "" || departementForm.contact_person === "" || departementForm.info === "") ?
-          < Button size="small" className={classes.iconbutton} disabled >Save</Button>
-          :
-          < Button size="small" style={{ color: 'blue' }} onClick={() => handleSaveButton()}>Save</Button>
+      <DialogActionsAdd
+        validation={
+          (
+            departementForm.departement_name === ""
+          ) ?
+            ("invalid") : ("valid")
         }
-      </DialogActions>
-    </Dialog>
+        close={() => handleCloseModal()}
+        submit={() => handleSaveButton()} />
+    </Dialog >
   );
 };
 

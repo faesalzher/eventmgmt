@@ -16,6 +16,7 @@ import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { StatusBox, EditImageForm } from "components";
 
 import uuid from 'uuid/v1';
 
@@ -175,6 +176,20 @@ export default function AddProjectModal(props) {
     }, 400);
   };
 
+  const uploadImage = (e) => {
+    setProjects({
+      ...projects,
+      picture: e,
+    });
+  };
+
+  const removeImage = (e) => {
+    setProjects({
+      ...projects,
+      picture: " ",
+    });
+  };
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -215,6 +230,25 @@ export default function AddProjectModal(props) {
                 onChange={handleInputChange}
               />
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <EditImageForm
+                uploadImage={uploadImage}
+                removeImage={removeImage}
+                picture={projects.picture}
+                type="edit"
+              />
+            </FormControl>
+            <FormControl
+              className={classes.formControl}
+              style={{ padding: '5px 0px' }}
+            >
+              <StatusBox
+                style={{ width: 'auto' }}
+                cancel={projects.cancel}
+                start_date={projects.project_start_date}
+                end_date={projects.project_end_date}
+              />
+            </FormControl>
           </div>
           <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
@@ -234,7 +268,7 @@ export default function AddProjectModal(props) {
             projects.project_name === "" ||
             projects.project_description === "" ||
             projects.project_start_date === "" ||
-            projects.project_end_date === ""
+            projects.project_end_date === "" 
           ) ?
             ("invalid") : ("valid")
         }

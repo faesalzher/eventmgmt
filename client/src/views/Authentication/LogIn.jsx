@@ -369,7 +369,7 @@ const LogIn = props => {
         user_type: "staff"
       },
       SECRET_KEY,
-      { expiresIn: '30m' }
+      { expiresIn: '10h' }
     );
   }
 

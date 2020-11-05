@@ -6,9 +6,19 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles} from '@material-ui/styles';
+
+const useStyles = makeStyles(theme => ({
+  error: {
+    backgroundColor: theme.palette.error.main,
+    color: 'white'
+  },
+
+}));
 
 export default function DeleteForm(props) {
   const [save, setSave] = useState(false)
+  const classes = useStyles();
 
   const handleDelete = () => {
     setSave(true)
@@ -36,10 +46,10 @@ export default function DeleteForm(props) {
         </DialogContent>
         <DialogActions>
           {save ? <CircularProgress size={20} /> : <div></div>}
-          <Button onClick={props.close}>
+          <Button onClick={props.close} color="secondary">
             Cancel
           </Button>
-          <Button color="secondary" variant="outlined" onClick={handleDelete} autoFocus>
+          <Button className={classes.error} variant="contained" onClick={handleDelete} autoFocus>
             OK
           </Button>
         </DialogActions>

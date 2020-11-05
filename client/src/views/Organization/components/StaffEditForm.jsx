@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 
@@ -14,6 +14,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import validate from 'validate.js';
 
 const DELETE_STAFF = gql`
 mutation deleteStaff ($_id: String!) {
@@ -80,13 +81,22 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
+const schema = {
+  email: {
+    // presence: { allowEmpty: false, message: 'is required' },
+    email: true,
+    length: {
+      maximum: 64
+    }
+  },
+};
 
 export default function StaffEditForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
-  const intitialFormState = {
+  const initialFormState = {
     _id: props.staff._id,
     staff_name: props.staff.staff_name,
     position_name: props.staff.position_name,
@@ -97,35 +107,57 @@ export default function StaffEditForm(props) {
     departement_id: props.staff.departement_id,
     organization_id: props.organization_id
   }
-  const [staffForm, setStaffForm] = useState(intitialFormState);
+
+  const defaultState = {
+    isValid: false,
+    values: initialFormState,
+    touched: {},
+    errors: {}
+  };
+
+  const [staffForm, setStaffForm] = useState(defaultState);
   const [departement_id, setDepartement_id] = useState(props.staff.departement_id)
 
   const [deleteStaff] = useMutation(DELETE_STAFF);
   const [editStaff] = useMutation(EDIT_STAFF);
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(staffForm)
+    props.handleSaveEditButton(staffForm.values)
     // setStaffForm(intitialFormState);
     props.close();
     editStaff({
       variables:
       {
-        _id: staffForm._id,
-        staff_name: staffForm.staff_name,
-        position_name: staffForm.position_name,
-        email: staffForm.email,
-        phone_number: staffForm.phone_number,
-        password: staffForm.password,
-        picture: staffForm.picture,
-        departement_id: staffForm.departement_id,
-        organization_id: staffForm.organization_id,
+        _id: staffForm.values._id,
+        staff_name: staffForm.values.staff_name,
+        position_name: staffForm.values.position_name,
+        email: staffForm.values.email,
+        phone_number: staffForm.values.phone_number,
+        password: staffForm.values.password,
+        picture: staffForm.values.picture,
+        departement_id: staffForm.values.departement_id,
+        organization_id: staffForm.values.organization_id,
       }
     });
   }
 
+  useEffect(() => {
+    const errors = validate(staffForm.values, schema);
+    setStaffForm(staffForm => ({
+      ...staffForm, isValid: errors ? false : true, errors: errors || {}
+    }));
+  }, [staffForm.values]);
+
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setStaffForm({ ...staffForm, [id]: value })
+    setStaffForm(staffForm => ({
+      ...staffForm, values: {
+        ...staffForm.values, [id]: value
+      },
+      touched: {
+        ...staffForm.touched, [id]: true
+      }
+    }));
   }
 
   const handleDelete = () => {
@@ -134,15 +166,29 @@ export default function StaffEditForm(props) {
     props.close();
     deleteStaff({ variables: { _id: props.staff._id, } });
   }
+
   const handleChange = (event) => {
-    staffForm.departement_id = event.target.value;
+    const { id, value } = event.target;
+
     setDepartement_id(event.target.value);
+    setStaffForm(staffForm => ({
+      ...staffForm, values: {
+        ...staffForm.values, [id]: value
+      },
+      touched: {
+        ...staffForm.touched, [id]: true
+      }
+    }));
   };
 
   const handleCloseModal = e => {
     props.close();
-    setStaffForm(intitialFormState)
+    setStaffForm(defaultState)
   }
+
+  console.log(staffForm.values)
+  const hasError = field =>
+  staffForm.touched[field] && staffForm.errors[field] ? true : false;
 
   return (
     <Dialog
@@ -156,7 +202,7 @@ export default function StaffEditForm(props) {
       <DialogTitle title="Edit Staff" onClose={props.close} />
       <DialogContent dividers>
         <form noValidate >
-          <div >
+          <div>
             <FormControl className={classes.formControl}>
               <TextField
                 style={{ backgroundColor: 'white' }}
@@ -165,7 +211,7 @@ export default function StaffEditForm(props) {
                 label="Staff Name"
                 type="text"
                 variant="outlined"
-                value={staffForm.staff_name}
+                value={staffForm.values.staff_name}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -202,7 +248,7 @@ export default function StaffEditForm(props) {
                 label="Position Name"
                 type="text"
                 variant="outlined"
-                value={staffForm.position_name}
+                value={staffForm.values.position_name}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -211,10 +257,14 @@ export default function StaffEditForm(props) {
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
                 id="email"
+                error={hasError('email')}
+                helperText={
+                  hasError('email') ? staffForm.errors.email[0] : null
+                }
                 label="Email"
                 type="text"
                 variant="outlined"
-                value={staffForm.email}
+                value={staffForm.values.email || ''}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -224,9 +274,12 @@ export default function StaffEditForm(props) {
                 margin="dense"
                 id="phone_number"
                 label="Phone Number"
-                type="text"
+                type="number"
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 variant="outlined"
-                value={staffForm.phone_number}
+                value={staffForm.values.phone_number}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -238,7 +291,7 @@ export default function StaffEditForm(props) {
                 label="Password"
                 variant="outlined"
                 disabled
-                value={staffForm.password}
+                value={staffForm.values.password}
                 onChange={handleInputChange}
                 type="password"
                 autoComplete="current-password"
@@ -251,11 +304,12 @@ export default function StaffEditForm(props) {
       <DialogActionsEdit
         validation={
           (
-            (staffForm.staff_name === "" ||
-              staffForm.departement_id === "" ||
-              staffForm.position_name === "" ||
-              staffForm.email === "" ||
-              staffForm.phone_number === ""
+            (staffForm.values.staff_name === "" ||
+              staffForm.values.departement_id === "" ||
+              staffForm.values.position_name === "" ||
+              staffForm.values.email === "" ||
+              staffForm.values.phone_number === ""||
+              !staffForm.isValid
             )
           ) ?
             ("invalid") : ("valid")

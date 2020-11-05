@@ -16,6 +16,7 @@ import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
+import { StatusBox, EditImageForm } from "components";
 
 import uuid from 'uuid/v1';
 
@@ -131,7 +132,20 @@ export default function AddEventModal(props) {
         }
       });
     setEventForm(initialFormState);
-    console.log(eventForm)
+  };
+
+  const uploadImage = (e) => {
+    setEventForm({
+      ...eventForm,
+      picture: e,
+    });
+  };
+
+  const removeImage = (e) => {
+    setEventForm({
+      ...eventForm,
+      picture: " ",
+    });
   };
 
   return (
@@ -179,6 +193,25 @@ export default function AddEventModal(props) {
                 variant="outlined"
                 value={eventForm.event_location}
                 onChange={handleInputChange}
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <EditImageForm
+                uploadImage={uploadImage}
+                removeImage={removeImage}
+                picture={eventForm.picture}
+                type="edit"
+              />
+            </FormControl>
+            <FormControl
+              className={classes.formControl}
+              style={{ padding: '5px 0px' }}
+            >
+              <StatusBox
+                style={{ width: 'auto' }}
+                cancel={eventForm.cancel}
+                start_date={eventForm.project_start_date}
+                end_date={eventForm.project_end_date}
               />
             </FormControl>
           </div>

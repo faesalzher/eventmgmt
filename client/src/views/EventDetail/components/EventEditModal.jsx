@@ -278,8 +278,8 @@ export default function EventEditModal(props) {
               <StatusBox
                 cancel={eventForm.cancel}
                 style={{ width: 'auto' }}
-                start_date={eventForm.start_date}
-                end_date={eventForm.end_date}
+                start_date={eventForm.event_start_date}
+                end_date={eventForm.event_end_date}
               />
             </FormControl>
             <FormControl className={classes.formControl} style={{ display: 'flex' }}>

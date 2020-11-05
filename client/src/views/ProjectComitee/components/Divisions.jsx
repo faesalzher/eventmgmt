@@ -122,7 +122,7 @@ export default function Divisions(props) {
   const classes = useStyles();
   // const [divisions, setDivisions] = useState(mockData);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [divisions, setDivisions] = useState(props.divisions)
   // console.log(divisions)
@@ -188,7 +188,6 @@ export default function Divisions(props) {
                   key={index}
                   handleDeleteDivision={props.handleDeleteDivision}
                   division={division}
-                  index={index}
                   handleSaveEditButton={props.handleSaveEditButton}
                 />
               })

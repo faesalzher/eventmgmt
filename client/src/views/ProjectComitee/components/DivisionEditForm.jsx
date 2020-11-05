@@ -59,12 +59,13 @@ export default function DivisionEditForm(props) {
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
-  // const [anchorEl, setAnchorEl] = React.useState(null);
-  const intitialFormState = {
-    _id: props.division._id,
-    division_name: props.division.division_name,
-  }
-  const [divisionForm, setDivisionForm] = useState(intitialFormState);
+
+  const [divisionForm, setDivisionForm] = useState(props.division);
+
+  React.useEffect(() => {
+    setDivisionForm(props.division)
+  }, [setDivisionForm,props.division]);
+
   const [deleteDivision] = useMutation(DELETE_DIVISION);
   const [editDivision] = useMutation(EDIT_DIVISION);
 
@@ -93,17 +94,22 @@ export default function DivisionEditForm(props) {
     deleteDivision({ variables: { _id: props.division._id, } });
   }
 
+  const handleClose = () => {
+    setDivisionForm(props.division)
+    props.close();
+  }
+
   return (
     <div>
       <Dialog
         fullScreen={fullScreen}
-        onClose={props.close}
+        onClose={()=>handleClose()}
         aria-labelledby="customized-dialog-title"
         open={props.open}
         fullWidth={true}
         maxWidth={'xs'}
       >
-        <DialogTitle title="Edit Division" onClose={props.close} />
+        <DialogTitle title="Edit Division" onClose={()=>handleClose()} />
         <DialogContent style={{}}>
           <form noValidate >
             <div >
