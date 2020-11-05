@@ -152,14 +152,24 @@ export default function Roadmap(props) {
                 xs={12}
                 style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}
               >
-                <div style={{ display: 'flex', justifyContent: "space-between" }}>
-                  <Typography className={classes.info}>
-                    {(countCompleted / tasksByRoadmap.length) * 100}% Completed
+                {tasksByRoadmap.length === 0 ?
+                  <div style={{ display: 'flex', justifyContent: "space-between" }}>
+                    <Typography className={classes.info}>
+                      {0}% Completed
                   </Typography>
-                  <Typography className={classes.info}>
-                    {countCompleted}/{tasksByRoadmap.length} Tasks
-                  </Typography>
-                </div>
+                    <Typography className={classes.info}>
+                      {0}/{0} Tasks
+                    </Typography>
+                  </div>
+                  :
+                  <div style={{ display: 'flex', justifyContent: "space-between" }}>
+                    <Typography className={classes.info}>
+                      {Math.ceil((countCompleted / tasksByRoadmap.length) * 100)}% Completed
+                        </Typography>
+                    <Typography className={classes.info}>
+                      {countCompleted}/{tasksByRoadmap.length} Tasks
+                        </Typography>
+                  </div>}
                 {tasksByRoadmap.length === 0 ?
                   <ColorLinearProgress
                     thickness={1}
