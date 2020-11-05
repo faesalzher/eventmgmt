@@ -21,7 +21,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { Redirect } from 'react-router';
 
 import {
-  CancelForm,
+  ConfirmationDialog,
   StatusBox,
   EditImageForm,
 } from 'components';
@@ -292,10 +292,12 @@ export default function EventEditModal(props) {
                   Cancel Event
                   </Button>
               }
-              <CancelForm
-                title={eventForm.event_name}
+              <ConfirmationDialog
+                type="Cancel"
+                name={eventForm.event_name}
+                content="Event"
                 open={openCancelModal}
-                handleCancel={handleCancel}
+                handleConfirm={handleCancel}
                 close={handleCloseCancelModal}
               />
             </FormControl>
@@ -322,6 +324,8 @@ export default function EventEditModal(props) {
           ) ?
             ("invalid") : ("valid")
         }
+        content="Event"
+        name={eventForm.event_name}
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}

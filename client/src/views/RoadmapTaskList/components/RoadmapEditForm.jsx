@@ -211,6 +211,8 @@ export default function RoadmapEditForm(props) {
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}
+        content="Roadmap"
+        name={roadmapForm.roadmap_name}
       />
     </Dialog>
   );

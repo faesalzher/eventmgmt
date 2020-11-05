@@ -8,7 +8,7 @@ import {
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {
-    DeleteForm
+    ConfirmationDialog
 } from 'components';
 
 const DialogActionsMui = withStyles(theme => ({
@@ -58,10 +58,13 @@ export default function DialogActionsEdit(props) {
             className={classes.deleteBtn}
             onClick={handleDeleteModal}>
             Delete
-                    </Button>
-        <DeleteForm
+    </Button>
+        <ConfirmationDialog
+            content={props.content}
+            type="delete"
+            name={props.name}
             open={openDeleteModal}
-            handleDelete={handleDelete}
+            handleConfirm={handleDelete}
             close={handleCloseDeleteModal}
         />
         <div style={{ display: 'flex' }}>

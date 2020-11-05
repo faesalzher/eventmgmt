@@ -64,7 +64,7 @@ export default function DivisionEditForm(props) {
 
   React.useEffect(() => {
     setDivisionForm(props.division)
-  }, [setDivisionForm,props.division]);
+  }, [setDivisionForm, props.division]);
 
   const [deleteDivision] = useMutation(DELETE_DIVISION);
   const [editDivision] = useMutation(EDIT_DIVISION);
@@ -103,13 +103,13 @@ export default function DivisionEditForm(props) {
     <div>
       <Dialog
         fullScreen={fullScreen}
-        onClose={()=>handleClose()}
+        onClose={() => handleClose()}
         aria-labelledby="customized-dialog-title"
         open={props.open}
         fullWidth={true}
         maxWidth={'xs'}
       >
-        <DialogTitle title="Edit Division" onClose={()=>handleClose()} />
+        <DialogTitle title="Edit Division" onClose={() => handleClose()} />
         <DialogContent style={{}}>
           <form noValidate >
             <div >
@@ -135,6 +135,8 @@ export default function DivisionEditForm(props) {
             ) ?
               ("invalid") : ("valid")
           }
+          content="Division"
+          name={divisionForm.division_name}
           submit={() => handleSaveEditButton()}
           delete={() => handleDelete()}
           close={props.close}

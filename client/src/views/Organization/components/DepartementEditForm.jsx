@@ -134,6 +134,8 @@ export default function DepartementEditForm(props) {
             ) ?
               ("invalid") : ("valid")
           }
+          content="Departement"
+          name={departementForm.departement_name}
           submit={() => handleSaveEditButton()}
           delete={() => handleDelete()}
           close={() => handleCloseModal()}

@@ -150,15 +150,15 @@ export default function Task(props) {
 
   return (
     <div
-      style={props.task.completed === true ?
+      style={task.completed === true ?
         { backgroundColor: '#e2e2e2', display: 'flex' } :
         { backgroundColor: 'white', display: 'flex' }}
       className={clsx(shadowStyles.root)}
     >
       <div style={
-        (props.task.priority === "low") ?
-          { backgroundColor: "#ffc916" } : (props.task.priority === "medium") ?
-            { backgroundColor: "#a3cd3b" } : (props.task.priority === "high") ?
+        (task.priority === "low") ?
+          { backgroundColor: "#ffc916" } : (task.priority === "medium") ?
+            { backgroundColor: "#a3cd3b" } : (task.priority === "high") ?
               { backgroundColor: "#ff4943" } : { backgroundColor: "#e2e2e2" }
       } >
         <CustomizedCheckbox
@@ -169,8 +169,8 @@ export default function Task(props) {
       </div>
       <ListItem button onClick={handleClickOpenDialogDetail} className={classes.list}>
         <div>
-          <Typography variant="h6" style={task.completed ? { textDecoration: 'line-through' } : {}}>{props.task.task_name}</Typography>
-          {props.task.due_date !== "" && props.task.completed === false ?
+          <Typography variant="h6" style={task.completed ? { textDecoration: 'line-through' } : {}}>{task.task_name}</Typography>
+          {task.due_date !== "" && task.completed === false ?
             (days >= 0 && hrs >= 0 && mins >= 0) ?
               <div style={{ display: 'flex' }}>
                 <Typography variant="body2" color="textSecondary" style={{ fontSize: 10, fontWeight: 600 }}>

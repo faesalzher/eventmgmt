@@ -10,7 +10,7 @@ import {
   Typography,
   CircularProgress,
 } from '@material-ui/core';
-
+import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import AddIcon from '@material-ui/icons/Add';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import { makeStyles } from '@material-ui/core/styles';
@@ -123,6 +123,7 @@ export default function EventRoadmapList(props) {
     <Card style={{ maxHeight: "100%", width: '100%' }} elevation={0} >
       <div className={classes.roadmapHeaderFooter} >
         <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
+          <LinearScaleIcon />
           <Typography variant="button"
             style={{ display: "flex", color: "white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
             Roadmap List

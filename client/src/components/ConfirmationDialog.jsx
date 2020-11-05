@@ -6,30 +6,48 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles} from '@material-ui/styles';
+import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles(theme => ({
   error: {
     backgroundColor: theme.palette.error.main,
-    color: 'white'
+    color: 'white',
+    "&:hover": {
+      backgroundColor: theme.palette.error.dark,
+    }
   },
-
+  secondary: {
+    backgroundColor: theme.palette.secondary.main,
+    color: 'white',
+    "&:hover": {
+      backgroundColor: theme.palette.secondary.dark,
+    }
+  },
 }));
 
-export default function DeleteForm(props) {
+export default function ConfirmationDialog(props) {
   const [save, setSave] = useState(false)
   const classes = useStyles();
 
-  const handleDelete = () => {
-    setSave(true)
-    setTimeout(() => {
-      setSave(false)
-    }, 400);
-    setTimeout(() => {
-      props.handleDelete();
+  const handleConfirm = () => {
+    if (props.type === "Log Out") {
+      props.handleConfirm();
       props.close();
-    }, 400);
+    } else {
+      setSave(true)
+      setTimeout(() => {
+        setSave(false)
+      }, 400);
+      setTimeout(() => {
+        props.handleConfirm();
+        props.close();
+      }, 400);
+    }
   }
+
+  const type = props.type;
+  const name = props.name;
+  const content = props.content;
   return (
     <div>
       <Dialog
@@ -38,10 +56,10 @@ export default function DeleteForm(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Delete Content"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{type.charAt(0).toUpperCase() + type.slice(1)} {content}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are You Sure to Delete this Content?
+            Are You Sure to {type} {name === undefined ? "this item" : name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -49,11 +67,11 @@ export default function DeleteForm(props) {
           <Button onClick={props.close} color="secondary">
             Cancel
           </Button>
-          <Button className={classes.error} variant="contained" onClick={handleDelete} autoFocus>
+          <Button className={type === "delete" ? classes.error : classes.secondary} variant="contained" onClick={() => handleConfirm()} autoFocus>
             OK
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </div >
   );
 }

@@ -19,7 +19,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { StatusBox } from 'components';
 import { Redirect } from "react-router";
 
-import { CancelForm, EditImageForm } from "components";
+import { ConfirmationDialog, EditImageForm } from "components";
 
 
 const EDIT_PROJECT = gql`
@@ -304,10 +304,12 @@ export default function ProjectEditModal(props) {
                     Cancel Project
                   </Button>
                 )}
-              <CancelForm
-                title={projectForm.project_name}
+              <ConfirmationDialog
+                type="Cancel"
+                name={projectForm.project_name}
+                content="Project"
                 open={openCancelModal}
-                handleCancel={handleCancel}
+                handleConfirm={handleCancel}
                 close={handleCloseCancelModal}
               />
             </FormControl>
@@ -333,6 +335,8 @@ export default function ProjectEditModal(props) {
           ) ?
             ("invalid") : ("valid")
         }
+        content="Project"
+        name={projectForm.project_name}
         submit={() => handleButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}

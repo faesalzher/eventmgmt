@@ -282,6 +282,8 @@ export default function ComiteeEditForm(props) {
           ) ?
             ("invalid") : ("valid")
         }
+        content="Comitee"
+        // name={comiteeForm.comitee_name}
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}

@@ -378,7 +378,6 @@ const LogIn = props => {
   // }
   const hasError = field =>
     formState.touched[field] && formState.errors[field] ? true : false;
-  console.log(staff)
 
   return (
     <div className={classes.root}>

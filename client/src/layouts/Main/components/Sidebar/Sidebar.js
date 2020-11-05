@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import { Divider} from '@material-ui/core';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleIcon from '@material-ui/icons/People';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 // import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 // import TextFieldsIcon from '@material-ui/icons/TextFields';
 // import ImageIcon from '@material-ui/icons/Image';
@@ -61,9 +61,9 @@ const Sidebar = props => {
       icon: <EventIcon />
     },
     {
-      title: 'Organization',
-      href: '/organization',
-      icon: <PeopleIcon />
+      title: 'User Management',
+      href: '/user_management',
+      icon: <PeopleAltIcon />
     },
     // {
     //   title: 'Account',

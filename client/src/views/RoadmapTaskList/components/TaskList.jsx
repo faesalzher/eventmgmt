@@ -20,7 +20,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import AddIcon from '@material-ui/icons/Add';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import jwtDecode from "jwt-decode";
-
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
@@ -316,6 +316,7 @@ export default function TaskList(props) {
               justifyContent: "space-between",
             }}
           >
+            <AssignmentIcon />
             <Typography variant="h6" style={{ color: 'white' }}>TASK TO DO</Typography>
             <div style={{ display: "flex" }}>
               <Tooltip title="Filter task" arrow >

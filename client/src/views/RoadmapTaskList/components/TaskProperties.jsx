@@ -14,7 +14,8 @@ import EscapeOutside from "react-escape-outside"
 import AddIcon from '@material-ui/icons/Add';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import PeopleIcon from '@material-ui/icons/People';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import AssignmentLateIcon from '@material-ui/icons/AssignmentLate';
 import { DatetimePicker } from 'rc-datetime-picker';
 import 'rc-datetime-picker/dist/picker.css';
 import moment from 'moment';
@@ -211,6 +212,7 @@ export default function TaskProperties(props) {
     setOpenComitees(false);
   };
 
+ 
   const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
   const handleDeleteTaskAssignedTo = (e) => {
@@ -220,6 +222,7 @@ export default function TaskProperties(props) {
 
   return (
     <div>
+     
       {descriptionForm ?
         <EscapeOutside onEscapeOutside={onEscapeOutside}>
           <TextField
@@ -334,7 +337,7 @@ export default function TaskProperties(props) {
       <div className={classes.row}>
         <div className={classes.label}>
           <div className={classes.verticalAlign} >
-            <PeopleIcon />
+            <AssignmentIndIcon />
           </div>
           <Typography className={classes.verticalAlign} variant="body2">
             Assigned To
@@ -373,7 +376,7 @@ export default function TaskProperties(props) {
       <div className={classes.row}>
         <div className={classes.label}>
           <div className={classes.verticalAlign} >
-            <PeopleIcon />
+            <AssignmentLateIcon />
           </div>
           <Typography className={classes.verticalAlign} variant="body2">
             Priority

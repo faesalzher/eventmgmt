@@ -5,6 +5,7 @@ import ListItem from '@material-ui/core/ListItem';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import CheckIcon from '@material-ui/icons/Check';
+import { ConfirmationDialog } from 'components';
 
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
@@ -128,9 +129,23 @@ export default function ComiteeDialog(props) {
     });
   }
 
-  const handleListClickDelete = (e) => {
-    setSelected(false);
-    props.handleDeleteTaskAssignedTo(e);
+  // const handleDelete = (e) => {
+  //   // setSelected(false);
+  //   props.handleDeleteTaskAssignedTo(e);
+  // }
+
+
+  const handleDelete = () => {
+    setSelected(false)
+    props.handleDeleteTaskAssignedTo(assignedComiteeId)
+  }
+  const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
+
+  const handleOpenConfirmationDialog = () => {
+    setOpenConfirmationDialog(true);
+  }
+  const handleCloseConfirmationDialog = () => {
+    setOpenConfirmationDialog(false);
   }
 
 
@@ -142,9 +157,17 @@ export default function ComiteeDialog(props) {
 
   return (
     <div>
+      <ConfirmationDialog
+        type="Delete"
+        name={staff.staff_name}
+        content="Assigned"
+        open={openConfirmationDialog}
+        handleConfirm={handleDelete}
+        close={handleCloseConfirmationDialog}
+      />
       <ListItem button className={classes.list}
         onClick={
-          assignedComiteeId || selected ? () => handleListClickDelete(assignedComiteeId) : () => handleListClickAdd()
+          assignedComiteeId || selected ? () => handleOpenConfirmationDialog() : () => handleListClickAdd()
         }>
         <ListItemAvatar>
           <Avatar src={staff.picture} />

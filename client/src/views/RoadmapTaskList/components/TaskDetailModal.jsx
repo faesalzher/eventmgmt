@@ -4,29 +4,33 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
+// import MuiDialogActions from '@material-ui/core/DialogActions';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import { Divider, TextField, Grid, Checkbox, Tooltip, IconButton } from '@material-ui/core';
+import { Divider, TextField, 
+  // Grid,
+   Checkbox, Tooltip, IconButton } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 import EditIcon from '@material-ui/icons/Edit';
-import SendIcon from '@material-ui/icons/Send';
+// import SendIcon from '@material-ui/icons/Send';
 
 import { useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 
 import EscapeOutside from "react-escape-outside";
-import { Scrollbars } from 'react-custom-scrollbars';
+// import { Scrollbars } from 'react-custom-scrollbars';
 
-import { TaskProperties, TaskChatBubble } from '.';
+import { TaskProperties, 
+  // TaskChatBubble
+ } from '.';
 import {
-  DeleteForm
+  ConfirmationDialog
 } from 'components';
 
 const DELETE_TASK = gql`
@@ -124,12 +128,12 @@ const DialogContent = withStyles(theme => ({
   },
 }))(MuiDialogContent);
 
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: '10px 16px',
-  },
-}))(MuiDialogActions);
+// const DialogActions = withStyles(theme => ({
+//   root: {
+//     margin: 0,
+//     padding: '10px 16px',
+//   },
+// }))(MuiDialogActions);
 
 function a11yProps(index) {
   return {
@@ -156,15 +160,15 @@ function TabPanel(props) {
   );
 }
 
-const chatData = [
-  { chat_id: '2', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '3', user_id: 1, task_id: 1, content: "Ini Percobaan chat", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '4', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '5', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '6', user_id: 3, task_id: 1, content: "aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '7', user_id: 3, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
-  { chat_id: '8', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: new Date().toString() },
-]
+// const chatData = [
+//   { chat_id: '2', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '3', user_id: 1, task_id: 1, content: "Ini Percobaan chat", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '4', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '5', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '6', user_id: 3, task_id: 1, content: "aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '7', user_id: 3, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: "Mon Mar 16 2020 19:33" },
+//   { chat_id: '8', user_id: 1, task_id: 1, content: "asdasdasdasdm aaaaa", chat_date: new Date().toString() },
+// ]
 
 
 export default function TaskDetailModal(props) {
@@ -175,7 +179,7 @@ export default function TaskDetailModal(props) {
   const [taskNameForm, setTaskNameForm] = React.useState(false);
   const [task, setTask] = useState(props.task);
   const [showEditIcon, setShowEditIcon] = useState(false);
-  const [chat, setChat] = useState(chatData);
+  // const [chat, setChat] = useState(chatData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteTask] = useMutation(DELETE_TASK);
 
@@ -183,20 +187,20 @@ export default function TaskDetailModal(props) {
     setTask(props.task)
   }, [setTask, props.task]);
 
-  React.useEffect(() => {
-    const elem = document.getElementById(`item_${chat.length}`);
-    elem && elem.scrollIntoView({ behavior: "smooth" });
-  });
+  // React.useEffect(() => {
+  //   const elem = document.getElementById(`item_${chat.length}`);
+  //   elem && elem.scrollIntoView({ behavior: "smooth" });
+  // });
 
-  const initialChatFormState =
-  {
-    chat_id: Math.random(),
-    user_id: 3,
-    task_id: task._id,
-    content: "",
-    chat_date: new Date().toString(),
-  };
-  const [chatForm, setChatForm] = useState(initialChatFormState);
+  // const initialChatFormState =
+  // {
+  //   chat_id: Math.random(),
+  //   user_id: 3,
+  //   task_id: task._id,
+  //   content: "",
+  //   chat_date: new Date().toString(),
+  // };
+  // const [chatForm, setChatForm] = useState(initialChatFormState);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -213,18 +217,18 @@ export default function TaskDetailModal(props) {
     setTaskNameForm(false);
   };
 
-  const handleAddChat = e => {
-    const { id, value } = e.target;
-    setChatForm({ ...chatForm, [id]: value });
-  };
+  // const handleAddChat = e => {
+  //   const { id, value } = e.target;
+  //   setChatForm({ ...chatForm, [id]: value });
+  // };
 
-  const handleSubmiAddChat = () => {
-    if (chatForm.content === "") {
-    } else {
-      setChat([...chat, chatForm]);
-      setChatForm(initialChatFormState);
-    }
-  }
+  // const handleSubmiAddChat = () => {
+  //   if (chatForm.content === "") {
+  //   } else {
+  //     setChat([...chat, chatForm]);
+  //     setChatForm(initialChatFormState);
+  //   }
+  // }
 
   const handleCompletedChange = () => {
     if (!task.completed) {
@@ -245,7 +249,9 @@ export default function TaskDetailModal(props) {
   }
   const onPressEnter = (e) => {
     if (e.key === 'Enter') {
-      onEscapeOutside();
+      handleCloseTaskNameForm();
+      handleSaveChange();
+      setShowEditIcon(false)
     }
   }
 
@@ -268,15 +274,15 @@ export default function TaskDetailModal(props) {
     props.closeDialogDetail();
   }
 
-  React.useEffect(() => {
-    const countChat = () => {
-      const count = chat.filter((e) => e.task_id === task._id).length;
-      props.handleChatCount(count)
-    }
-    return () => {
-      countChat();
-    }
-  })
+  // React.useEffect(() => {
+  //   const countChat = () => {
+  //     const count = chat.filter((e) => e.task_id === task._id).length;
+  //     props.handleChatCount(count)
+  //   }
+  //   return () => {
+  //     countChat();
+  //   }
+  // })
 
 
   return (
@@ -288,9 +294,12 @@ export default function TaskDetailModal(props) {
         open={props.openDialogDetail}
         maxWidth={'sm'}
       >
-        <DeleteForm
+        <ConfirmationDialog
+          type="Delete"
+          name={task.task_name}
+          content="Task"
           open={openDeleteModal}
-          handleDelete={handleDelete}
+          handleConfirm={handleDelete}
           close={handleCloseDeleteModal}
         />
         {/* <div style={{width:700,height:700}}> */}
@@ -367,7 +376,7 @@ export default function TaskDetailModal(props) {
         </DialogTitle>
         <AntTabs variant="fullWidth" value={value} onChange={handleChange} aria-label="ant example">
           <AntTab label="Properties" style={{ marginRight: 0 }} {...a11yProps(0)} />
-          <AntTab label="Chats" style={{ marginRight: 0 }} {...a11yProps(1)} />
+          <AntTab label="Comments" style={{ marginRight: 0 }} {...a11yProps(1)} />
           {/* <AntTab label="Files" /> */}
         </AntTabs>
         <TabPanel value={value} index={0} style={
@@ -391,11 +400,11 @@ export default function TaskDetailModal(props) {
         </TabPanel>
         <TabPanel value={value} index={1} style={
           fullScreen ?
-            { minWidth: 10, height: '100%', backgroundColor: 'rgb(230, 232, 235)' } :
-            { width: 580, height: 440, backgroundColor: 'rgb(230, 232, 235)' }
+            { minWidth: 10, height: '100%', } :
+            { width: 580, height: 440, }
         } >
           <Divider />
-          {!fullScreen ?
+          {/* {!fullScreen ?
             <Scrollbars
               autoHide
               autoHideTimeout={1000}
@@ -406,30 +415,30 @@ export default function TaskDetailModal(props) {
               autoHeightMin={360}
             >
               <DialogContent style={{ height: '83%' }} >
-                {chat.map((chat, index) => {
+                 {chat.map((chat, index) => {
                   if (chat.task_id === props.task._id) return (
                     <Grid id={`item_${index + 1}`} key={index} item style={{ margin: '5px 0px' }}>
                       <TaskChatBubble chat={chat} />
                     </Grid>
                   )
                   return null;
-                })}
+                })} 
               </DialogContent>
             </Scrollbars>
-            :
+             : */}
             <DialogContent style={{ height: '83%' }} >
-              {chat.map((chat, index) => {
+              {/* {chat.map((chat, index) => {
                 if (chat.task_id === props.task._id) return (
                   <Grid id={`item_${index + 1}`} key={index} item style={{ margin: '5px 0px' }}>
                     <TaskChatBubble chat={chat} />
                   </Grid>
                 )
                 return null;
-              })}
+              })} */}
             </DialogContent>
-          }
+          {/* // } */}
           <Divider />
-          <DialogActions style={{ height: '12%' }}>
+          {/* <DialogActions style={{ height: '12%' }}>
             <TextField
               id="content"
               multiline
@@ -445,7 +454,7 @@ export default function TaskDetailModal(props) {
             <IconButton onClick={handleSubmiAddChat}>
               <SendIcon />
             </IconButton>
-          </DialogActions>
+          </DialogActions> */}
         </TabPanel>
         <Typography className={classes.padding} />
         {/* </div>      */}

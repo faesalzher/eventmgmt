@@ -8,7 +8,7 @@ import {
 
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-
+import { ConfirmationDialog } from 'components';
 const STAFFSBYID_QUERY = gql`
   query staffById($_id: String!){
     staffById(_id:$_id) {
@@ -51,13 +51,24 @@ export default function StatusBox(props) {
       onCompleted: () => { setStaff(staffData.staffById) }
     });
 
-  const { data: comiteeData} = useQuery(COMITEE_QUERY,
+  const { data: comiteeData } = useQuery(COMITEE_QUERY,
     {
       variables: { _id: props.taskAssignedTo.comitee_id },
       onCompleted: () => { setComitee(comiteeData.comitee); staffFetch(); }
 
     });
 
+  const handleDelete = () => {
+    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id)
+  }
+  const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
+
+  const handleOpenConfirmationDialog = () => {
+    setOpenConfirmationDialog(true);
+  }
+  const handleCloseConfirmationDialog = () => {
+    setOpenConfirmationDialog(false);
+  }
 
   if (staffLoading) {
     return <div style={{ textAlign: 'center' }}>
@@ -70,14 +81,24 @@ export default function StatusBox(props) {
   }
 
   if (props.type === "chip") {
-    return <Chip
-      avatar={<Avatar src={staff.picture} />}
-      label={staff.staff_name}
-      size="small"
-      color="primary"
-      variant="outlined"
-      onDelete={() => props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id)}
-    />
+    return <div>
+      <ConfirmationDialog
+        type="Delete"
+        name={staff.staff_name}
+        content="Assigned"
+        open={openConfirmationDialog}
+        handleConfirm={handleDelete}
+        close={handleCloseConfirmationDialog}
+      />
+      <Chip
+        avatar={<Avatar src={staff.picture} />}
+        label={staff.staff_name}
+        size="small"
+        color="primary"
+        variant="outlined"
+        onDelete={() => handleOpenConfirmationDialog()}
+      />
+    </div>
   }
 
 }

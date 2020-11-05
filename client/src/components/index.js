@@ -1,9 +1,7 @@
 export { default as SearchInput } from "./SearchInput";
 export { default as StatusBullet } from "./StatusBullet";
 export { default as RouteWithLayout } from "./RouteWithLayout";
-export { default as DeleteForm } from "./DeleteForm.jsx";
-export { default as CancelForm } from "./CancelForm.jsx";
-export { default as SaveConfirm } from "./SaveConfirm.jsx";
+export { default as ConfirmationDialog } from "./ConfirmationDialog.jsx";
 export { default as EditImageForm } from "./EditImageForm.jsx";
 export { default as EditImageModal } from "./EditImageModal.jsx";
 export { default as EditAvatarForm } from "./EditAvatarForm.jsx";

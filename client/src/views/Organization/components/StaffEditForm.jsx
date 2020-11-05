@@ -314,6 +314,8 @@ export default function StaffEditForm(props) {
           ) ?
             ("invalid") : ("valid")
         }
+        content="Staff"
+        name={staffForm.values.staff_name}
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}

@@ -273,6 +273,8 @@ export default function EditAgendaModal(props) {
           ) ?
             ("invalid") : ("valid")
         }
+        content="Agenda"
+        name={agendaForm.agenda_name}
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleClose()}

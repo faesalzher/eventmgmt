@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import Grow from "@material-ui/core/Grow";
 import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
+import Popover from "@material-ui/core/Popover";
+
 import {
   List,
   Typography,
@@ -20,6 +19,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import InputIcon from "@material-ui/icons/Input";
 import { Link as RouterLink } from "react-router-dom";
+import { ConfirmationDialog } from "components";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,38 +31,38 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function CustomizedMenus(props) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openLogOutModal, setOpenLogOutModal] = useState(false);
 
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
+  const handleCloseLogOutModal = () => {
+    setOpenLogOutModal(false);
   };
 
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
-    }
-
-    setOpen(false);
+  const handleLogOutModal = (event) => {
+    setOpenLogOutModal(true);
   };
 
-  // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
-    }
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    prevOpen.current = open;
-  }, [open]);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogOut = () => {
+    handleClose();
+    props.logOut();
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   return (
     <ThemeProvider theme={theme}>
       <Button
-        ref={anchorRef}
-        aria-controls={open ? "menu-list-grow" : undefined}
-        aria-haspopup="true"
-        onClick={handleToggle}
+        aria-describedby={id}
+        onClick={handleClick}
         style={{
           display: "flex",
           backgroundColor: "transparent",
@@ -70,9 +70,13 @@ export default function CustomizedMenus(props) {
         }}
       >
         {props.decodedToken.user_type === "staff" ? (
-          <PersonIcon style={{ color: "white", margin: '0px 2px',fontSize: 18 }} />
+          <PersonIcon
+            style={{ color: "white", margin: "0px 2px", fontSize: 18 }}
+          />
         ) : (
-          <SupervisorAccountIcon style={{ color: "white", margin: '0px 2px',fontSize: 18 }} />
+          <SupervisorAccountIcon
+            style={{ color: "white", margin: "0px 2px", fontSize: 18 }}
+          />
         )}
 
         <Typography
@@ -86,56 +90,50 @@ export default function CustomizedMenus(props) {
         </Typography>
         <ArrowDropDownIcon style={{ color: "white" }} />
       </Button>
-      <Popper
+      <ConfirmationDialog
+        type="Log Out"
+        name=""
+        content=""
+        open={openLogOutModal}
+        handleConfirm={handleLogOut}
+        close={handleCloseLogOutModal}
+      />
+      <Popover
+        id={id}
         open={open}
-        anchorEl={anchorRef.current}
-        placement={"bottom-end"}
-        role={undefined}
-        transition
-        disablePortal
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
       >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === "bottom-end" ? "center top" : "bottom-end",
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <List component="nav" aria-label="main mailbox folders">
-                  <ListItem
-                    button
-                    onClick={handleClose}
-                    component={RouterLink}
-                    to="/account"
-                  >
-                    <ListItemIcon style={{ minWidth: 20 }}>
-                      <AccountBoxIcon style={{ fontSize: 18 }} />
-                    </ListItemIcon>
-                    <ListItemText primary="My Account" />
-                  </ListItem>
-                  <ListItem button onClick={props.logOut}>
-                    <ListItemIcon style={{ minWidth: 20 }}>
-                      <InputIcon style={{ fontSize: 18 }} />
-                    </ListItemIcon>
-                    <ListItemText primary="Logout" />
-                  </ListItem>
-                </List>
-                {/* <MenuList
-                  autoFocusItem={open}
-                  id="menu-list-grow"
-                  onKeyDown={handleListKeyDown}
-                >
-                  <MenuItem onClick={handleClose}>Account</MenuItem>
-                  <MenuItem onClick={handleClose}>Logout</MenuItem>
-                </MenuList> */}
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
+        <Paper>
+          <List component="nav" aria-label="main mailbox folders">
+            <ListItem
+              button
+              onClick={handleClose}
+              component={RouterLink}
+              to="/account"
+            >
+              <ListItemIcon style={{ minWidth: 20 }}>
+                <AccountBoxIcon style={{ fontSize: 18 }} />
+              </ListItemIcon>
+              <ListItemText primary="My Account" />
+            </ListItem>
+            <ListItem button onClick={() => handleLogOutModal()}>
+              <ListItemIcon style={{ minWidth: 20 }}>
+                <InputIcon style={{ fontSize: 18 }} />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </List>
+        </Paper>
+      </Popover>
     </ThemeProvider>
   );
 }

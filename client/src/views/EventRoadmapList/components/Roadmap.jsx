@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { NavLink as RouterLink } from 'react-router-dom';
 
 // import "./styles.css";
@@ -10,11 +10,29 @@ import {
   Grid,
 } from '@material-ui/core';
 import DateRangeIcon from '@material-ui/icons/DateRange';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
 import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { useSoftRiseShadowStyles } from '@mui-treasury/styles/shadow/softRise';
 
+const TASKS_QUERY = gql`
+query tasks($roadmap_id:String!){
+  tasks(roadmap_id: $roadmap_id){
+      _id
+      task_name
+      priority
+      completed
+      task_description
+      due_date
+      completed_date
+      created_at
+      created_by
+      roadmap_id
+  }
+}
+`;
 const CustomRouterLink = forwardRef((props, ref) => (
   <div
     ref={ref}
@@ -50,11 +68,54 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Roadmap(props) {
-
+  // const [countUncompleted, setCountUncompleted] = React.useState(0);
+  const [countCompleted, setCountCompleted] = React.useState(0);
+  const [tasks, setTasks] = React.useState([]);
   const shadowStyles = useSoftRiseShadowStyles();
   const classes = useStyles();
+
+  const { loading: tasksLoading, error: tasksError, data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY,
+    {
+      variables: { roadmap_id: props.roadmap._id },
+    });
+
+  useEffect(() => {
+    const onCompleted = (tasksData) => { setTasks(tasksData.tasks) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !tasksLoading && !tasksError) {
+        onCompleted(tasksData);
+      } else if (onError && !tasksLoading && tasksError) {
+        onError(tasksError);
+      }
+    }
+  }, [tasksLoading, tasksData, tasksError]);
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    tasksRefetch();
+  };
+
+  let tasksByRoadmap = (tasks.filter(function (task) {
+    if (task.roadmap_id === props.roadmap._id) {
+      return task
+    }
+    return null;
+  }));
+
+  React.useEffect(() => {
+    // const countUncompleted = tasksByRoadmap.filter((e) => e.completed === false).length;
+    // setCountUncompleted(countUncompleted);
+    const countCompleted = tasksByRoadmap.filter((e) => e.completed === true).length;
+    setCountCompleted(countCompleted);
+  }, [tasksByRoadmap])
+
+
   return (
-    <div className={clsx(shadowStyles.root)} style={{padding:'2px 0px'}}>
+    <div className={clsx(shadowStyles.root)} style={{ padding: '2px 0px' }}>
       <div style={{ display: 'flex' }}>
         <div style={{ backgroundColor: props.roadmap.color, width: '1%' }} />
         <ListItem button style={{ padding: 0, display: 'flex', backgroundColor: 'white' }}
@@ -76,7 +137,7 @@ export default function Roadmap(props) {
                 </Typography>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex' }}>
-                    <DateRangeIcon className={classes.icon} color="secondary"/>
+                    <DateRangeIcon className={classes.icon} color="secondary" />
                     <Typography className={classes.info} color="secondary">
                       {new Date(props.roadmap.start_date).toString().slice(0, 16)}
                       {" - "}
@@ -86,25 +147,37 @@ export default function Roadmap(props) {
                 </div>
               </Grid>
               <Grid
-              item
-              sm={4}
-              xs={12}
-              style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}
-            >
-              <div style={{display:'flex', justifyContent:"space-between"}}>
-                <Typography className={classes.info}>
-                  15% Completed 
+                item
+                sm={4}
+                xs={12}
+                style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}
+              >
+                <div style={{ display: 'flex', justifyContent: "space-between" }}>
+                  <Typography className={classes.info}>
+                    {(countCompleted / tasksByRoadmap.length) * 100}% Completed
                   </Typography>
                   <Typography className={classes.info}>
-                  0/0 Tasks
+                    {countCompleted}/{tasksByRoadmap.length} Tasks
                   </Typography>
-              </div>
-              <ColorLinearProgress col={props.roadmap.color} 
-              thickness={1} 
-              style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }} 
-              variant="determinate" value={19} />
-              {/* </div> */}
-            </Grid>
+                </div>
+                {tasksByRoadmap.length === 0 ?
+                  <ColorLinearProgress
+                    thickness={1}
+                    col={props.roadmap.color}
+                    variant="determinate"
+                    value={0}
+                    style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }}
+                  />
+                  :
+                  <ColorLinearProgress
+                    variant="determinate"
+                    thickness={1}
+                    col={props.roadmap.color}
+                    style={{ backgroundColor: lighten(props.roadmap.color, 0.5), marginTop: 2 }}
+                    value={(countCompleted / tasksByRoadmap.length) * 100}
+                  />
+                }
+              </Grid>
             </Grid>
           </div>
         </ListItem>

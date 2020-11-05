@@ -42,7 +42,7 @@ const Routes = (props) => {
         component={OrganizationView}
         exact
         layout={MainLayout}
-        path="/organization"
+        path="/user_management"
       />
       <RouteWithLayout
         component={ProjectListView}

@@ -247,6 +247,8 @@ console.log(externalForm)
           ) ?
             ("invalid") : ("valid")
         }
+        content="External"
+        name={externalForm.external_name}
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}
