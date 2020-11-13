@@ -50,7 +50,7 @@ const STAFF_QUERY = gql`
 
 const DELETE_TASK_ASSIGNED_TO = gql`
 mutation deleteTaskAssignedTo ($_id: String!) {
-  deleteTask_assigned_to(_id:$_id){
+  delete_task_assigned_to(_id:$_id){
     _id
   }
 }

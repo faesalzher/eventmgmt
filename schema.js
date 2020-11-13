@@ -1105,7 +1105,7 @@ const Mutation = new GraphQLObjectType({
         return task_assigned_to.save();
       },
     },
-    deleteTask_assigned_to: {
+    delete_task_assigned_to: {
       type: Task_assigned_toType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {

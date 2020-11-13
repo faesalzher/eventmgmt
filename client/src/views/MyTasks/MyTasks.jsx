@@ -86,9 +86,15 @@ const AssignedToMe = (props) => {
       temp.splice(index, 1);
       setTasksAssignedTo(temp);
     }
-    console.log(e)
-    console.log(props.comitee._id)
-    console.log(comitee_id)
+  }
+
+  const handleDelete = (e) => {
+    const temp = [...tasksAssignedTo];
+    const index = temp.map(function (item) {
+      return (item.task_id)
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setTasksAssignedTo(temp);
   }
 
   return (
@@ -98,6 +104,7 @@ const AssignedToMe = (props) => {
           <TasksAssignedToMe
             taskAssignedTo={taskAssignedTo}
             comitee={props.comitee}
+            handleDelete={handleDelete}
             handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
           />
         </List>

@@ -44,6 +44,14 @@ mutation deleteTask ($_id: String!) {
 }
 `;
 
+const DELETE_TASK_ASSIGNED_TO = gql`
+mutation deleteTaskAssignedTo ($_id: String!) {
+  delete_task_assigned_to(_id:$_id){
+    _id
+  }
+}
+`;
+
 const AntTabs = withStyles(theme => (({
   root: {
     borderBottom: '1px solid #e8e8e8',
@@ -185,6 +193,7 @@ export default function TaskDetailModal(props) {
   // const [chat, setChat] = useState(chatData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteTask] = useMutation(DELETE_TASK);
+  const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
   React.useEffect(() => {
     setTask(props.task)
@@ -270,6 +279,10 @@ export default function TaskDetailModal(props) {
     props.handleDelete(task._id);
     props.closeDialogDetail();
     deleteTask({ variables: { _id: task._id } });
+    props.tasksAssignedTo.map((taskAssignedTo) => {
+      deleteTaskAssignedTo({ variables: { _id: taskAssignedTo._id } })
+      return null
+    })
   }
 
   const handleCloseModal = () => {
@@ -277,6 +290,9 @@ export default function TaskDetailModal(props) {
     props.closeDialogDetail();
   }
 
+  const handleDeleteTaskAssignedTo = (e, id) => {
+    props.handleDeleteTaskAssignedTo(e, id)
+  }
   // React.useEffect(() => {
   //   const countChat = () => {
   //     const count = chat.filter((e) => e.task_id === task._id).length;
@@ -396,7 +412,7 @@ export default function TaskDetailModal(props) {
               task={task}
               roadmap={props.roadmap}
               handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
-              handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+              handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
               handleCompletedChange={props.handleCompletedChange}
               tasksAssignedTo={props.tasksAssignedTo}
             />

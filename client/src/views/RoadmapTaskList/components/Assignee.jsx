@@ -169,7 +169,7 @@ export default function ComiteeDialog(props) {
       />
       <ListItem button className={classes.list}
         onClick={
-          assignedComiteeId || selected ? () => handleDelete() : () => handleListClickAdd()
+          assignedComiteeId || selected ? () => handleOpenConfirmationDialog() : () => handleListClickAdd()
         }>
         <ListItemAvatar>
           <Avatar src={staff.picture} />

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 // import { makeStyles } from '@material-ui/styles';
-import { Paper } from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 // import {
@@ -145,23 +144,6 @@ export default function TasksAssignedToMe(props) {
     }
   }, [taskLoading, taskData, taskError]);
 
-  // useEffect(() => {
-  //   const onCompleted = (roadmapData) => {
-  //     setRoadmap(
-  //       roadmapData.roadmap
-  //     )
-  //   };
-  //   const onError = (error) => { /* magic */ };
-  //   if (onCompleted || onError) {
-  //     if (onCompleted && !roadmapLoading && !roadmapError) {
-  //       onCompleted(roadmapData);
-  //     } else if (onError && !roadmapLoading && roadmapError) {
-  //       onError(roadmapError);
-  //     }
-  //   }
-  // }, [roadmapLoading, roadmapData, roadmapError]);
-
-
   const [roadmap, setRoadmap] = React.useState({ event_id: "" });
   const { data: roadmapData, refetch: roadmapRefetch } = useQuery(ROADMAP_QUERY,
     {
@@ -214,11 +196,6 @@ export default function TasksAssignedToMe(props) {
   const [editTask] = useMutation(EDIT_TASK);
 
   const handleCompletedChange = (e) => {
-    // const temp = [...task];
-    // const index = temp.map(function (item) {
-    //   return item._id
-    // }).indexOf(e._id);
-    // temp[index] = e;
     setTask(e)
     editTask({
       variables:
@@ -238,11 +215,6 @@ export default function TasksAssignedToMe(props) {
   };
 
   // const handleDelete = (e) => {
-  //   setTasks(e);
-  // }
-
-  // const handleDeleteTaskAssignedTo = (e) => {
-
   //   setTasks(e);
   // }
 
