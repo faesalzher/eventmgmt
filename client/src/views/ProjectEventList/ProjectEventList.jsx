@@ -15,6 +15,16 @@ import {
   AddEventCard,
 } from './components';
 
+const PROJECT_QUERY = gql`
+query project($project_id: String!){
+  project(_id:$project_id) {
+    _id
+    project_start_date
+    project_end_date
+  }
+}
+`;
+
 const EVENTSBYPROJECT_QUERY = gql`
 query eventsByProject($project_id: String!){
   eventsByProject(project_id:$project_id) {
@@ -45,10 +55,19 @@ const EventList = (props) => {
   const classes = useStyles();
 
   const [events, setEvents] = useState([]);
+  const [project, setProject] = useState([]);
 
   const { loading, error, data, refetch } = useQuery(EVENTSBYPROJECT_QUERY,
     {
       variables: { project_id: props.project_id },
+    });
+
+  const { data: projectData } = useQuery(PROJECT_QUERY,
+    {
+      variables: { project_id: props.project_id },
+      onCompleted: () => {
+        setProject(projectData.project)
+      }
     });
 
   useEffect(() => {
@@ -86,7 +105,7 @@ const EventList = (props) => {
             spacing={2}
           >
 
-            <AddEventCard addEvent={addEvent} project_id={props.project._id} />
+            <AddEventCard addEvent={addEvent} project_id={props.project._id} project={project} />
             {
               events.slice().reverse().map((event, index) => {
                 if (events.length === 0) {

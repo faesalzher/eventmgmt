@@ -282,6 +282,12 @@ export default function AddAgendaModal(props) {
           <DayPicker
             showOutsideDays
             selectedDays={selectedDays}
+            disabledDays={
+              {
+                before: new Date(props.event.event_start_date),
+                after: new Date(props.event.event_end_date)
+              }
+            }
             onDayClick={handleDayClick}
           />
         </div>

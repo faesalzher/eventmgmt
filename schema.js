@@ -326,6 +326,13 @@ const RootQuery = new GraphQLObjectType({
         });
       },
     },
+    comiteesByStaff: {
+      type: new GraphQLList(ComiteeType),
+      args: { staff_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Comitee.find({ staff_id: args.staff_id });
+      },
+    },
     roadmaps: {
       type: new GraphQLList(RoadmapType),
       args: { event_id: { type: GraphQLString } },
@@ -361,6 +368,13 @@ const RootQuery = new GraphQLObjectType({
         return Agenda.find({ event_id: args.event_id });
       },
     },
+    task: {
+      type: TaskType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Task.findById(args._id);
+      },
+    },
     tasks: {
       type: new GraphQLList(TaskType),
       args: { roadmap_id: { type: GraphQLString } },
@@ -373,6 +387,13 @@ const RootQuery = new GraphQLObjectType({
       args: { task_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Task_assigned_to.find({ task_id: args.task_id });
+      },
+    },
+    tasks_assigned_to_by_comitee: {
+      type: new GraphQLList(Task_assigned_toType),
+      args: { comitee_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Task_assigned_to.find({ comitee_id: args.comitee_id });
       },
     },
   },

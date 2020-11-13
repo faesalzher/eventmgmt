@@ -137,7 +137,6 @@ export default function ComiteeAddForm(props) {
     setPosition_id("");
     setComiteeForm({...comiteeForm, position_id: ""})
     // comiteeForm.position_id = "";
-    console.log(event.target.value)
   };
 
   const handleChangePosition = (event) => {
@@ -193,10 +192,6 @@ export default function ComiteeAddForm(props) {
       checkCoreDivisionId.push(division._id)
     return null;
   });
-
-  console.log(comiteeForm)
-  console.log(division_id)
-  console.log(position_id)
 
   return (
     <Dialog

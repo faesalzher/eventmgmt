@@ -58,18 +58,6 @@ const EVENT_QUERY = gql`
   }
 `;
 
-// const ROADMAP_QUERY = gql`
-//   query roadmap($roadmap_id: String!){
-//     roadmap(_id:$roadmap_id) {
-//       _id
-//       roadmap_name
-//       start_date
-//       end_date
-//       color
-//       event_id
-//     }
-//   }
-// `;
 
 const ROADMAP_QUERY = gql`
   query roadmap($roadmap_id: String!){
@@ -225,6 +213,7 @@ export default function RoadamapTaskList() {
             xs={12}
             item>
             <TaskList
+              roadmap={roadmap}
               roadmap_id={roadmap_id}
               project_id={project_id}
             />

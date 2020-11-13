@@ -14,7 +14,7 @@ import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { useParams } from "react-router-dom";
 import { Redirect } from 'react-router';
@@ -51,6 +51,16 @@ const DELETE_ROADMAP = gql`
   mutation deleteRoadmap($_id: String!) {
     deleteRoadmap(_id: $_id) {
       _id
+    }
+  }
+`;
+
+const EVENT_QUERY = gql`
+  query event($event_id: String!){
+    event(_id:$event_id) {
+      _id
+      event_start_date
+      event_end_date
     }
   }
 `;
@@ -94,6 +104,15 @@ export default function RoadmapEditForm(props) {
     setRoadmapForm(props.roadmap);
   }, [setRoadmapForm, props.roadmap]);
 
+  const [event, setEvent] = useState([]);
+  const { data: eventData } = useQuery(EVENT_QUERY,
+    {
+      variables: { event_id: event_id },
+      onCompleted: () => {
+        setEvent(eventData.event)
+      }
+    });
+    
   const [date, setDate] = useState(initialDateRange);
 
   React.useEffect(() => {
@@ -196,6 +215,8 @@ export default function RoadmapEditForm(props) {
                 onChange={handleDate}
                 moveRangeOnFirstSelection={false}
                 ranges={date}
+                maxDate={new Date(event.event_end_date)}
+                rangeColors={[roadmapForm.color]}
               />
             </FormControl>
           </div>

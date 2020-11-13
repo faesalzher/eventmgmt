@@ -119,6 +119,9 @@ export default function ComiteeDialog(props) {
   const handleListClickAdd = () => {
     setSelected(true);
     props.handleAddTaskAssignedTo(addTaskAssignedToForm)
+    console.log(addTaskAssignedToForm._id)
+    console.log(addTaskAssignedToForm.task_id)
+
     addTaskAssignedTo({
       variables:
       {
@@ -134,10 +137,9 @@ export default function ComiteeDialog(props) {
   //   props.handleDeleteTaskAssignedTo(e);
   // }
 
-
   const handleDelete = () => {
     setSelected(false)
-    props.handleDeleteTaskAssignedTo(assignedComiteeId)
+    props.handleDeleteTaskAssignedTo(assignedComiteeId, props.comitee._id)
   }
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
 
@@ -167,7 +169,7 @@ export default function ComiteeDialog(props) {
       />
       <ListItem button className={classes.list}
         onClick={
-          assignedComiteeId || selected ? () => handleOpenConfirmationDialog() : () => handleListClickAdd()
+          assignedComiteeId || selected ? () => handleDelete() : () => handleListClickAdd()
         }>
         <ListItemAvatar>
           <Avatar src={staff.picture} />

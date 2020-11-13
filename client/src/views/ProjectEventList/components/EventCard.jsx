@@ -69,7 +69,7 @@ const useStyles = makeStyles(theme => ({
   cancelled: {
     backgroundColor: theme.palette.error.main
   },
-  planned: {
+  preparing: {
     backgroundColor: theme.palette.warning.main,
   },
   completed: {

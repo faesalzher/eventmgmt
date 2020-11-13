@@ -18,6 +18,8 @@ export { default as LandingPage } from './LandingPage/LandingPage.js';
 export { default as AccountProfile } from './AccountProfile/AccountProfile.jsx';
 export { default as LogIn } from './Authentication/LogIn.jsx';
 export { default as Register } from './Authentication/Register.jsx';
+export { default as MyTasks } from './MyTasks/MyTasks.jsx';
+
 
 
 

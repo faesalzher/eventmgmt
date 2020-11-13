@@ -65,7 +65,7 @@ export function StatusProgressDays(props) {
       someDate.getFullYear() === today.getFullYear()
   }
 
-  const plannedDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
+  const preparingDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
   const activeDays = Math.ceil((today.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
   const completedDays = Math.ceil((today.getTime() - end_date.getTime()) / (1000 * 3600 * 24));
   const totalActiveDays = Math.ceil((end_date.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
@@ -76,7 +76,7 @@ export function StatusProgressDays(props) {
         (props.cancel === true) ? (
           " "
         ) : ((today < start_date) ? (
-          (plannedDays) + " Days to go"
+          (preparingDays) + " Days to go"
         ) : (
             (today < end_date) ? (
               "Days " + (activeDays) + " of " + (totalActiveDays + 1)

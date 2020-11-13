@@ -92,8 +92,8 @@ export default function AddEventModal(props) {
     project_id: props.project_id,
   };
 
+  const [daysSelected, setDaysSelected] = useState(false);
   const [eventForm, setEventForm] = useState(initialFormState);
-
   const [date, setDate] = useState([
     {
       startDate: new Date(),
@@ -106,6 +106,7 @@ export default function AddEventModal(props) {
     setDate([e.selection])
     eventForm.event_start_date = e.selection.startDate.toString();
     eventForm.event_end_date = e.selection.endDate.toString();
+    setDaysSelected(true)
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -114,7 +115,7 @@ export default function AddEventModal(props) {
 
   const [addEvent] = useMutation(ADD_EVENT);
   const handleButton = e => {
-    props.onCloseListener();
+    handleClose();
     props.addEvent(eventForm);
     addEvent(
       {
@@ -147,6 +148,11 @@ export default function AddEventModal(props) {
       picture: " ",
     });
   };
+
+  const handleClose = () => {
+    props.onCloseListener();
+    setDaysSelected(false);
+  }
 
   return (
     <Dialog
@@ -218,7 +224,10 @@ export default function AddEventModal(props) {
           <div style={fullScreen ? {} : { marginTop: 14 }}>
             <FormControl className={classes.formDate}>
               <DateRange
+                minDate={new Date(props.project.project_start_date)}
+                maxDate={new Date(props.project.project_end_date)}
                 onChange={handleDate}
+                rangeColors={[theme.palette.secondary.main]}
                 moveRangeOnFirstSelection={false}
                 ranges={date}
               />
@@ -233,7 +242,8 @@ export default function AddEventModal(props) {
             eventForm.event_name === "" ||
             eventForm.event_description === "" ||
             eventForm.event_start_date === "" ||
-            eventForm.event_end_date === ""
+            eventForm.event_end_date === "" ||
+            daysSelected === false
           ) ?
             ("invalid") : ("valid")
         }

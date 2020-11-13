@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
   cancelled: {
     backgroundColor: theme.palette.error.main
   },
-  planned: {
+  preparing: {
     backgroundColor: theme.palette.warning.main
   },
   completed: {
@@ -43,7 +43,7 @@ export default function StatusBox(props) {
   const start_date = new Date(props.start_date);
   const end_date = new Date(props.end_date);
 
-  // const plannedDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
+  // const preparingDays = Math.ceil((start_date.getTime() - today.getTime()) / (1000 * 3600 * 24));
   // const activeDays = Math.ceil((today.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
   // const completedDays = Math.ceil((today.getTime() - end_date.getTime()) / (1000 * 3600 * 24));
   // const totalActiveDays = Math.ceil((end_date.getTime() - start_date.getTime()) / (1000 * 3600 * 24));
@@ -54,7 +54,7 @@ export default function StatusBox(props) {
       someDate.getFullYear() === today.getFullYear()
   }
 
-  const plannedDays = today < start_date;
+  const preparingDays = today < start_date;
   const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
 
 
@@ -65,9 +65,9 @@ export default function StatusBox(props) {
         <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
       </Box>
     ) : (
-        (plannedDays) ? (
-          <Box borderRadius={4} style={props.style}  className={[classes.planned, classes.boxStatus].join(" ")}>
-            <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Planned</Typography>
+        (preparingDays) ? (
+          <Box borderRadius={4} style={props.style}  className={[classes.preparing, classes.boxStatus].join(" ")}>
+            <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Preparing</Typography>
           </Box>
         ) : (
             (activeDays) ? (

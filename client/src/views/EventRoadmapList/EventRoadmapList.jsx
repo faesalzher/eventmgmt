@@ -39,6 +39,16 @@ const ROADMAPS_QUERY = gql`
   }
 `;
 
+const EVENT_QUERY = gql`
+  query event($event_id: String!){
+    event(_id:$event_id) {
+      _id
+      event_start_date
+      event_end_date
+    }
+  }
+`;
+
 const useStyles = makeStyles(theme => ({
   root: {
     padding: '0px 30px',
@@ -64,15 +74,18 @@ export default function EventRoadmapList(props) {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [roadmaps, setRoadmaps] = useState([]);
-
+  const [event, setEvent] = useState([]);
   const { data: roadmapsData, refetch: roadmapsRefetch, loading: roadmapsLoading, eror: roadmapsError } = useQuery(ROADMAPS_QUERY,
     {
       variables: { event_id: props.event_id },
-      // onCompleted: () => {
-      //   if (roadmapsData !== undefined) {
-      //     setRoadmaps(roadmapsData.roadmaps)
-      //   }
-      // }
+    });
+
+  const { data: eventData } = useQuery(EVENT_QUERY,
+    {
+      variables: { event_id: props.event_id },
+      onCompleted: () => {
+        setEvent(eventData.event)
+      }
     });
 
   React.useEffect(() => {
@@ -149,6 +162,7 @@ export default function EventRoadmapList(props) {
               open={openAddModal}
               close={handleCloseAddModal}
               event_id={props.event_id}
+              event={event}
               handleSaveButton={handleSaveButton}
               roadmaps={roadmaps} />
           </div>

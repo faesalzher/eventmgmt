@@ -64,6 +64,7 @@ export default function AddEventCard(props){
           openListener={open}
           onCloseListener={handleClose}
           closeAfterTransition
+          project={props.project}
           project_id={props.project_id}
           style={{ minWidth: 420 }}
           addEvent={addEvent}

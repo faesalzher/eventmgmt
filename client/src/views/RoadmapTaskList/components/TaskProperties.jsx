@@ -195,7 +195,6 @@ export default function TaskProperties(props) {
   const openCalendar = Boolean(anchorEl);
   const id = openCalendar ? 'simple-popover' : undefined;
 
-
   const handleChangePriority = e => {
     taskForm.priority = e;
     setTaskForm({ ...taskForm, priority: e });
@@ -212,17 +211,17 @@ export default function TaskProperties(props) {
     setOpenComitees(false);
   };
 
- 
+
   const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
-  const handleDeleteTaskAssignedTo = (e) => {
-    props.handleDeleteTaskAssignedTo(e);
+  const handleDeleteTaskAssignedTo = (e,id) => {
+    props.handleDeleteTaskAssignedTo(e,id);
     deleteTaskAssignedTo({ variables: { _id: e, } });
   }
 
   return (
     <div>
-     
+
       {descriptionForm ?
         <EscapeOutside onEscapeOutside={onEscapeOutside}>
           <TextField
@@ -327,6 +326,8 @@ export default function TaskProperties(props) {
         >
           <DatetimePicker
             moment={moments}
+            maxDate={moment(new Date(props.roadmap.end_date))}
+            minDate={moment(new Date(props.roadmap.start_date))}
             onChange={handleSelectDate}
           />
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -363,6 +364,7 @@ export default function TaskProperties(props) {
             label="More"
           />
           <AssigneesDivision
+            project_id={props.project_id}
             task={props.task}
             handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
             handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}

@@ -41,6 +41,16 @@ const AGENDAS_QUERY = gql`
   }
 `;
 
+const EVENT_QUERY = gql`
+  query event($event_id: String!){
+    event(_id:$event_id) {
+      _id
+      event_start_date
+      event_end_date
+    }
+  }
+`;
+
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -77,6 +87,16 @@ export default function EventAgenda(props) {
       variables: { event_id: props.event_id },
     }
   );
+
+  const [event, setEvent] = useState([]);
+  const { data: eventData } = useQuery(EVENT_QUERY,
+    {
+      variables: { event_id: props.event_id },
+      onCompleted: () => {
+        setEvent(eventData.event)
+      }
+    });
+
 
   useEffect(() => {
     const onCompleted = (data) => {
@@ -200,6 +220,7 @@ export default function EventAgenda(props) {
               <StyledTableCell align="left">Details</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 <AddAgendaModal
+                  event={event}
                   open={openAddDialog}
                   event_id={props.event_id}
                   handleSaveAgendaButton={handleSaveAgendaButton}

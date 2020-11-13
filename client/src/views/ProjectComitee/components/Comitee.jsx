@@ -38,7 +38,7 @@ const StyledTableCell = withStyles(theme => ({
   },
   body: {
     fontSize: 14,
-    padding: "6px 3px 6px 3px"
+    padding: "3px 3px 3px 3px"
   },
 }))(TableCell);
 
@@ -78,7 +78,7 @@ export default function Comitees(props) {
   return (
     <StyledTableRow>
       <StyledTableCell component="th" scope="row" style={{ display: 'flex', justifyContent: 'center', width: 70 }}>
-        <Avatar src={staff.picture} />
+        <Avatar style={{width:30, height:30}} src={staff.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
         {staff.staff_name}
@@ -93,15 +93,6 @@ export default function Comitees(props) {
         {props.positions.map((position, index) => {
           if (position._id === props.comitee.position_id) {
             return <div key={index}>{position.position_name}</div>
-          }
-          return null;
-        })
-        }
-      </StyledTableCell>
-      <StyledTableCell align="left">
-        {props.divisions.map((division, index) => {
-          if (division._id === props.comitee.division_id) {
-            return <div key={index}>{division.division_name}</div>
           }
           return null;
         })

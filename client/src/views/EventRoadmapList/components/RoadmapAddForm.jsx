@@ -90,6 +90,7 @@ export default function RoadmapAddForm(props) {
     key: 'selection'
   }]
   const [roadmapForm, setRoadmapForm] = useState(intitialFormState);
+  const [daysSelected, setDaysSelected] = useState(false);
   const [date, setDate] = useState(initialDateRange);
 
   const handleDeleteDate = () => {
@@ -99,6 +100,7 @@ export default function RoadmapAddForm(props) {
 
   const handleDate = e => {
     setDate([e.selection])
+    setDaysSelected(true)
   }
 
   const handleInputChange = e => {
@@ -128,6 +130,7 @@ export default function RoadmapAddForm(props) {
     setRoadmapForm(intitialFormState);
     handleDeleteDate()
     props.close();
+    setDaysSelected(false);
   }
 
   
@@ -170,6 +173,9 @@ export default function RoadmapAddForm(props) {
                 onChange={handleDate}
                 moveRangeOnFirstSelection={false}
                 ranges={date}
+                // minDate={new Date(props.project.project_start_date)}
+                maxDate={new Date(props.event.event_end_date)}
+                rangeColors={[roadmapForm.color]}
               />
             </FormControl>
           </div>
@@ -178,7 +184,8 @@ export default function RoadmapAddForm(props) {
       <DialogActionsAdd
         validation={
           (
-            roadmapForm.roadmap_name === ""
+            roadmapForm.roadmap_name === "" ||
+            daysSelected === false
           ) ?
             ("invalid") : ("valid")
         }

@@ -23,6 +23,7 @@ import {
   EventDetail as EventDetailView,
   RoadmapTaskList as RoadmapTaskListView,
   LandingPage as LandingPageView,
+  MyTasks as MyTasksView
 } from "./views";
 
 const Routes = (props) => {
@@ -85,6 +86,12 @@ const Routes = (props) => {
         exact
         layout={MainLayout}
         path="/account"
+      />
+         <RouteWithLayout
+        component={MyTasksView}
+        exact
+        layout={MainLayout}
+        path="/mytasks"
       />
       {/* <RouteWithLayout
         component={DashboardView}

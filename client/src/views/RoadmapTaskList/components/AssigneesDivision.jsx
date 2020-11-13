@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography, List, ListItem, Divider} from '@material-ui/core';
+import { Typography, List, ListItem, Divider } from '@material-ui/core';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { useParams } from "react-router-dom";
 
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
@@ -41,10 +40,8 @@ export default function AssigneesDivision(props) {
   const classes = useStyles();
   const [divisions, setDivisions] = useState([]);
 
-  let { project_id} = useParams();
-
   const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
-    variables: { project_id: project_id },
+    variables: { project_id: props.project_id },
     onCompleted: () => {
       setDivisions(
         divisionsData.divisionsByProject
@@ -99,6 +96,7 @@ export default function AssigneesDivision(props) {
                   </ListItem>
                   <Divider />
                   <Assignees
+                    project_id={props.project_id}
                     handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
                     handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
                     tasksAssignedTo={props.tasksAssignedTo}

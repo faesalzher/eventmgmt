@@ -1,105 +1,116 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from "react";
+import clsx from "clsx";
 // import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Divider} from '@material-ui/core';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
+import { makeStyles } from "@material-ui/styles";
+import { Divider } from "@material-ui/core";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 // import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 // import TextFieldsIcon from '@material-ui/icons/TextFields';
 // import ImageIcon from '@material-ui/icons/Image';
 // import SettingsIcon from '@material-ui/icons/Settings';
 // import LockOpenIcon from '@material-ui/icons/LockOpen';
-import { Link as RouterLink } from 'react-router-dom';
-import logo from 'assets/image.png'
+import { Link as RouterLink } from "react-router-dom";
+import logo from "assets/image.png";
 // import { StatusBullet } from 'components';
-import EventIcon from '@material-ui/icons/Event';
+import AssignmentIcon from "@material-ui/icons/Assignment";
+import FolderIcon from '@material-ui/icons/Folder';
+import jwtDecode from "jwt-decode";
 
-import { Profile, SidebarNav } from './components';
+import { Profile, SidebarNav } from "./components";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   drawer: {
     width: 200,
   },
   root: {
     backgroundColor: theme.palette.white,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
   },
   divider: {
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   nav: {
     // padding: theme.spacing(2),
     // backgroundColor: 'yellow',
-    alignItems: 'center',
+    alignItems: "center",
   },
-  logo:{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    minHeight: 'fit-content',
-    marginTop: theme.spacing(1)
-  }
+  logo: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    minHeight: "fit-content",
+    marginTop: theme.spacing(1),
+  },
 }));
 
-const Sidebar = props => {
+const Sidebar = (props) => {
   const { open, variant, onClose, className, ...rest } = props;
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
 
   const classes = useStyles();
 
-  const pages = [
+  const OrganizationPages = [
     {
-      title: 'Dashboard',
-      href: '/dashboard',
-      icon: <DashboardIcon />
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: <DashboardIcon />,
     },
     {
-      title: 'Project',
-      href: '/project',
-      icon: <EventIcon />
+      title: "All Project",
+      href: "/project",
+      icon: <FolderIcon />,
     },
     {
-      title: 'User Management',
-      href: '/user_management',
-      icon: <PeopleAltIcon />
+      title: "My Tasks",
+      href: "/mytasks",
+      icon: <AssignmentIcon />,
     },
-    // {
-    //   title: 'Account',
-    //   href: '/account',
-    //   icon: <AccountBoxIcon />
-    // }
-    // ,
-    // {
-    //   title: 'Settings',
-    //   href: '/settings',
-    //   icon: <SettingsIcon />
-    // }
+    {
+      title: "User Management",
+      href: "/user_management",
+      icon: <PeopleAltIcon />,
+    },
+  ];
+
+  const StaffPages = [
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: <DashboardIcon />,
+    },
+    {
+      title: "My Project",
+      href: "/project",
+      icon: <FolderIcon />,
+    },
+    {
+      title: "My Tasks",
+      href: "/mytasks",
+      icon: <AssignmentIcon />,
+    },
   ];
 
   return (
-    <div
-      {...rest}
-      className={clsx(classes.root, className)}
-    >
-      <div className={classes.logo}> 
+    <div {...rest} className={clsx(classes.root, className)}>
+      <div className={classes.logo}>
         <RouterLink to="/">
-          <img
-            alt="Logo"
-            src={logo}
-            width='40'
-            height='40'
-          />
-      </RouterLink>
+          <img alt="Logo" src={logo} width="40" height="40" />
+        </RouterLink>
       </div>
       <Divider className={classes.divider} />
       <SidebarNav
         className={classes.nav}
-        pages={pages}
+        pages={
+          decodedToken.user_type === "organization"
+            ? OrganizationPages
+            : StaffPages
+        }
       />
       <Divider />
-      <Profile collapsed={props.collapsed}/>
+      <Profile collapsed={props.collapsed} />
     </div>
   );
 };

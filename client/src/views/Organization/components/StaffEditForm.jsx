@@ -186,7 +186,6 @@ export default function StaffEditForm(props) {
     setStaffForm(defaultState)
   }
 
-  console.log(staffForm.values)
   const hasError = field =>
   staffForm.touched[field] && staffForm.errors[field] ? true : false;
 

@@ -24,11 +24,6 @@ import {
   Divisions,
 } from './components';
 
-// import mockDataComitee from './dataComitee';
-// import mockDataPosition from './dataPosition.js';
-// import mockDataDivision from './dataDivision.js';
-
-
 const COMITEESBYPROJECT_QUERY = gql`
   query comiteesByProject($project_id: String!){
      comiteesByProject(project_id:$project_id) {

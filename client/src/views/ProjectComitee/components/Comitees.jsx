@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   Paper,
   IconButton,
-  TablePagination,
+  // TablePagination,
   Toolbar,
   Tooltip,
   Typography,
   TextField,
+  TableCell,
+  TableRow,
 } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -14,21 +16,22 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 // import {, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 
 import {
   Comitee,
   ComiteeAddForm
 } from '.';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   table: {
     // minWidth: 500,
   },
-});
+  division: {
+    backgroundColor: "#e4e4e4"
+  }
+}));
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -41,12 +44,96 @@ const StyledTableCell = withStyles(theme => ({
   },
 }))(TableCell);
 
+function ComiteesByDivision(props) {
+  // const rowsPerPage = props.rowsPerPage;
+  const comiteesByDivision = props.comiteesByDivision;
+  // const page = props.page;
+  const sortedComitees = comiteesByDivision.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
+
+
+  if (comiteesByDivision.length === 0) {
+    return <StyledTableRow >
+      <StyledTableCell component="th" scope="row" colSpan={7}>
+        <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+          there is no comitees yet
+    </Typography>
+      </StyledTableCell>
+    </StyledTableRow>
+  }
+
+  return (
+    (sortedComitees).map((comitee) => {
+      return (
+        <Comitee
+          key={comitee._id}
+          handleDeleteComitee={props.handleDeleteComitee}
+          positions={props.positions}
+          divisions={props.divisions}
+          project_id={props.project_id}
+          comitee={comitee}
+          staffs={props.staffs}
+          comitees={props.comitees}
+          handleSaveEditButton={props.handleSaveEditButton}
+        />
+      )
+    })
+  );
+}
+
+function ComiteesAll(props) {
+  // const rowsPerPage = props.rowsPerPage;
+  const comiteesByDivision = props.comiteesByDivision;
+  // const page = props.page;
+
+  const comiteesPerDivision = comiteesByDivision.filter(function (comitee) {
+    return comitee.division_id === props.division._id
+  });
+
+  const sortedComitees = comiteesPerDivision.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
+
+  if (comiteesPerDivision.length === 0) {
+    return <StyledTableRow >
+      <StyledTableCell component="th" scope="row" colSpan={7}>
+        <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+          there is no comitees yet
+    </Typography>
+      </StyledTableCell>
+    </StyledTableRow>
+  }
+
+  return (
+    (sortedComitees).map((comitee) => {
+      return (
+        <Comitee
+          key={comitee._id}
+          handleDeleteComitee={props.handleDeleteComitee}
+          positions={props.positions}
+          divisions={props.divisions}
+          project_id={props.project_id}
+          comitee={comitee}
+          staffs={props.staffs}
+          comitees={props.comitees}
+          handleSaveEditButton={props.handleSaveEditButton}
+        />
+      )
+    })
+  );
+}
+
+
+const StyledTableRow = withStyles(theme => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: "theme.palette.background.default",
+    },
+  },
+}))(TableRow);
 
 export default function Comitees(props) {
   const classes = useStyles();
   const [comitees, setComitees] = useState(props.comitees);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  // const [page, setPage] = React.useState(0);
+  // const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [divisions, setDivisions] = React.useState(props.divisions);
   const [division_id, setDivision_id] = React.useState('all');
@@ -75,7 +162,7 @@ export default function Comitees(props) {
     }
   });
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, comiteesByDivision.length - page * rowsPerPage);
+  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, comiteesByDivision.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
     setOpenAddModal(true);
@@ -85,19 +172,19 @@ export default function Comitees(props) {
     setOpenAddModal(false);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
 
   const handleChange = (event) => {
     setDivision_id(event.target.value);
   };
-  
+
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
@@ -150,46 +237,76 @@ export default function Comitees(props) {
       <TableContainer component={Paper}>
         <Table size="small" className={classes.table} aria-label="customized table">
           <TableHead>
-            <TableRow>
+            <TableRow >
               <StyledTableCell style={{ width: 70 }} ></StyledTableCell>
               <StyledTableCell >Name</StyledTableCell>
               <StyledTableCell >Phone Number</StyledTableCell>
               <StyledTableCell >Email</StyledTableCell>
               <StyledTableCell align="left">Position</StyledTableCell>
-              <StyledTableCell align="left">Division</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 Action
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? comiteesByDivision.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : comiteesByDivision
-              ).map((comitee) => {
-                return <Comitee
-                  key={comitee._id}
+          {
+            division_id === "all" ?
+              divisions.map((division, index) => {
+                return (
+                  <TableBody key={index}>
+                    <TableRow className={classes.division}>
+                      <StyledTableCell component="th" scope="row" colSpan={7}>
+                        <Typography variant="body2" style={{ fontWeight: 500 }}>
+                          {division.division_name}
+                        </Typography>
+                      </StyledTableCell>
+                    </TableRow>
+                    <ComiteesAll
+                      division={division}
+                      // rowsPerPage={rowsPerPage}
+                      comiteesByDivision={comiteesByDivision}
+                      // page={page}
+                      handleSaveEditButton={props.handleSaveEditButton}
+                      handleDeleteComitee={props.handleDeleteComitee}
+                      positions={props.positions}
+                      divisions={props.divisions}
+                      project_id={props.project_id}
+                      staffs={props.staffs}
+                      comitees={props.comitees}
+                    />
+                  </TableBody>
+                )
+              })
+              :
+              <TableBody>
+                {/* <StyledTableRow>
+                <StyledTableCell component="th" scope="row" colSpan={7}>
+                  {division_name}
+                </StyledTableCell>
+              </StyledTableRow> */}
+                <ComiteesByDivision
+                  // rowsPerPage={rowsPerPage}
+                  comiteesByDivision={comiteesByDivision}
+                  // page={page}
+                  handleSaveEditButton={props.handleSaveEditButton}
                   handleDeleteComitee={props.handleDeleteComitee}
                   positions={props.positions}
                   divisions={props.divisions}
                   project_id={props.project_id}
-                  comitee={comitee}
                   staffs={props.staffs}
                   comitees={props.comitees}
-                  handleSaveEditButton={props.handleSaveEditButton}
                 />
-              })
-            }
+              </TableBody>
+          }
+          {/* <TableBody>
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
                 <TableCell colSpan={6} />
               </TableRow>
             )}
-          </TableBody>
+          </TableBody> */}
         </Table>
       </TableContainer>
-      <TablePagination
+      {/* <TablePagination
         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
         component="div"
         count={comiteesByDivision.length}
@@ -197,7 +314,7 @@ export default function Comitees(props) {
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
+      /> */}
     </div>
   );
 }

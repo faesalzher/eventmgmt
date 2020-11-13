@@ -59,8 +59,9 @@ export default function StatusBox(props) {
     });
 
   const handleDelete = () => {
-    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id)
+    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id,props.taskAssignedTo.comitee_id)
   }
+  
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
 
   const handleOpenConfirmationDialog = () => {

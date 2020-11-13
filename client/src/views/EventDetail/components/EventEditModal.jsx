@@ -166,7 +166,7 @@ export default function EventEditModal(props) {
 
   const handleCloseModal = () => {
     props.close();
-    setEventForm(props.event)
+    setEventForm(props.event)    
   }
 
   const handleCancelModal = () => {
@@ -308,6 +308,9 @@ export default function EventEditModal(props) {
                 onChange={handleDate}
                 moveRangeOnFirstSelection={false}
                 ranges={date}
+                minDate={new Date(props.project.project_start_date)}
+                maxDate={new Date(props.project.project_end_date)}
+                rangeColors={[theme.palette.secondary.main]}
               />
             </FormControl>
           </div>
@@ -320,7 +323,7 @@ export default function EventEditModal(props) {
             eventForm.event_description === "" ||
             eventForm.event_start_date === "" ||
             eventForm.event_end_date === "" ||
-            eventForm.event_location === ""
+            eventForm.event_location === "" 
           ) ?
             ("invalid") : ("valid")
         }

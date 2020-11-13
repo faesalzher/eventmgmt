@@ -9,9 +9,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import { Divider, TextField, 
+import {
+  Divider, TextField,
   // Grid,
-   Checkbox, Tooltip, IconButton } from '@material-ui/core';
+  Checkbox, Tooltip, IconButton
+} from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -26,9 +28,10 @@ import { gql } from 'apollo-boost';
 import EscapeOutside from "react-escape-outside";
 // import { Scrollbars } from 'react-custom-scrollbars';
 
-import { TaskProperties, 
+import {
+  TaskProperties,
   // TaskChatBubble
- } from '.';
+} from '.';
 import {
   ConfirmationDialog
 } from 'components';
@@ -284,7 +287,6 @@ export default function TaskDetailModal(props) {
   //   }
   // })
 
-
   return (
     <div>
       <Dialog
@@ -390,7 +392,9 @@ export default function TaskDetailModal(props) {
               { height: '100%' }
           } >
             <TaskProperties
+              project_id={props.project_id}
               task={task}
+              roadmap={props.roadmap}
               handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
               handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
               handleCompletedChange={props.handleCompletedChange}
@@ -426,8 +430,8 @@ export default function TaskDetailModal(props) {
               </DialogContent>
             </Scrollbars>
              : */}
-            <DialogContent style={{ height: '83%' }} >
-              {/* {chat.map((chat, index) => {
+          <DialogContent style={{ height: '83%' }} >
+            {/* {chat.map((chat, index) => {
                 if (chat.task_id === props.task._id) return (
                   <Grid id={`item_${index + 1}`} key={index} item style={{ margin: '5px 0px' }}>
                     <TaskChatBubble chat={chat} />
@@ -435,7 +439,7 @@ export default function TaskDetailModal(props) {
                 )
                 return null;
               })} */}
-            </DialogContent>
+          </DialogContent>
           {/* // } */}
           <Divider />
           {/* <DialogActions style={{ height: '12%' }}>

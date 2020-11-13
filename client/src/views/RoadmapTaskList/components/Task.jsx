@@ -139,13 +139,15 @@ export default function Task(props) {
     setTasksAssignedTo([...tasksAssignedTo, e]);
   }
 
-  const handleDeleteTaskAssignedTo = e => {
+  const handleDeleteTaskAssignedTo = (e, id) => {
     const temp = [...tasksAssignedTo];
     const index = temp.map(function (item) {
+      console.log(item)
       return item._id
     }).indexOf(e);
     temp.splice(index, 1);
     setTasksAssignedTo(temp);
+    props.handleDeleteTaskAssignedTo(e, id);
   }
 
   return (
@@ -214,12 +216,14 @@ export default function Task(props) {
         </div>
       </ListItem>
       <TaskDetailModal
+        project_id={props.project_id}
         openDialogDetail={openDialogDetail}
         handleAddTaskAssignedTo={handleAddTaskAssignedTo}
         closeDialogDetail={handleClose}
         handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
         handleDelete={props.handleDelete}
         // closeAfterTransition
+        roadmap={props.roadmap}
         tasksAssignedTo={tasksAssignedTo}
         handleChangeChecked={handleChangeChecked}
         handleCompletedChange={handleCompletedChange}

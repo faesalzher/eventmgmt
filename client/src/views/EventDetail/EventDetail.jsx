@@ -38,6 +38,8 @@ const PROJECT_QUERY = gql`
     project(_id:$project_id) {
       _id
       project_name
+      project_start_date
+      project_end_date
     }
   }
 `;
@@ -117,7 +119,7 @@ export default function EventDetail() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const [event, setEvent] = React.useState({event_name:""});
+  const [event, setEvent] = React.useState({ event_name: "" });
   const { data: eventData, refetch: eventRefetch } = useQuery(EVENT_QUERY,
     {
       variables: { event_id: event_id },
@@ -133,7 +135,7 @@ export default function EventDetail() {
   const refresh = () => {
     eventRefetch();
   };
-  const [project, setProject] = React.useState({project_name:""});
+  const [project, setProject] = React.useState({ project_name: "" });
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {
       variables: { project_id: project_id },
@@ -192,6 +194,7 @@ export default function EventDetail() {
           </IconButton>
           <EventEditModal
             open={openEditModal}
+            project={project}
             project_id={project_id}
             close={handleCloseEditModal}
             handleSaveEditButton={handleSaveEditEventButton}
@@ -210,7 +213,7 @@ export default function EventDetail() {
             event_id={event_id}
             project_id={project_id}
             xs={fullScreen}
-            />
+          />
         </TabPanel>
         <TabPanel value={value} index={1} style={{ padding: '0px 30px' }}>
           <EventExternal
@@ -218,7 +221,7 @@ export default function EventDetail() {
           />
         </TabPanel>
         <TabPanel value={value} index={2} style={{ padding: '0px 30px' }}>
-          <EventAgenda  event_id={event_id} />
+          <EventAgenda event_id={event_id} />
         </TabPanel>
         <TabPanel value={value} index={3} style={{ padding: '0px 30px' }}>
           <EventOverview

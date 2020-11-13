@@ -271,6 +271,10 @@ export default function TaskList(props) {
     setSortTask(!sortTask)
   }
 
+  const handleDeleteTaskAssignedTo = (e) => {
+    
+  }
+
   let tasksByRoadmap = (tasks.filter(function (task) {
     if (task.roadmap_id === props.roadmap_id) {
       return task
@@ -390,6 +394,9 @@ export default function TaskList(props) {
                                 <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
                                 <Task
                                   task={task}
+                                  handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+                                  project_id={props.project_id}
+                                  roadmap={props.roadmap}
                                   handleCompletedChange={handleCompletedChange}
                                   handleDelete={handleDelete}
                                 />
@@ -402,7 +409,10 @@ export default function TaskList(props) {
                                   return <div key={index}>
                                     <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
                                     <Task
+                                      project_id={props.project_id}
+                                      handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                                       task={task}
+                                      roadmap={props.roadmap}
                                       handleCompletedChange={handleCompletedChange}
                                       handleDelete={handleDelete}
                                     />
@@ -420,7 +430,10 @@ export default function TaskList(props) {
                               {sortedCompletedTasks.slice().map((task, index) => {
                                 return <div key={index}>
                                   <Task
+                                    project_id={props.project_id}
+                                    handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                                     task={task}
+                                    roadmap={props.roadmap}
                                     handleCompletedChange={handleCompletedChange}
                                     handleDelete={handleDelete}
                                   />
