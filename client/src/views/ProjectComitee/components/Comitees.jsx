@@ -70,6 +70,8 @@ function ComiteesByDivision(props) {
           positions={props.positions}
           divisions={props.divisions}
           project_id={props.project_id}
+          project_comitee={props.project_comitee}
+          decodedToken={props.decodedToken}
           comitee={comitee}
           staffs={props.staffs}
           comitees={props.comitees}
@@ -110,8 +112,10 @@ function ComiteesAll(props) {
           positions={props.positions}
           divisions={props.divisions}
           project_id={props.project_id}
+          project_comitee={props.project_comitee}
           comitee={comitee}
           staffs={props.staffs}
+          decodedToken={props.decodedToken}
           comitees={props.comitees}
           handleSaveEditButton={props.handleSaveEditButton}
         />
@@ -215,17 +219,24 @@ export default function Comitees(props) {
               </option>
             ))}
           </TextField>
-          <Tooltip arrow title="Add New Comitees" aria-label="confirm">
-            <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
+          {
+            props.project_comitee.position_id !== "7" || props.decodedToken.user_type === "organization" ?
+              <Tooltip arrow title="Add New Comitees" aria-label="confirm">
+                <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+              :
+              <></>
+          }
           <ComiteeAddForm
             staffs={props.staffs}
             project_id={props.project_id}
             division_id={division_id}
             divisions={divisions}
+            project_comitee={props.project_comitee}
             positions={props.positions}
+            decodedToken={props.decodedToken}
             division_name={division_name}
             comitees={comitees}
             open={openAddModal}
@@ -244,7 +255,10 @@ export default function Comitees(props) {
               <StyledTableCell >Email</StyledTableCell>
               <StyledTableCell align="left">Position</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
-                Action
+                {
+                  props.project_comitee.position_id !== "7" ?
+                    "Action" : ""
+                }
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -264,11 +278,13 @@ export default function Comitees(props) {
                       division={division}
                       // rowsPerPage={rowsPerPage}
                       comiteesByDivision={comiteesByDivision}
+                      decodedToken={props.decodedToken}
                       // page={page}
                       handleSaveEditButton={props.handleSaveEditButton}
                       handleDeleteComitee={props.handleDeleteComitee}
                       positions={props.positions}
                       divisions={props.divisions}
+                      project_comitee={props.project_comitee}
                       project_id={props.project_id}
                       staffs={props.staffs}
                       comitees={props.comitees}
@@ -287,6 +303,7 @@ export default function Comitees(props) {
                   // rowsPerPage={rowsPerPage}
                   comiteesByDivision={comiteesByDivision}
                   // page={page}
+                  decodedToken={props.decodedToken}
                   handleSaveEditButton={props.handleSaveEditButton}
                   handleDeleteComitee={props.handleDeleteComitee}
                   positions={props.positions}

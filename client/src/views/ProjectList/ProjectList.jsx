@@ -14,11 +14,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import {
   ProjectCard,
   AddProjectCard,
+  MyProject,
 } from './components';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import jwtDecode from "jwt-decode";
-
 const PROJECTS_QUERY = gql`
   query projects($organization_id:String!){
     projects(organization_id: $organization_id){
@@ -42,6 +42,17 @@ mutation deleteProject ($_id: String!) {
 }
 `;
 
+const COMITEESBYSTAFF_QUERY = gql`
+  query comiteesByStaff($staff_id: String!){
+    comiteesByStaff(staff_id:$staff_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -62,7 +73,6 @@ function Alert(props) {
 const ProjectList = () => {
   const classes = useStyles();
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
-
   const [open, setOpen] = React.useState(false);
 
   const handleSucces = () => {
@@ -86,7 +96,7 @@ const ProjectList = () => {
   useEffect(() => {
     refresh();
   });
-  
+
   useEffect(() => {
     const onCompleted = (data) => { setProjects(data.projects) };
     const onError = (error) => { /* magic */ };
@@ -103,6 +113,33 @@ const ProjectList = () => {
   const refresh = () => {
     refetch();
   };
+
+  const [comitees, setComitees] = useState([]);
+  const { data: comiteesData, loading: comiteesLoading, error: comiteesError, refetch: comiteesRefetch } = useQuery(COMITEESBYSTAFF_QUERY, {
+    variables: { staff_id: decodedToken.staff_id }
+  }
+  );
+
+  useEffect(() => {
+    const onCompleted = (comiteesData) => {
+      setComitees(
+        comiteesData.comiteesByStaff
+      )
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !comiteesLoading && !comiteesError) {
+        onCompleted(comiteesData);
+      } else if (onError && !comiteesLoading && comiteesError) {
+        onError(comiteesError);
+      }
+    }
+  }, [comiteesLoading, comiteesData, comiteesError]);
+
+  useEffect(() => {
+    refresh();
+    comiteesRefetch();
+  });
 
   const addProject = useCallback(
     (e) => {
@@ -122,7 +159,10 @@ const ProjectList = () => {
   }
 
   if (error) return <p>Error :(</p>;
-  // console.log(projects);
+  if (loading) return (
+    <div className={classes.loading}><CircularProgress /></div>
+  )
+  console.log(comitees);
   // console.log(decodedToken.organization_id)
 
   return (
@@ -152,27 +192,37 @@ const ProjectList = () => {
                </Alert>
                 </Snackbar>
                 {decodedToken.user_type === "organization" ?
-                  <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
-                  :
-                  <div></div>
-                }
-                {
-                  projects.slice().reverse().map((project, index) => {
-                    if (projects.length === 0) {
-                      return (
-                        <div className={classes.loading}><CircularProgress /></div>
-                      )
-                    } else {
-                      return (
-                        <ProjectCard
-                          key={project._id}
-                          project={project}
-                          handleDelete={handleDelete}
-                        />
-                      )
+                  <>
+                    <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
+                    {
+                      projects.slice().reverse().map((project, index) => {
+                        return (
+                          <ProjectCard
+                            key={project._id}
+                            project={project}
+                            handleDelete={handleDelete}
+                          />
+                        )
+                      })
                     }
-                  })
+                  </>
+                  :
+                  <>
+                    {
+                      comitees.slice().reverse().map((comitee, index) => {
+                        return (
+                          <MyProject
+                            key={index}
+                            comitee={comitee}
+                            handleDelete={handleDelete}
+                          />
+                          // <div>{console.log(comitee.project_id)}</div>
+                        )
+                      })
+                    }
+                  </>
                 }
+
               </Grid>
             </div>
         }

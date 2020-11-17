@@ -1,26 +1,31 @@
 import React from 'react';
-// import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/styles';
 // import { Grid } from '@material-ui/core';
-import AwesomeSlider from 'react-awesome-slider';
-import 'react-awesome-slider/dist/styles.css';
-import image1 from "assets/planer_desk.jpg";
-import image2 from "assets/project.png";
+// import AwesomeSlider from 'react-awesome-slider';
+// import 'react-awesome-slider/dist/styles.css';
+// import image1 from "assets/planer_desk.jpg";
+// import image2 from "assets/project.png";
+import { DashboardOrganization, DashboardStaff } from './components';
 
-// const useStyles = makeStyles(theme => ({
-//   root: {
-//     padding: theme.spacing(4)
-//   }
-// }));
+import jwtDecode from "jwt-decode";
+const useStyles = makeStyles(theme => ({
+  root: {
+    padding: theme.spacing(4)
+  }
+}));
 
 const Dashboard = () => {
-  // const classes = useStyles();
-  // const styles = AwsSliderStyles();
-
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
+  const classes = useStyles();
   return (
-      <AwesomeSlider >
-        <div data-src={image1} />
-        <div data-src={image2} />
-      </AwesomeSlider>
+    <div className={classes.root}>
+      {
+        decodedToken.user_type === "organization" ?
+          <DashboardOrganization decodedToken={decodedToken} />
+          :
+          <DashboardStaff decodedToken={decodedToken}/>
+      }
+    </div>
   );
 };
 

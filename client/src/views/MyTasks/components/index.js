@@ -6,3 +6,5 @@
 // export { default as TotalProfit } from './TotalProfit';
 // export { default as TotalUsers } from './TotalUsers';
 export { default as TasksAssignedToMe } from './TasksAssignedToMe.jsx';
+export { default as TasksCreatedByMe } from './TasksCreatedByMe.jsx';
+

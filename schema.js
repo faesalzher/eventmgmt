@@ -299,6 +299,13 @@ const RootQuery = new GraphQLObjectType({
         return Division.find({ project_id: args.project_id });
       },
     },
+    division: {
+      type: DivisionType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Division.findById(args._id);
+      },
+    },
     comiteesByProject: {
       type: new GraphQLList(ComiteeType),
       args: { project_id: { type: GraphQLString } },
@@ -311,6 +318,19 @@ const RootQuery = new GraphQLObjectType({
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Comitee.findById(args._id);
+      },
+    },
+    comiteeByStaffAndProject: {
+      type: new GraphQLList(ComiteeType),
+      args: {
+        staff_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        return Comitee.find({
+          staff_id: args.staff_id,
+          project_id: args.project_id,
+        });
       },
     },
     comiteesByHeadProject: {
@@ -380,6 +400,13 @@ const RootQuery = new GraphQLObjectType({
       args: { roadmap_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Task.find({ roadmap_id: args.roadmap_id });
+      },
+    },
+    tasks_by_creator: {
+      type: new GraphQLList(TaskType),
+      args: { created_by: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Task.find({ created_by: args.created_by });
       },
     },
     tasks_assigned_to: {

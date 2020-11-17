@@ -135,13 +135,23 @@ export default function EventRoadmapList(props) {
   return (
     <Card style={{ maxHeight: "100%", width: '100%' }} elevation={0} >
       <div className={classes.roadmapHeaderFooter} >
-        <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex', }}>
+        <div style={{ padding: '0px 13px', justifyContent: 'space-between', display: 'flex' }}>
           <LinearScaleIcon />
           <Typography variant="button"
             style={{ display: "flex", color: "white", flexDirection: "column", justifyContent: "center", textTransform: 'uppercase' }}>
             Roadmap List
           </Typography>
-          <div style={{ display: 'flex', width: 50, justifyContent: 'space-between' }}>
+          <div style={
+            (props.project_comitee.position_id === '1' ||
+              props.project_comitee.position_id === '2' ||
+              props.project_comitee.position_id === '3' ||
+              props.project_comitee.position_id === '5' ||
+              props.project_comitee.position_id === '6' ||
+              props.decodedToken.user_type === "organization") ?
+              { display: 'flex', width: 50, justifyContent: 'space-between' }
+              :
+              {}
+          }>
             <Tooltip title="Show Roadmap Calendar" arrow>
               <IconButton style={{ padding: 0 }} onClick={handleOpenCalendar}>
                 <CalendarTodayIcon style={{ fontSize: 20, }} />
@@ -152,11 +162,22 @@ export default function EventRoadmapList(props) {
               open={openCalendar}
               close={handleCloseCalendar}
             />
-            <Tooltip title="Add New Roadmap" arrow>
-              <IconButton style={{ padding: 0 }} onClick={handleOpenAddModal}>
-                <AddIcon style={{ fontSize: 20, }} />
-              </IconButton>
-            </Tooltip>
+            {
+              (props.project_comitee.position_id === '1' ||
+                props.project_comitee.position_id === '2' ||
+                props.project_comitee.position_id === '3' ||
+                props.project_comitee.position_id === '5' ||
+                props.project_comitee.position_id === '6' ||
+                props.decodedToken.user_type === "organization") ?
+                <>
+                  <Tooltip title="Add New Roadmap" arrow>
+                    <IconButton style={{ padding: 0 }} onClick={handleOpenAddModal}>
+                      <AddIcon style={{ fontSize: 20, }} />
+                    </IconButton>
+                  </Tooltip>
+                </>
+                : <></>
+            }
             <RoadmapAddForm
               xs={props.xs}
               open={openAddModal}

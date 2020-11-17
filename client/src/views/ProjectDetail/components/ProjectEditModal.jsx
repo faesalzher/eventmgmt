@@ -210,7 +210,6 @@ export default function ProjectEditModal(props) {
     });
   };
 
-
   if (navigate) {
     return <Redirect push to="/project" />;
   }
@@ -334,6 +333,10 @@ export default function ProjectEditModal(props) {
             projectForm.project_end_date === ""
           ) ?
             ("invalid") : ("valid")
+        }
+        deleteButton={
+          props.project_comitee.position_id === '1' ?
+            false : true
         }
         content="Project"
         name={projectForm.project_name}

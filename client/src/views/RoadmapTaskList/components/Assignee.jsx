@@ -119,8 +119,6 @@ export default function ComiteeDialog(props) {
   const handleListClickAdd = () => {
     setSelected(true);
     props.handleAddTaskAssignedTo(addTaskAssignedToForm)
-    console.log(addTaskAssignedToForm._id)
-    console.log(addTaskAssignedToForm.task_id)
 
     addTaskAssignedTo({
       variables:

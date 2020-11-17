@@ -226,12 +226,14 @@ export default function TasksAssignedToMe(props) {
 
   return (
     <div>
-      <div style={{ backgroundColor: 'white', display: 'flex' ,padding: '0px 5px'}}      >
+      <div style={{ backgroundColor: 'white', display: 'flex', padding: '0px 5px' }}      >
         {/* {project.project_name}{" > "}{event.event_name}{" > "}{roadmap.roadmap_name} */}
         <MyTaskBreadCrumbs breadcrumb_item={breadcrumb_item} />
       </div>
       <Task
         task={task}
+        project_comitee={props.comitee}
+        decodedToken={props.decodedToken}
         project_id={props.comitee.project_id}
         roadmap={roadmap}
         handleCompletedChange={handleCompletedChange}

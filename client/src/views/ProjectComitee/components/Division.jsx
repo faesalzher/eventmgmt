@@ -63,24 +63,34 @@ export default function Volunteer(props) {
         {props.division.division_name === 'Core Comitee' ?
           <div></div>
           :
-          <>
-            <Tooltip arrow title="Edit" aria-label="confirm">
-              <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
-                <EditIcon style={{ fontSize: 14 }} />
-              </IconButton>
-            </Tooltip>
-            <DivisionEditForm
-              division={props.division}
-              event_id={props.event_id}
-              open={openEditModal}
-              index={props.index}
-              handleDeleteDivision={props.handleDeleteDivision}
-              handleSaveEditButton={props.handleSaveEditButton}
-              close={handleCloseEditModal}
-            />
-          </>
+          <div>
+            {
+              props.project_comitee.position_id === "1" ||
+                props.project_comitee.position_id === "2" ||
+                props.project_comitee.position_id === "3" ||
+                props.decodedToken.user_type === "organization" ?
+                <>
+                  <Tooltip arrow title="Edit" aria-label="confirm">
+                    <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+                      <EditIcon style={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Tooltip>
+                  <DivisionEditForm
+                    division={props.division}
+                    event_id={props.event_id}
+                    open={openEditModal}
+                    index={props.index}
+                    handleDeleteDivision={props.handleDeleteDivision}
+                    handleSaveEditButton={props.handleSaveEditButton}
+                    close={handleCloseEditModal}
+                  />
+                </>
+                :
+                <></>
+            }
+          </div>
         }
       </StyledTableCell>
-    </StyledTableRow>
+    </StyledTableRow >
   );
 }

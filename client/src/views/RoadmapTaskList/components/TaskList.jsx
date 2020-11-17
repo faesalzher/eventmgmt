@@ -168,7 +168,7 @@ export default function TaskList(props) {
     task_description: "",
     due_date: "",
     completed_date: "",
-    created_at: new Date(),
+    created_at: new Date().toString(),
     created_by: (decodedToken.user_type === "organization") ? decodedToken.organization_id : decodedToken.staff_id
   };
 
@@ -272,7 +272,7 @@ export default function TaskList(props) {
   }
 
   const handleDeleteTaskAssignedTo = (e) => {
-    
+
   }
 
   let tasksByRoadmap = (tasks.filter(function (task) {
@@ -309,7 +309,6 @@ export default function TaskList(props) {
     setCountCompleted(countCompleted);
   }, [tasksByRoadmap])
 
-
   return (
     <Card className={classes.root} elevation={0} >
       <div>
@@ -328,11 +327,20 @@ export default function TaskList(props) {
                   <FilterListIcon style={{ fontSize: 20, }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Add New Task" arrow>
-                <IconButton style={{ padding: 0, margin: '0px 6px' }} onClick={() => { setAddTaskForm(true) }}>
-                  <AddIcon style={{ fontSize: 20, }} />
-                </IconButton>
-              </Tooltip>
+              {
+                (props.project_comitee.position_id === '1' ||
+                  props.project_comitee.position_id === '2' ||
+                  props.project_comitee.position_id === '3' ||
+                  props.project_comitee.position_id === '5' ||
+                  props.project_comitee.position_id === '6' ||
+                  decodedToken.user_type === "organization") ?
+                  <Tooltip title="Add New Task" arrow>
+                    <IconButton style={{ padding: 0, margin: '0px 6px' }} onClick={() => { setAddTaskForm(true) }}>
+                      <AddIcon style={{ fontSize: 20, }} />
+                    </IconButton>
+                  </Tooltip>
+                  : <></>
+              }
             </div>
           </div>
           {addTaskForm ? (
@@ -399,6 +407,8 @@ export default function TaskList(props) {
                                   roadmap={props.roadmap}
                                   handleCompletedChange={handleCompletedChange}
                                   handleDelete={handleDelete}
+                                  project_comitee={props.project_comitee}
+                                  decodedToken={props.decodedToken}
                                 />
                               </div>
                             })
@@ -415,6 +425,8 @@ export default function TaskList(props) {
                                       roadmap={props.roadmap}
                                       handleCompletedChange={handleCompletedChange}
                                       handleDelete={handleDelete}
+                                      project_comitee={props.project_comitee}
+                                      decodedToken={props.decodedToken}
                                     />
                                   </div>
                                 })
@@ -436,6 +448,8 @@ export default function TaskList(props) {
                                     roadmap={props.roadmap}
                                     handleCompletedChange={handleCompletedChange}
                                     handleDelete={handleDelete}
+                                    project_comitee={props.project_comitee}
+                                    decodedToken={props.decodedToken}
                                   />
                                   <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
                                 </div>

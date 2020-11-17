@@ -105,7 +105,15 @@ const EventList = (props) => {
             spacing={2}
           >
 
-            <AddEventCard addEvent={addEvent} project_id={props.project._id} project={project} />
+            {
+              props.project_comitee.position_id === "1" ||
+                props.project_comitee.position_id === "2" ||
+                props.project_comitee.position_id === "3" ||
+                props.decodedToken.user_type === "organization" ?
+                <AddEventCard addEvent={addEvent} project_id={props.project._id} project={project} />
+                :
+                <></>
+            }
             {
               events.slice().reverse().map((event, index) => {
                 if (events.length === 0) {

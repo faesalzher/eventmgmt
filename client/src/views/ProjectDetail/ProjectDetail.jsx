@@ -8,6 +8,9 @@ import { useParams } from "react-router-dom";
 import { createBrowserHistory } from 'history';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+
+// import { UseSimeContext } from "context/context.jsx";
+
 // import useMediaQuery from '@material-ui/core/useMediaQuery';
 import jwtDecode from "jwt-decode";
 
@@ -51,8 +54,17 @@ const DIVISIONSBYPROJECT_QUERY = gql`
   }
 `;
 
-
-
+const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
+  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
+    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
+  }
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -106,16 +118,16 @@ export default function ProjectDetail() {
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
   const browserHistory = createBrowserHistory();
   let { project_id } = useParams();
+  const staff_id = decodedToken.staff_id
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  const [project, setProject] = React.useState({ project_name: "" });
+  const [project, setProject] = useState({ project_name: "" });
+  const [project_comitee, setProject_comitee] = useState({ position_id: "" });
   const [divisions, setDivisions] = useState([]);
   const [openEditModal, setOpenEditModal] = useState(false);
-
 
   const { data } = useQuery(PROJECT_QUERY,
     {
@@ -124,6 +136,38 @@ export default function ProjectDetail() {
         setProject(data.project)
       }
     });
+
+  // const { data: comiteeData, refetch: comiteeRefetch } = useQuery(COMITEEBYSTAFFANDPROJECT_QUERY,
+  //   {
+  //     variables: { project_id: project_id, staff_id: staff_id },
+  //     onCompleted: () => {
+  //       if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
+  //         setComitee(comiteeData.comiteeByStaffAndProject[0])
+  //       }
+  //     }
+  //   });
+
+  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
+    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+      variables: { project_id: project_id, staff_id: staff_id },
+    }
+    );
+
+  useEffect(() => {
+    const onCompleted = (comiteeData) => {
+      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
+        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !comiteeLoading && !comiteeError) {
+        onCompleted(comiteeData);
+      } else if (onError && !comiteeLoading && comiteeError) {
+        onError(comiteeError);
+      }
+    }
+  }, [comiteeLoading, comiteeData, comiteeError]);
 
   const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
     variables: { project_id: project_id },
@@ -141,6 +185,7 @@ export default function ProjectDetail() {
 
   const refresh = () => {
     divisionsRefetch();
+    comiteeRefetch();
   };
 
   const handleOpenEditModal = () => {
@@ -209,17 +254,26 @@ export default function ProjectDetail() {
         </Tabs>
         {/* </div> */}
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton onClick={handleOpenEditModal} >
-            <SettingsIcon />
-          </IconButton>
-          <ProjectEditModal
-            open={openEditModal}
-            organization_id={decodedToken.organization_id}
-            divisions={divisions}
-            close={handleCloseEditModal}
-            handleSaveEditButton={handleSaveEditProjectButton}
-            project={project}
-          />
+          {
+            (project_comitee.position_id === '1' || decodedToken.user_type === "organization") ?
+              <>
+                <IconButton onClick={handleOpenEditModal} >
+                  <SettingsIcon />
+                </IconButton>
+                <ProjectEditModal
+                  open={openEditModal}
+                  organization_id={decodedToken.organization_id}
+                  divisions={divisions}
+                  project_comitee={project_comitee}
+                  close={handleCloseEditModal}
+                  handleSaveEditButton={handleSaveEditProjectButton}
+                  project={project}
+                />
+              </>
+              :
+              <>
+              </>
+          }
         </div>
       </AppBar>
       <div className={classes.root}>
@@ -227,12 +281,13 @@ export default function ProjectDetail() {
           <BreadCrumbs breadcrumb_item={breadcrumb_item} />
         </div>
         <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px' }}>
-          <ProjectEventList project={project} project_id={project_id} />
+          <ProjectEventList project={project} project_id={project_id} project_comitee={project_comitee} decodedToken={decodedToken} />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px', paddingBottom: 10 }}>
           <ProjectComitee
             project_id={project_id}
             divisions={divisions}
+            project_comitee={project_comitee}
             handleSaveEditButton={handleSaveEditDivisionButton}
             handleSaveButton={handleSaveDivisionButton}
             handleDeleteDivision={handleDeleteDivision}
@@ -242,6 +297,6 @@ export default function ProjectDetail() {
           <ProjectOverview project={project} project_id={project_id} divisions={divisions} />
         </TabPanel>
       </div>
-    </div>
+    </div >
   );
 }

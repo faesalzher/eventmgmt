@@ -28,6 +28,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function DialogActionsEdit(props) {
     const classes = useStyles();
+
+    const deleteButton = props.deleteButton === false ? false : true;
     const [save, setSave] = useState(false)
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -50,15 +52,18 @@ export default function DialogActionsEdit(props) {
     const handleDelete = () => {
         props.delete();
     }
-
     return <DialogActionsMui  >
-        <Button
-            variant="outlined"
-            size="small"
-            className={classes.deleteBtn}
-            onClick={handleDeleteModal}>
-            Delete
-        </Button>
+        {deleteButton ?
+            <Button
+                variant="outlined"
+                size="small"
+                className={classes.deleteBtn}
+                onClick={handleDeleteModal}>
+                Delete
+             </Button>
+            :
+            <></>
+        }
         <ConfirmationDialog
             content={props.content}
             type="delete"

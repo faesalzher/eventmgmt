@@ -44,6 +44,7 @@ export default function StatusBox(props) {
   const classes = useStyles();
   const [staff, setStaff] = useState([]);
   const [comitee, setComitee] = useState([]);
+  const deleteButton = props.deleteButton === true ? true : false;
 
   const [staffFetch, { data: staffData, loading: staffLoading }] = useLazyQuery(STAFFSBYID_QUERY,
     {
@@ -59,9 +60,9 @@ export default function StatusBox(props) {
     });
 
   const handleDelete = () => {
-    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id,props.taskAssignedTo.comitee_id)
+    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id, props.taskAssignedTo.comitee_id)
   }
-  
+
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
 
   const handleOpenConfirmationDialog = () => {
@@ -91,14 +92,25 @@ export default function StatusBox(props) {
         handleConfirm={handleDelete}
         close={handleCloseConfirmationDialog}
       />
-      <Chip
-        avatar={<Avatar src={staff.picture} />}
-        label={staff.staff_name}
-        size="small"
-        color="primary"
-        variant="outlined"
-        onDelete={() => handleOpenConfirmationDialog()}
-      />
+      {deleteButton === true ?
+        <Chip
+          avatar={<Avatar src={staff.picture} />}
+          label={staff.staff_name}
+          size="small"
+          color="primary"
+          variant="outlined"
+          onDelete={() => handleOpenConfirmationDialog()}
+        />
+        :
+        <Chip
+          avatar={<Avatar src={staff.picture} />}
+          label={staff.staff_name}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      }
+
     </div>
   }
 

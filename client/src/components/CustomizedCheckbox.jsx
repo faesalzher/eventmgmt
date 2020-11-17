@@ -69,6 +69,6 @@ function StyledCheckbox(props) {
 
 export default function CustomizedCheckbox(props) {
   return (
-    <StyledCheckbox checked={props.checked} onChange={props.onChange} />
+    <StyledCheckbox checked={props.checked} onChange={props.onChange} disabled={props.disabled}/>
   );
 }

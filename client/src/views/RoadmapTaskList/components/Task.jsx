@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   Typography,
 } from '@material-ui/core';
-import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import ListItem from '@material-ui/core/ListItem';
 import { useSoftRiseShadowStyles } from '@mui-treasury/styles/shadow/softRise';
@@ -36,12 +35,6 @@ const useStyles = makeStyles(theme => ({
       display: 'block'
     }
   },
-  chat: {
-    padding: '0px 15px',
-    [theme.breakpoints.down('xs')]: {
-      padding: 0,
-    }
-  },
   small: {
     width: 25,
     height: 25
@@ -67,7 +60,6 @@ export default function Task(props) {
 
 
   const [tasksAssignedTo, setTasksAssignedTo] = useState([])
-  const [chatCount, setChatCount] = useState(0);
 
 
   React.useEffect(() => {
@@ -130,9 +122,7 @@ export default function Task(props) {
     props.handleCompletedChange(e)
   }
 
-  const handleChatCount = e => {
-    setChatCount(e);
-  }
+
 
   const handleAddTaskAssignedTo = (e) => {
     // setTasksAssignedTo([...tasksAssignedTo, e]);
@@ -142,13 +132,25 @@ export default function Task(props) {
   const handleDeleteTaskAssignedTo = (e, id) => {
     const temp = [...tasksAssignedTo];
     const index = temp.map(function (item) {
-      console.log(item)
       return item._id
     }).indexOf(e);
     temp.splice(index, 1);
     setTasksAssignedTo(temp);
     props.handleDeleteTaskAssignedTo(e, id);
   }
+
+  let isAssignedToMe = false;
+  tasksAssignedTo.forEach((taskAssignedTo, index) => {
+    if ((taskAssignedTo.comitee_id === props.project_comitee._id) ||
+      (props.project_comitee.position_id === '1' ||
+        props.project_comitee.position_id === '2' ||
+        props.project_comitee.position_id === '3' ||
+        props.project_comitee.position_id === '5' ||
+        props.project_comitee.position_id === '6' ||
+        props.decodedToken.user_type === "organization")
+    )
+      isAssignedToMe = true
+  })
 
   return (
     <div
@@ -166,6 +168,9 @@ export default function Task(props) {
         <CustomizedCheckbox
           checked={task.completed}
           onChange={handleChangeChecked}
+          disabled={
+            !isAssignedToMe
+          }
         // inputProps={{ 'aria-label': 'primary checkbox' }}
         />
       </div>
@@ -201,11 +206,6 @@ export default function Task(props) {
 
         </div>
         <div style={{ display: 'flex' }}>
-          {chatCount === 0 ? <div></div> :
-            <div style={{ display: 'flex' }} className={classes.chat}>
-              <ChatBubbleOutlineIcon style={{ fontSize: 15, margin: '4px 0px' }} />
-              <Typography style={{ fontSize: 13, paddingLeft: 4 }}>{chatCount}</Typography>
-            </div>}
           <AvatarGroup spacing={8} style={{ flexGrow: 1, justifyContent: 'flex-end' }}>
             {
               tasksAssignedTo.map((taskAssignedTo, index) => {
@@ -228,7 +228,8 @@ export default function Task(props) {
         handleChangeChecked={handleChangeChecked}
         handleCompletedChange={handleCompletedChange}
         task={props.task}
-        handleChatCount={handleChatCount}
+        project_comitee={props.project_comitee}
+        decodedToken={props.decodedToken}
       />
     </div >
   );

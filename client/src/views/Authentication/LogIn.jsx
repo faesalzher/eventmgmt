@@ -350,7 +350,7 @@ const LogIn = props => {
   function generateTokenOrganization(user) {
     return jwt.sign(
       {
-        _id: user._id,
+        // _id: user._id,
         staff_id: "",
         organization_id: user._id,
         user_type: "organization"

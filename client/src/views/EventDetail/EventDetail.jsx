@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { useParams } from "react-router-dom";
@@ -16,6 +16,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { createBrowserHistory } from 'history';
 // import ScrollContainer from 'react-indiana-drag-scroll'
 import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
+import jwtDecode from "jwt-decode";
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
@@ -60,6 +61,18 @@ const EVENT_QUERY = gql`
   }
 `;
 
+
+const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
+  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
+    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
+  }
+`;
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -112,6 +125,7 @@ export default function EventDetail() {
   const theme = useTheme();
   const browserHistory = createBrowserHistory();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
   let { project_id, event_id } = useParams();
   const [value, setValue] = React.useState(0);
   // const matches = useMediaQuery(theme.breakpoints.up('sm'));
@@ -128,13 +142,40 @@ export default function EventDetail() {
       }
     });
 
+  const [project_comitee, setProject_comitee] = useState([])
+
+  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
+    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+      variables: { project_id: project_id, staff_id: decodedToken.staff_id },
+    }
+    );
+
+  useEffect(() => {
+    const onCompleted = (comiteeData) => {
+      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
+        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !comiteeLoading && !comiteeError) {
+        onCompleted(comiteeData);
+      } else if (onError && !comiteeLoading && comiteeError) {
+        onError(comiteeError);
+      }
+    }
+  }, [comiteeLoading, comiteeData, comiteeError]);
+
+
   React.useEffect(() => {
     refresh();
   });
 
   const refresh = () => {
     eventRefetch();
+    comiteeRefetch();
   };
+
   const [project, setProject] = React.useState({ project_name: "" });
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {
@@ -189,17 +230,27 @@ export default function EventDetail() {
           <Tab label="Event Overview" {...a11yProps(3)} />
         </Tabs>
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
-            <SettingsIcon />
-          </IconButton>
-          <EventEditModal
-            open={openEditModal}
-            project={project}
-            project_id={project_id}
-            close={handleCloseEditModal}
-            handleSaveEditButton={handleSaveEditEventButton}
-            event={event}
-          />
+          {
+            (project_comitee.position_id === '1' ||
+              project_comitee.position_id === '2' ||
+              project_comitee.position_id === '3' ||
+              decodedToken.user_type === "organization") ?
+              <>
+                <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
+                  <SettingsIcon />
+                </IconButton>
+                <EventEditModal
+                  open={openEditModal}
+                  project={project}
+                  project_id={project_id}
+                  close={handleCloseEditModal}
+                  handleSaveEditButton={handleSaveEditEventButton}
+                  event={event}
+                />
+              </>
+              : <></>
+          }
+
         </div>
       </AppBar>
       <div className={classes.root}>
@@ -213,6 +264,8 @@ export default function EventDetail() {
             event_id={event_id}
             project_id={project_id}
             xs={fullScreen}
+            project_comitee={project_comitee}
+            decodedToken={decodedToken}
           />
         </TabPanel>
         <TabPanel value={value} index={1} style={{ padding: '0px 30px' }}>

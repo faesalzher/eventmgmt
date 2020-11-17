@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import { AvatarName } from 'components';
@@ -109,7 +109,7 @@ export default function ComiteeAddForm(props) {
   //     comiteeForm.division_id = props.division_id;
   //   }
   // }, [props.division_id, comiteeForm.division_id]);
-
+  
   const handleSaveButton = () => {
     props.handleSaveButton(comiteeForm)
     props.close();
@@ -135,7 +135,7 @@ export default function ComiteeAddForm(props) {
     // setComiteeForm({...comiteeForm, division_id: '1'})
     setDivision_id(event.target.value);
     setPosition_id("");
-    setComiteeForm({...comiteeForm, position_id: ""})
+    setComiteeForm({ ...comiteeForm, position_id: "" })
     // comiteeForm.position_id = "";
   };
 
@@ -146,7 +146,7 @@ export default function ComiteeAddForm(props) {
 
   const handleChangeStaff = (event) => {
     // comiteeForm.staff_id = event.target.value;
-    setComiteeForm({...comiteeForm, staff_id: event.target.value})
+    setComiteeForm({ ...comiteeForm, staff_id: event.target.value })
     setStaff_id(event.target.value);
   };
 
@@ -159,20 +159,18 @@ export default function ComiteeAddForm(props) {
   }
 
   let checkComiteeStaffId = [];
-  props.comitees.map((comitee) =>
-    props.staffs.map((staff) => {
+  props.comitees.forEach((comitee) => {
+    props.staffs.forEach((staff) => {
       if (staff._id === comitee.staff_id && props.project_id === comitee.project_id) {
         checkComiteeStaffId.push(staff._id)
-      } else {
-        return null;
       }
-      return null;
     })
+  }
   );
 
   let checkComiteePositionId = [];
-  props.comitees.map((comitee) =>
-    props.positions.map((position) => {
+  props.comitees.forEach((comitee) => {
+    props.positions.forEach((position) => {
       if (position._id === comitee.position_id
         && props.project_id === comitee.project_id
         && division_id === comitee.division_id
@@ -184,13 +182,14 @@ export default function ComiteeAddForm(props) {
       }
       return null;
     })
+    return null;
+  }
   );
 
   let checkCoreDivisionId = [];
-  props.divisions.map((division) => {
+  props.divisions.forEach((division) => {
     if (division_id === division._id && division.division_name === "Core Comitee")
       checkCoreDivisionId.push(division._id)
-    return null;
   });
 
   return (
@@ -253,13 +252,21 @@ export default function ComiteeAddForm(props) {
                   onChange={handleChangeDivision}
                   variant="outlined"
                 >
-                  {props.divisions.map((division) => (
-                    <MenuItem key={division.division_name}
-                      value={division._id}
-                    >
-                      {division.division_name}
-                    </MenuItem>
-                  ))}
+                  {props.divisions.map((division) => {
+                    if (division._id === props.project_comitee.division_id
+                      || props.decodedToken.user_type === "organization"
+                      || props.project_comitee.position_id === '1'
+                      || props.project_comitee.position_id === '2'
+                      || props.project_comitee.position_id === '3'
+                    )
+                      return (
+                        <MenuItem key={division.division_name}
+                          value={division._id}
+                        >
+                          {division.division_name}
+                        </MenuItem>)
+                    return null
+                  })}
                 </TextField>
               }
             </FormControl>
@@ -292,26 +299,40 @@ export default function ComiteeAddForm(props) {
                         props.positions.map((position) => {
                           if (position.core === true)
                             if (checkComiteePositionId.indexOf(position._id) > -1)
-                              return <MenuItem key={position.position_name} disabled={true}>
+                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organiation")
+                                return null
+                              else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              return <MenuItem key={position.position_name} value={position._id}>
-                                {position.position_name}
-                              </MenuItem>
+                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organiation")
+                                return null
+                              else
+                                return <MenuItem key={position.position_name} value={position._id}>
+                                  {position.position_name}
+                                </MenuItem>
                           else return null;
                         })
                         :
                         props.positions.map((position) => {
                           if (position.core === false)
                             if (checkComiteePositionId.indexOf(position._id) > -1)
-                              return <MenuItem key={position.position_name} disabled={true}>
+                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organiation")
+                                return null
+                              else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              return <MenuItem key={position.position_name} value={position._id}>
-                                {position.position_name}
-                              </MenuItem>
+                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organiation")
+                                return null
+                              else
+                                return <MenuItem key={position.position_name} value={position._id}>
+                                  {position.position_name}
+                                </MenuItem>
                           else return null;
                         })
                     }

@@ -234,7 +234,9 @@ export default function ProjectComitee(props) {
             <Comitees
               project_id={props.project_id}
               divisions={props.divisions}
+              project_comitee={props.project_comitee}
               comitees={comitees}
+              decodedToken={decodedToken}
               staffs={staffs}
               positions={positions}
               handleSaveButton={handleSaveComiteeButton}
@@ -246,6 +248,8 @@ export default function ProjectComitee(props) {
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
           <Divisions
             divisions={props.divisions}
+            decodedToken={decodedToken}
+            project_comitee={props.project_comitee}
             project_id={props.project_id}
             handleSaveEditButton={props.handleSaveEditButton}
             handleSaveButton={props.handleSaveButton}

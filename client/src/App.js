@@ -3,6 +3,7 @@ import { Router, Route } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { ThemeProvider } from "@material-ui/core/styles";
 import { AuthProvider } from "./context/auth.jsx";
+import { ContextProvider } from "./context/context.jsx";
 import { Register as RegisterView, LogIn as LogInView } from "views";
 
 import theme from "./theme";
@@ -22,13 +23,15 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <AuthProvider>
-        <Router history={browserHistory}>
-          <ThemeProvider theme={theme}>
-            <Routes />
-            <Route path="/login" component={LogInView} />
-            <Route path="/register" component={RegisterView} />
-          </ThemeProvider>
-        </Router>
+        <ContextProvider>
+          <Router history={browserHistory}>
+            <ThemeProvider theme={theme}>
+              <Routes />
+              <Route path="/login" component={LogInView} />
+              <Route path="/register" component={RegisterView} />
+            </ThemeProvider>
+          </Router>
+        </ContextProvider>
       </AuthProvider>
     </ApolloProvider>
   );

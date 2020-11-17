@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import jwtDecode from "jwt-decode";
 
 import {
   IconButton,
@@ -72,6 +73,18 @@ const ROADMAP_QUERY = gql`
   }
 `;
 
+const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
+  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
+    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
+      _id
+      staff_id
+      position_id
+      division_id
+      project_id
+    }
+  }
+`;
+
 // const ROADMAPBYEVENTID_QUERY = gql`
 //   query roadmapByEvent($event_id: String!){
 //     roadmapByEvent(event_id:$event_id) {
@@ -112,11 +125,13 @@ export default function RoadamapTaskList() {
   const classes = useStyles();
   const theme = useTheme();
   const browserHistory = createBrowserHistory();
+
+
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   let { project_id, event_id, roadmap_id } = useParams();
 
   const [openEditModal, setOpenEditModal] = useState(false);
-
+  const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
   const [project, setProject] = React.useState({ project_name: "" });
   const { data: projectData } = useQuery(PROJECT_QUERY,
     {
@@ -146,12 +161,35 @@ export default function RoadamapTaskList() {
       }
     });
 
+  const [project_comitee, setProject_comitee] = useState([])
+  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
+    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+      variables: { project_id: project_id, staff_id: decodedToken.staff_id },
+    }
+    );
+
+  useEffect(() => {
+    const onCompleted = (comiteeData) => {
+      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
+        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !comiteeLoading && !comiteeError) {
+        onCompleted(comiteeData);
+      } else if (onError && !comiteeLoading && comiteeError) {
+        onError(comiteeError);
+      }
+    }
+  }, [comiteeLoading, comiteeData, comiteeError]);
+
   useEffect(() => {
     refresh();
   });
 
   const refresh = () => {
-    // divisionsRefetch();
+    comiteeRefetch();
     roadmapRefetch()
   };
 
@@ -188,9 +226,18 @@ export default function RoadamapTaskList() {
           Roadmap {roadmap.roadmap_name}
         </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
-            <SettingsIcon />
-          </IconButton>
+          {
+            (project_comitee.position_id === '1' ||
+              project_comitee.position_id === '2' ||
+              project_comitee.position_id === '3' ||
+              project_comitee.position_id === '5' ||
+              project_comitee.position_id === '6' ||
+              decodedToken.user_type === "organization") ?
+              <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
+                <SettingsIcon />
+              </IconButton>
+              : <></>
+          }
           <RoadmapEditForm
             open={openEditModal}
             close={handleCloseEditModal}
@@ -216,6 +263,8 @@ export default function RoadamapTaskList() {
               roadmap={roadmap}
               roadmap_id={roadmap_id}
               project_id={project_id}
+              project_comitee={project_comitee}
+              decodedToken={decodedToken}
             />
           </Grid>
         </Grid>

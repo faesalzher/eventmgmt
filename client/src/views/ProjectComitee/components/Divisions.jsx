@@ -155,11 +155,19 @@ export default function Divisions(props) {
         <Typography style={{ color: 'black' }} variant='subtitle2'>
           List of Division
         </Typography>
-        <Tooltip arrow title="Add New Divisions" aria-label="confirm">
-          <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
+        {
+          props.project_comitee.position_id === "1" ||
+            props.project_comitee.position_id === "2" ||
+            props.project_comitee.position_id === "3" ||
+            props.decodedToken.user_type === "organization"
+            ?
+            <Tooltip arrow title="Add New Divisions" aria-label="confirm">
+              <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            : <></>
+        }
         <DivisionAddForm
           // guests={guests}
           project_id={props.project_id}
@@ -174,7 +182,15 @@ export default function Divisions(props) {
             <TableRow>
               <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
-                Action
+                {
+                  props.project_comitee.position_id === "1" ||
+                    props.project_comitee.position_id === "2" ||
+                    props.project_comitee.position_id === "3" ||
+                    props.decodedToken.user_type === "organization"
+                    ?
+                    "Action" : ""
+                }
+
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -186,6 +202,8 @@ export default function Divisions(props) {
               ).map((division, index) => {
                 return <Division
                   key={index}
+                  project_comitee={props.project_comitee}
+                  decodedToken={props.decodedToken}
                   handleDeleteDivision={props.handleDeleteDivision}
                   division={division}
                   handleSaveEditButton={props.handleSaveEditButton}

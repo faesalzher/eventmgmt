@@ -8,7 +8,8 @@ import {
   TextField,
   ButtonGroup,
   Chip,
-  Popover
+  Popover,
+  Box
 } from '@material-ui/core';
 import EscapeOutside from "react-escape-outside"
 import AddIcon from '@material-ui/icons/Add';
@@ -72,7 +73,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    marginRight: 7,
+    paddingRight: 7,
   },
   assigned: {
     display: 'flex',
@@ -80,8 +81,35 @@ const useStyles = makeStyles(theme => ({
     '& > *': {
       margin: theme.spacing(0.5),
     },
+  },
+  colorSecondary: {
+    color: theme.palette.secondary.main
+  },
+  colorRed: {
+    color: 'red'
+  },
+  priorityBtn: {
+    textTransform: 'none', width: '33%'
+  },
+  low: {
+    backgroundColor: "#ffc916",
+  },
+  medium: {
+    backgroundColor: "#a3cd3b",
+  },
+  high: {
+    backgroundColor: "#ff4943",
+    color: "#white"
+  },
+  not_defined: {
+    backgroundColor: "#e4e4e4"
+  },
+  box: {
+    width: 'fit-content',
+    padding: '0px 16px',
   }
-}));
+}
+));
 
 
 export default function TaskProperties(props) {
@@ -95,7 +123,7 @@ export default function TaskProperties(props) {
   }, [setTaskForm, props.task]);
 
 
-  const [createdBy, setCreatedBy] = useState([]);
+  const [createdBy, setCreatedBy] = useState({ staff_name: "", organization_name: "" });
 
   const [staff, { data: dataStaff }] = useLazyQuery(STAFF_QUERY, {
     variables: { staff_id: taskForm.created_by },
@@ -130,7 +158,7 @@ export default function TaskProperties(props) {
       setCreatedBy(dataStaff.staffById);
     }
   }, [dataStaff])
-
+  console.log(dataStaff)
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showEditIcon, setShowEditIcon] = React.useState(false);
   const [descriptionForm, setDescriptionForm] = React.useState(false);
@@ -214,8 +242,8 @@ export default function TaskProperties(props) {
 
   const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
-  const handleDeleteTaskAssignedTo = (e,id) => {
-    props.handleDeleteTaskAssignedTo(e,id);
+  const handleDeleteTaskAssignedTo = (e, id) => {
+    props.handleDeleteTaskAssignedTo(e, id);
     deleteTaskAssignedTo({ variables: { _id: e, } });
   }
 
@@ -239,25 +267,35 @@ export default function TaskProperties(props) {
           />
         </EscapeOutside>
         :
-        <Button
-          elevation={0}
-          size="small"
-          onClick={handleOpenDescriptionForm}
-          onMouseEnter={() => setShowEditIcon(true)}
-          onMouseLeave={() => setShowEditIcon(false)}
-          style={{ justifyContent: "space-between", display: 'flex', textTransform: "none", marginBottom: 10, width: "-webkit-fill-available" }}>
-          {taskForm.task_description === "" ?
-            <Typography variant="body1" color="secondary">
-              Add a Description
-            </Typography>
-            :
-            <Typography variant="body1" style={{ textAlign: 'left' }}>
-              {taskForm.task_description}
-            </Typography>
-          }
-          {showEditIcon ? <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <EditIcon style={{ fontSize: 19 }} /></div> : <div style={{ width: "10%" }}></div>}
-        </Button>
+        (props.project_comitee.position_id === '1' ||
+          props.project_comitee.position_id === '2' ||
+          props.project_comitee.position_id === '3' ||
+          props.project_comitee.position_id === '5' ||
+          props.project_comitee.position_id === '6' ||
+          props.decodedToken.user_type === "organization") ?
+          <Button
+            elevation={0}
+            size="small"
+            onClick={handleOpenDescriptionForm}
+            onMouseEnter={() => setShowEditIcon(true)}
+            onMouseLeave={() => setShowEditIcon(false)}
+            style={{ justifyContent: "space-between", display: 'flex', textTransform: "none", marginBottom: 10, width: "-webkit-fill-available" }}>
+            {taskForm.task_description === "" ?
+              <Typography variant="body1" color="secondary">
+                Add a Description
+          </Typography>
+              :
+              <Typography variant="body1" style={{ textAlign: 'left' }}>
+                {taskForm.task_description}
+              </Typography>
+            }
+            {showEditIcon ? <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <EditIcon style={{ fontSize: 19 }} /></div> : <div style={{ width: "10%" }}></div>}
+          </Button>
+          :
+          <Typography variant="body1" style={{ textAlign: 'left' }}>
+            {taskForm.task_description}
+          </Typography>
       }
       <Divider />
       <div className={classes.row}>
@@ -270,7 +308,7 @@ export default function TaskProperties(props) {
           </Typography>
         </div>
         <div className={classes.field}>
-          {createdBy.__typename === "Staff" ?
+          {dataStaff ?
             <AvatarName
               name={createdBy.staff_name}
               picture={createdBy.picture}
@@ -299,15 +337,32 @@ export default function TaskProperties(props) {
                 {taskForm.completed_date.slice(0, 21)}
               </Typography>
               :
-              taskForm.due_date === "" ?
-                <Button onClick={handleOpenCalendar} variant="outlined" disableElevation size="small" color="secondary">
-                  <AddIcon />
-                </Button>
+              (props.project_comitee.position_id === '1' ||
+                props.project_comitee.position_id === '2' ||
+                props.project_comitee.position_id === '3' ||
+                props.project_comitee.position_id === '5' ||
+                props.project_comitee.position_id === '6' ||
+                props.decodedToken.user_type === "organization") ?
+                taskForm.due_date === "" ?
+                  <Button onClick={handleOpenCalendar} variant="outlined" disableElevation size="small" color="secondary">
+                    <AddIcon />
+                  </Button>
+                  :
+                  <ButtonGroup variant="contained" size="small" color="secondary">
+                    <Button onClick={handleOpenCalendar} style={mins >= 0 ? { backgroundColor: 'red', textTransform: "none" } : { textTransform: "none" }}>{taskForm.due_date}</Button>
+                    <Button onClick={handleDeleteDueDate} style={mins >= 0 ? { backgroundColor: 'red' } : {}}><CloseIcon /></Button>
+                  </ButtonGroup>
                 :
-                <ButtonGroup variant="contained" size="small" color="secondary">
-                  <Button onClick={handleOpenCalendar} style={mins >= 0 ? { backgroundColor: 'red', textTransform: "none" } : { textTransform: "none" }}>{taskForm.due_date}</Button>
-                  <Button onClick={handleDeleteDueDate} style={mins >= 0 ? { backgroundColor: 'red' } : {}}><CloseIcon /></Button>
-                </ButtonGroup>
+                taskForm.due_date === "" ?
+                  <Typography className={classes.verticalAlign} color="textSecondary" variant="body1">
+                    not defined
+                  </Typography>
+                  :
+                  <Typography style={{ fontWeight: 500 }}
+                    className={[classes.verticalAlign, (mins >= 0 ? classes.colorRed : classes.colorSecondary)].join("")}
+                    variant="body1">
+                    {taskForm.due_date.slice(0, 21)}
+                  </Typography>
           }
         </div>
         <Popover
@@ -349,20 +404,45 @@ export default function TaskProperties(props) {
             props.tasksAssignedTo.map((taskAssignedTo, index) => {
               return <AssigneeAvatar
                 type="chip"
+                deleteButton={
+                  (props.project_comitee.position_id === '1' ||
+                    props.project_comitee.position_id === '2' ||
+                    props.project_comitee.position_id === '3' ||
+                    props.project_comitee.position_id === '5' ||
+                    props.project_comitee.position_id === '6' ||
+                    props.decodedToken.user_type === "organization") ?
+                    true : false
+                }
                 key={index}
                 handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                 taskAssignedTo={taskAssignedTo} />
             })
           }
-          <Chip
-            size="small"
-            color="secondary"
-            variant="outlined"
-            clickable
-            onClick={handleOpenComitees}
-            icon={<AddIcon />}
-            label="More"
-          />
+          {
+            (props.project_comitee.position_id === '1' ||
+              props.project_comitee.position_id === '2' ||
+              props.project_comitee.position_id === '3' ||
+              props.project_comitee.position_id === '5' ||
+              props.project_comitee.position_id === '6' ||
+              props.decodedToken.user_type === "organization") ?
+              <Chip
+                size="small"
+                color="secondary"
+                variant="outlined"
+                clickable
+                onClick={handleOpenComitees}
+                icon={<AddIcon />}
+                label="More"
+              /> : <div>
+                {props.tasksAssignedTo.length === 0 ?
+                  <Typography className={classes.verticalAlign} color="textSecondary" variant="body1">
+                    not defined
+                </Typography>
+                  :
+                  <></>
+                }
+              </div>
+          }
           <AssigneesDivision
             project_id={props.project_id}
             task={props.task}
@@ -385,23 +465,58 @@ export default function TaskProperties(props) {
           </Typography>
         </div>
         <div className={classes.field}>
-          <ButtonGroup variant="contained" style={{ width: '70%' }} size="small" aria-label="outlined primary button group">
-            {taskForm.priority === "low" ?
-              <Button onClick={() => handleChangePriority('')} style={{ backgroundColor: "#ffc916", textTransform: 'none', width: '33%', }}>Low</Button>
+          {
+            (props.project_comitee.position_id === '1' ||
+              props.project_comitee.position_id === '2' ||
+              props.project_comitee.position_id === '3' ||
+              props.project_comitee.position_id === '5' ||
+              props.project_comitee.position_id === '6' ||
+              props.decodedToken.user_type === "organization") ?
+              <ButtonGroup variant="contained" style={{ width: '70%' }} size="small" aria-label="outlined primary button group">
+                {taskForm.priority === "low" ?
+                  <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.low].join(" ")}>Low</Button>
+                  :
+                  <Button onClick={() => handleChangePriority('low')} className={classes.priorityBtn}>Low</Button>
+                }
+                {taskForm.priority === "medium" ?
+                  <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.low].join(" ")}>Medium</Button>
+                  :
+                  <Button onClick={() => handleChangePriority('medium')} className={classes.priorityBtn}>Medium</Button>
+                }
+                {taskForm.priority === "high" ?
+                  <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.low].join(" ")}>High</Button>
+                  :
+                  <Button onClick={() => handleChangePriority('high')} className={classes.priorityBtn}>High</Button>
+                }
+              </ButtonGroup>
               :
-              <Button onClick={() => handleChangePriority('low')} style={{ width: '33%', textTransform: 'none' }}>Low</Button>
-            }
-            {taskForm.priority === "medium" ?
-              <Button onClick={() => handleChangePriority('')} style={{ backgroundColor: "#a3cd3b", width: '33%', textTransform: 'none' }}>Medium</Button>
-              :
-              <Button onClick={() => handleChangePriority('medium')} style={{ width: '33%', textTransform: 'none' }}>Medium</Button>
-            }
-            {taskForm.priority === "high" ?
-              <Button onClick={() => handleChangePriority('')} style={{ backgroundColor: "#ff4943", width: '33%', color: "white", textTransform: 'none' }} >High</Button>
-              :
-              <Button onClick={() => handleChangePriority('high')} style={{ width: '33%', textTransform: 'none' }}>High</Button>
-            }
-          </ButtonGroup>
+              taskForm.priority === "low" ?
+                <Box borderRadius={4} className={[classes.low, classes.box].join(" ")}>
+                  < Typography variant="h6">
+                    Low
+                 </Typography>
+                </Box>
+                :
+                taskForm.priority === "medium" ?
+                  <Box borderRadius={4} className={[classes.medium, classes.box].join(" ")}>
+                    < Typography variant="h6">
+                      Medium
+               </Typography>
+                  </Box>
+                  :
+                  taskForm.priority === "high" ?
+                    <Box borderRadius={4} className={[classes.medium, classes.box].join(" ")}>
+                      < Typography variant="h6" style={{ color: 'white' }}>
+                        High
+                      </Typography>
+                    </Box>
+                    :
+                    <Box borderRadius={4} className={[classes.not_defined, classes.box].join(" ")}>
+                      < Typography variant="h6">
+                        not defined
+                      </Typography>
+                    </Box>
+          }
         </div>
       </div>
     </div >
