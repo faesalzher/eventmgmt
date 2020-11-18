@@ -13,6 +13,10 @@ export { default as ActiveProjectCard } from './ActiveProjectCard';
 export { default as CompletedProjectCard } from './CompletedProjectCard';
 export { default as CancelledProjectCard } from './CancelledProjectCard';
 export { default as ProjectDoughnutChart } from './ProjectDoughnutChart';
+export { default as RecentlyAddedProject } from './RecentlyAddedProject';
+export { default as RecentlyAddedTask } from './RecentlyAddedTask';
+
+
 
 
 

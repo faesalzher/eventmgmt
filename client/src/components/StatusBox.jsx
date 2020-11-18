@@ -57,8 +57,6 @@ export default function StatusBox(props) {
   const preparingDays = today < start_date;
   const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
 
-
-
   return (
     (props.cancel === true) ? (
       <Box borderRadius={4} style={props.style} className={[classes.cancelled, classes.boxStatus].join(" ")}>

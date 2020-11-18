@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
 import FolderIcon from '@material-ui/icons/Folder';
 
-
-import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 // const COMITEESBYPROJECT_QUERY = gql`
 //   query comiteesByProject($project_id: String!){
@@ -58,7 +54,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function PreparingComiteeCard(props) {
   const { className,countPreparingProject, ...rest } = props;
-  const today = new Date();
 
   const classes = useStyles();
   // const [comitees, setComitees] = useState([]);

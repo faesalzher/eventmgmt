@@ -197,11 +197,19 @@ const ProjectList = () => {
                     {
                       projects.slice().reverse().map((project, index) => {
                         return (
-                          <ProjectCard
+                          <Grid
+                            item
                             key={project._id}
-                            project={project}
-                            handleDelete={handleDelete}
-                          />
+                            lg={3}
+                            sm={6}
+                            xl={3}
+                            xs={12}
+                          >
+                            <ProjectCard
+                              project={project}
+                              handleDelete={handleDelete}
+                            />
+                          </Grid>
                         )
                       })
                     }
@@ -211,11 +219,18 @@ const ProjectList = () => {
                     {
                       comitees.slice().reverse().map((comitee, index) => {
                         return (
-                          <MyProject
+                          <Grid
                             key={index}
-                            comitee={comitee}
-                            handleDelete={handleDelete}
-                          />
+                            item
+                            lg={3}
+                            sm={6}
+                            xl={3}
+                          >
+                            <MyProject
+                              comitee={comitee}
+                              handleDelete={handleDelete}
+                            />
+                          </Grid>
                           // <div>{console.log(comitee.project_id)}</div>
                         )
                       })

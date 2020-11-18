@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
+// import AwesomeSlider from 'react-awesome-slider';
+// import 'react-awesome-slider/dist/styles.css';
+
 // import { makeStyles } from '@material-ui/styles';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { Grid } from '@material-ui/core';
 import {
-    PreparingProjectCard,
-    ActiveProjectCard,
-    CompletedProjectCard,
-    CancelledProjectCard,
-    ProjectDoughnutChart
+    // PreparingProjectCard,
+    // ActiveProjectCard,
+    // CompletedProjectCard,
+    // CancelledProjectCard,
+    ProjectDoughnutChart,
+    RecentlyAddedProject,
+    RecentlyAddedTask,
 } from '.';
+// const useStyles = makeStyles(theme => ({
+//     root: {
+//         padding: theme.spacing(4)
+//     },
+// }));
+
 const PROJECTS_QUERY = gql`
   query projects($organization_id:String!){
     projects(organization_id: $organization_id){
@@ -27,6 +38,7 @@ const PROJECTS_QUERY = gql`
 
 export default function DashboardOrganization(props) {
     const today = new Date()
+
     const [projects, setProjects] = useState([]);
 
     const { loading, error, data, refetch } = useQuery(PROJECTS_QUERY, {
@@ -113,7 +125,7 @@ export default function DashboardOrganization(props) {
             container
             spacing={1}
         >
-            <Grid
+            {/* <Grid
                 item
                 lg={3}
                 md={3}
@@ -149,9 +161,10 @@ export default function DashboardOrganization(props) {
             >
                 <CancelledProjectCard projects={projects} countCancelledProject={countCancelledProject} />
             </Grid>
+           */}
             <Grid
                 item
-                lg={4}
+                lg={6}
                 md={6}
                 xl={12}
                 xs={12}
@@ -163,6 +176,37 @@ export default function DashboardOrganization(props) {
                     countCancelledProject={countCancelledProject}
                     projects={projects}
                 />
+            </Grid>
+            <Grid
+                item
+                lg={6}
+                md={6}
+                xl={12}
+                xs={12}
+            >
+                <Grid
+                    container
+                    spacing={1}
+                >
+                    <Grid
+                        item
+                        lg={12}
+                        md={12}
+                        xl={12}
+                        xs={12}
+                    >
+                        <RecentlyAddedProject projects={projects} />
+                    </Grid >
+                    <Grid
+                        item
+                        lg={12}
+                        md={12}
+                        xl={12}
+                        xs={12}
+                    >
+                        <RecentlyAddedTask decodedToken={props.decodedToken} />
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     );

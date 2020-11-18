@@ -302,19 +302,34 @@ export default function TasksCreatedByMe(props) {
 
 
   return (
-    tasks.map((task, index) => {
-      return (
-        <CreatedByMe
-          key={index}
-          task={task}
-          project_comitee={props.comitee}
-          decodedToken={props.decodedToken}
-          handleCompletedChange={handleCompletedChange}
-          handleDelete={handleDelete}
-          handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
-        />
-      )
-    })
+    props.dashboard ?
+      tasks.slice(0,3).reverse().map((task, index) => {
+        return (
+          <CreatedByMe
+            key={index}
+            task={task}
+            project_comitee={props.comitee}
+            decodedToken={props.decodedToken}
+            handleCompletedChange={handleCompletedChange}
+            handleDelete={handleDelete}
+            handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+          />
+        )
+      })
+      :
+      tasks.slice(0,3).reverse().map((task, index) => {
+        return (
+          <CreatedByMe
+            key={index}
+            task={task}
+            project_comitee={props.comitee}
+            decodedToken={props.decodedToken}
+            handleCompletedChange={handleCompletedChange}
+            handleDelete={handleDelete}
+            handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+          />
+        )
+      })
   );
 };
 

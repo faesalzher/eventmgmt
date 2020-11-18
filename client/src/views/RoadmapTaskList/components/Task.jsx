@@ -140,18 +140,33 @@ export default function Task(props) {
   }
 
   let isAssignedToMe = false;
-  tasksAssignedTo.forEach((taskAssignedTo, index) => {
-    if ((taskAssignedTo.comitee_id === props.project_comitee._id) ||
+  if (tasksAssignedTo.length !== 0) {
+    tasksAssignedTo.forEach((taskAssignedTo, index) => {
+        if (
+          (taskAssignedTo.comitee_id === props.project_comitee._id)
+          ||
+          (props.project_comitee.position_id === '1' ||
+            props.project_comitee.position_id === '2' ||
+            props.project_comitee.position_id === '3' ||
+            props.project_comitee.position_id === '5' ||
+            props.project_comitee.position_id === '6' ||
+            props.decodedToken.user_type === "organization")
+        ) {
+          isAssignedToMe = true
+        }
+    })
+  } else {
+    if (
       (props.project_comitee.position_id === '1' ||
         props.project_comitee.position_id === '2' ||
         props.project_comitee.position_id === '3' ||
         props.project_comitee.position_id === '5' ||
         props.project_comitee.position_id === '6' ||
         props.decodedToken.user_type === "organization")
-    )
+    ) {
       isAssignedToMe = true
-  })
-
+    }
+  }
   return (
     <div
       style={task.completed === true ?

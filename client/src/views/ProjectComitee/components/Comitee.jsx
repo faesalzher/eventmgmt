@@ -53,7 +53,7 @@ const StyledTableRow = withStyles(theme => ({
 export default function Comitees(props) {
   // const classes = useStyles();
   // console.log(props.comitees.imageUrl)
-  
+
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [staff, setStaff] = useState([]);
@@ -101,34 +101,41 @@ export default function Comitees(props) {
       </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         {
-          (
+          (props.decodedToken.user_type === "organization")
+            ?
+            <Tooltip arrow title="Edit" aria-label="confirm">
+              <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+                <EditIcon style={{ fontSize: 14 }} />
+              </IconButton>
+            </Tooltip>
+            :
             (props.project_comitee.position_id === "1"
               || props.project_comitee.position_id === "2"
               || props.project_comitee.position_id === "3"
-            )
-            && (props.decodedToken.user_type !== "organization")) ?
-            ((parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id))
-              || (props.project_comitee.division_id !== props.comitee.division_id))
-              ?
-              <></>
+            ) ?
+              ((parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id)))
+                ?
+                <></>
+                :
+                <>
+                  <Tooltip arrow title="Edit" aria-label="confirm">
+                    <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+                      <EditIcon style={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Tooltip>
+
+                </>
               :
-              <>
+              (parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id))
+              || (props.project_comitee.division_id !== props.comitee.division_id)
+                ?
+                <></>
+                :
                 <Tooltip arrow title="Edit" aria-label="confirm">
                   <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
                     <EditIcon style={{ fontSize: 14 }} />
                   </IconButton>
                 </Tooltip>
-
-              </>
-            :
-            (parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id)) ?
-              <></>
-              :
-              <Tooltip arrow title="Edit" aria-label="confirm">
-                <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
-                  <EditIcon style={{ fontSize: 14 }} />
-                </IconButton>
-              </Tooltip>
         }
         <ComiteeEditForm
           comitee={props.comitee}

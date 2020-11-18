@@ -1,10 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 // import { Grid } from '@material-ui/core';
-// import AwesomeSlider from 'react-awesome-slider';
-// import 'react-awesome-slider/dist/styles.css';
-// import image1 from "assets/planer_desk.jpg";
-// import image2 from "assets/project.png";
+
 import { DashboardOrganization, DashboardStaff } from './components';
 
 import jwtDecode from "jwt-decode";

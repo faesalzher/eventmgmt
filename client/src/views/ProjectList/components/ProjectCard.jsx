@@ -20,7 +20,6 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Grid,
   Typography,
   Tooltip,
 } from '@material-ui/core';
@@ -169,14 +168,7 @@ const ProjectCard = (props) => {
     start_date.getFullYear() === end_date.getFullYear()
   )
 
-  return (
-    <Grid
-      item
-      lg={3}
-      sm={6}
-      xl={3}
-      xs={12}
-    >
+  return (  
       <Card
         {...rest}
         className={clsx(classes.root, className, shadowStyles.root)}
@@ -267,8 +259,7 @@ const ProjectCard = (props) => {
             }
           </div>
         </CardActions>
-      </Card>
-    </Grid >
+      </Card>  
   );
 };
 

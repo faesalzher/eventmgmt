@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import {
-  Grid,
-  Paper,
-  Typography
-} from '@material-ui/core';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import React, { useState, useEffect } from 'react';
+// import { makeStyles } from '@material-ui/styles';
+// import {
+//   Grid,
+//   Paper,
+//   Typography
+// } from '@material-ui/core';
+import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import CircularProgress from '@material-ui/core/CircularProgress';
 // import { NotificationContainer, NotificationManager } from "react-light-notifications";
 // import "react-light-notifications/lib/main.css";
 // import Paper from '@material-ui/core/Paper';
 import {
   ProjectCard,
 } from '.';
-import MuiAlert from '@material-ui/lab/Alert';
-import jwtDecode from "jwt-decode";
+// import MuiAlert from '@material-ui/lab/Alert';
+// import jwtDecode from "jwt-decode";
 
 const PROJECT_QUERY = gql`
   query project($project_id:String!){
@@ -32,18 +32,18 @@ const PROJECT_QUERY = gql`
   }
 `;
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(4),
-  },
-  tabs_root: {
-    flexGrow: 1
-  },
-  loading: {
-    paddingTop: 100,
-    textAlign: 'center',
-  },
-}));
+// const useStyles = makeStyles(theme => ({
+//   root: {
+//     padding: theme.spacing(4),
+//   },
+//   tabs_root: {
+//     flexGrow: 1
+//   },
+//   loading: {
+//     paddingTop: 100,
+//     textAlign: 'center',
+//   },
+// }));
 
 
 export default function MyProject(props) {

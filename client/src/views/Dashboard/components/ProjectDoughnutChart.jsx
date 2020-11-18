@@ -6,11 +6,11 @@ import {
   Card,
   CardHeader,
   CardContent,
-  IconButton,
   Divider,
   Typography
 } from '@material-ui/core';
-import AdjustIcon from '@material-ui/icons/Adjust';
+// import AdjustIcon from '@material-ui/icons/Adjust';
+import FolderIcon from '@material-ui/icons/Folder';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -88,26 +88,26 @@ export default function ProjectDoughnutChart(props) {
   const devices = [
     {
       title: 'Preparing',
-      value: preparing.toString(),
-      icon: <AdjustIcon />,
+      value: props.countPreparingProject.length,
+      icon: <FolderIcon />,
       color: theme.palette.warning.main
     },
     {
       title: 'Active',
-      value: active.toString(),
-      icon: <AdjustIcon />,
+      value: props.countActiveProject.length,
+      icon: <FolderIcon />,
       color: theme.palette.info.main
     },
     {
       title: 'Completed',
-      value: completed.toString(),
-      icon: <AdjustIcon />,
+      value: props.countCompletedProject.length,
+      icon: <FolderIcon />,
       color: theme.palette.success.main
     },
     {
       title: 'Cancelled',
-      value: cancelled.toString(),
-      icon: <AdjustIcon />,
+      value: props.countCancelledProject.length,
+      icon: <FolderIcon />,
       color: theme.palette.error.main
     }
   ];
@@ -140,7 +140,7 @@ export default function ProjectDoughnutChart(props) {
                 style={{ color: device.color }}
                 variant="h2"
               >
-                {device.value}%
+                {device.value}
               </Typography>
             </div>
           ))}

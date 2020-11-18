@@ -107,7 +107,6 @@ export default function TaskDetailModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const [value, setValue] = React.useState(0);
   const [taskNameForm, setTaskNameForm] = React.useState(false);
   const [task, setTask] = useState(props.task);
   const [showEditIcon, setShowEditIcon] = useState(false);
@@ -119,9 +118,7 @@ export default function TaskDetailModal(props) {
     setTask(props.task)
   }, [setTask, props.task]);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+ 
 
   const handleChangeTaskName = e => {
     const { id, value } = e.target;
@@ -309,7 +306,7 @@ export default function TaskDetailModal(props) {
         <DialogContent dividers style={
           fullScreen ?
             { height: '100%', minWidth: 10, } :
-            { height: '100%', width: 580, height: 440 }
+            { height: '100%', width: 580 }
         } >
           <TaskProperties
             project_id={props.project_id}
