@@ -199,7 +199,7 @@ const ProjectList = () => {
                         return (
                           <Grid
                             item
-                            key={project._id}
+                            key={index}
                             lg={3}
                             sm={6}
                             xl={3}

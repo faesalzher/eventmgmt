@@ -303,7 +303,7 @@ export default function TasksCreatedByMe(props) {
 
   return (
     props.dashboard ?
-      tasks.slice(0,3).reverse().map((task, index) => {
+      tasks.slice(0,3).map((task, index) => {
         return (
           <CreatedByMe
             key={index}
@@ -317,7 +317,7 @@ export default function TasksCreatedByMe(props) {
         )
       })
       :
-      tasks.slice(0,3).reverse().map((task, index) => {
+      tasks.slice().reverse().map((task, index) => {
         return (
           <CreatedByMe
             key={index}

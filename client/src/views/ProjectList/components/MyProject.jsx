@@ -89,7 +89,6 @@ export default function MyProject(props) {
     refetch();
   };
 
-  console.log(project._id)
   if (error) return <p>Error :(</p>;
   // console.log(projects);
   // console.log(decodedToken.organization_id)
