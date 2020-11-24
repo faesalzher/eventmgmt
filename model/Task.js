@@ -11,7 +11,9 @@ const Task = new Schema({
   completed_date: String,
   created_at: String,
   created_by: String,
-  roadmap_id: String
+  roadmap_id: String,
+  project_id:String,
+  event_id: String
 });
 
 module.exports = mongo.model("Task", Task);

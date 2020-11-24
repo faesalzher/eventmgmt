@@ -29,8 +29,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function AddEventCard(props){
-  const { sc, addEvent, className, ...rest } = props;
+export default function AddEventCard(props) {
+  const { sc, handleSaveEventButton, className, ...rest } = props;
   // const [elevate, setElevate] = useState(1);
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -40,7 +40,7 @@ export default function AddEventCard(props){
   const handleClose = () => {
     setOpen(false);
   };
- 
+
 
   const classes = useStyles();
 
@@ -65,11 +65,10 @@ export default function AddEventCard(props){
           onCloseListener={handleClose}
           closeAfterTransition
           project={props.project}
-          project_id={props.project_id}
           style={{ minWidth: 420 }}
-          addEvent={addEvent}
+          handleSaveEventButton={props.handleSaveEventButton}
         />
-        <CardActionArea className={classes.root} onClick={()=>handleOpen()}>
+        <CardActionArea className={classes.root} onClick={() => handleOpen()}>
           <CardContent className={classes.root}
             style={{
               display: 'flex',

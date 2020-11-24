@@ -17,7 +17,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 // import { useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   Roadmap,
@@ -26,28 +25,8 @@ import {
 } from './components';
 
 
-const ROADMAPS_QUERY = gql`
-  query roadmaps($event_id: String!){
-    roadmaps(event_id:$event_id) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
+import { ROADMAPS_QUERY, EVENT_QUERY } from 'gql';
 
-const EVENT_QUERY = gql`
-  query event($event_id: String!){
-    event(_id:$event_id) {
-      _id
-      event_start_date
-      event_end_date
-    }
-  }
-`;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -142,11 +121,11 @@ export default function EventRoadmapList(props) {
             Roadmap List
           </Typography>
           <div style={
-            (props.project_comitee.position_id === '1' ||
-              props.project_comitee.position_id === '2' ||
-              props.project_comitee.position_id === '3' ||
-              props.project_comitee.position_id === '5' ||
-              props.project_comitee.position_id === '6' ||
+            (props.project_personInCharge.position_id === '1' ||
+              props.project_personInCharge.position_id === '2' ||
+              props.project_personInCharge.position_id === '3' ||
+              props.project_personInCharge.position_id === '5' ||
+              props.project_personInCharge.position_id === '6' ||
               props.decodedToken.user_type === "organization") ?
               { display: 'flex', width: 50, justifyContent: 'space-between' }
               :
@@ -163,16 +142,16 @@ export default function EventRoadmapList(props) {
               close={handleCloseCalendar}
             />
             {
-              (props.project_comitee.position_id === '1' ||
-                props.project_comitee.position_id === '2' ||
-                props.project_comitee.position_id === '3' ||
-                props.project_comitee.position_id === '5' ||
-                props.project_comitee.position_id === '6' ||
+              (props.project_personInCharge.position_id === '1' ||
+                props.project_personInCharge.position_id === '2' ||
+                props.project_personInCharge.position_id === '3' ||
+                props.project_personInCharge.position_id === '5' ||
+                props.project_personInCharge.position_id === '6' ||
                 props.decodedToken.user_type === "organization") ?
                 <>
                   <Tooltip title="Add New Roadmap" arrow>
                     <IconButton style={{ padding: 0 }} onClick={handleOpenAddModal}>
-                      <AddIcon style={{ fontSize: 20, }} />
+                      <AddIcon />
                     </IconButton>
                   </Tooltip>
                 </>
@@ -180,10 +159,13 @@ export default function EventRoadmapList(props) {
             }
             <RoadmapAddForm
               xs={props.xs}
+              decodedToken={props.decodedToken}
               open={openAddModal}
               close={handleCloseAddModal}
               event_id={props.event_id}
+              project_id={props.project_id}
               event={event}
+              project_personInCharge={props.project_personInCharge}
               handleSaveButton={handleSaveButton}
               roadmaps={roadmaps} />
           </div>

@@ -6,24 +6,7 @@ import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
 import EventNoteIcon from '@material-ui/icons/EventNote';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
-
-const EVENTSBYPROJECT_QUERY = gql`
-query eventsByProject($project_id: String!){
-  eventsByProject(project_id:$project_id) {
-    _id
-    event_name
-    event_description
-    event_location
-    cancel
-    event_start_date
-    event_end_date
-    picture
-    project_id
-  }
-}
-`;
+import { EVENTS_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -66,11 +49,11 @@ const NumberOfEventCard = props => {
 
   const [events, setEvents] = useState([]);
 
-  const { loading, error, data, refetch } = useQuery(EVENTSBYPROJECT_QUERY,
+  const { loading, error, data, refetch } = useQuery(EVENTS_QUERY,
     {
       variables: { project_id: props.project._id },
       // onCompleted: () => {
-      //   setEvents(eventsByProjectData.eventsByProject)
+      //   setEvents(eventsData.events)
       // }
     });
 
@@ -79,7 +62,7 @@ const NumberOfEventCard = props => {
   });
 
   useEffect(() => {
-    const onCompleted = (data) => { setEvents(data.eventsByProject) };
+    const onCompleted = (data) => { setEvents(data.events) };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !loading && !error) {

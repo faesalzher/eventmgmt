@@ -10,54 +10,12 @@ import {
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+
 import {
   EditImageForm,
   EditAvatarForm,
 } from 'components';
-
-const EDIT_EXTERNAL = gql`
-  mutation editExternal(
-    $_id: String!,
-    $external_name: String!,
-    $external_type: String!,
-    $email: String!,
-    $event_id: String!,
-    $phone_number: String!,
-    $picture:String!,
-    $details:String!
-    ) {
-    editExternal(
-      _id: $_id,
-      external_name: $external_name,
-      external_type: $external_type,
-      email:$email,
-      event_id:$event_id,
-      phone_number:$phone_number,
-      picture:$picture,
-      details:$details
-      ) {
-      _id
-      external_name
-      external_type
-      email
-      event_id
-      phone_number
-      picture
-      details
-    }
-  }
-`;
-
-
-const DELETE_EXTERNAL = gql`
-  mutation deleteExternal($_id: String!) {
-    deleteExternal(_id: $_id) {
-      _id
-    }
-  }
-`;
-
+import { EDIT_EXTERNAL, DELETE_EXTERNAL } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -95,6 +53,7 @@ export default function ExternalEditForm(props) {
     phone_number: props.external.phone_number,
     details: props.external.phone_number,
     picture: props.external.picture,
+    project_id: props.external.project_id,
   }
   const [externalForm, setExternalForm] = useState(intitialFormState);
 
@@ -118,6 +77,7 @@ export default function ExternalEditForm(props) {
             details: externalForm.details,
             picture: externalForm.picture,
             event_id: externalForm.event_id,
+            project_id: externalForm.project_id,
           }
         });
       // setExternalForm(initialFormState);
@@ -151,7 +111,7 @@ export default function ExternalEditForm(props) {
   const handleCloseModal = () => {
     props.close();
   }
-console.log(externalForm)
+  console.log(externalForm)
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -165,7 +125,7 @@ console.log(externalForm)
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}>
           {props.type === "Volunteer" || props.type === "Guest" ?
             <FormControl style={fullScreen ?
-              { width: '100%', padding: 17} :
+              { width: '100%', padding: 17 } :
               { width: '50%', padding: '0px 17px', display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
               <EditAvatarForm
                 uploadImage={uploadImage}

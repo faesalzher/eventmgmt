@@ -14,44 +14,8 @@ import {
   useMutation,
 } from '@apollo/react-hooks';
 import validate from 'validate.js';
-import { gql } from 'apollo-boost';
+import { ADD_STAFF } from 'gql';
 
-
-const ADD_STAFF = gql`
-  mutation addStaff(
-    $_id: String!,
-    $staff_name: String!,
-    $position_name: String!,
-    $email: String!,
-    $phone_number: String!,
-    $password: String!,
-    $picture: String!,
-    $departement_id: String!,
-    $organization_id: String!,
-    ){
-    addStaff(
-      _id: $_id,
-      staff_name: $staff_name,
-      position_name: $position_name,
-      email:$email,
-      phone_number:$phone_number,
-      password:$password,
-      picture:$picture,
-      departement_id:$departement_id,
-      organization_id:$organization_id,
-    ){
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
-    }
-  }
-`;
 
 const useStyles = makeStyles(theme => ({
   form: {

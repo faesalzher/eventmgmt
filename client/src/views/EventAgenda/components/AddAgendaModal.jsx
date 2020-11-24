@@ -18,42 +18,12 @@ import { useTheme } from '@material-ui/core/styles';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 import uuid from 'uuid/v1';
 
-
-const ADD_AGENDA = gql`
-  mutation addAgenda(
-    $_id: String!,
-    $agenda_name: String!,
-    $date: String!,
-    $start_time: String!,
-    $end_time: String!,
-    $details:String!,
-    $event_id:String!
-    ) {
-    addAgenda(
-      _id: $_id,
-      agenda_name: $agenda_name,
-      date: $date,
-      start_time:$start_time,
-      end_time:$end_time,
-      details:$details,
-      event_id:$event_id
-      ) {
-      _id
-      agenda_name
-      date
-      start_time
-      end_time
-      details
-      event_id
-    }
-  }
-`;
+import { ADD_AGENDA } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -93,7 +63,8 @@ export default function AddAgendaModal(props) {
     date: "",
     start_time: "00:00",
     end_time: "00:00",
-    event_id: props.event_id
+    event_id: props.event_id,
+    project_id: props.project_id
   };
   const [agendaForm, setAgendaForm] = useState(initialFormState)
 
@@ -128,6 +99,7 @@ export default function AddAgendaModal(props) {
             end_time: agendaForm.end_time,
             details: agendaForm.details,
             event_id: agendaForm.event_id,
+            project_id: agendaForm.project_id,
           }
         });
 

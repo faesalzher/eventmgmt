@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 
 // import { makeStyles } from '@material-ui/styles';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import { Grid } from '@material-ui/core';
 import {
     // PreparingProjectCard,
@@ -20,21 +19,8 @@ import {
 //         padding: theme.spacing(4)
 //     },
 // }));
+import { PROJECTS_QUERY } from 'gql';
 
-const PROJECTS_QUERY = gql`
-  query projects($organization_id:String!){
-    projects(organization_id: $organization_id){
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
 
 export default function DashboardOrganization(props) {
     const today = new Date()
@@ -67,13 +53,6 @@ export default function DashboardOrganization(props) {
         refetch();
     };
 
-    let countCancelledProject = [];
-    projects.forEach((project) => {
-        if (project.cancel) {
-            countCancelledProject.push(project)
-        }
-    }
-    );
 
     let countCompletedProject = [];
     projects.forEach((project) => {
@@ -88,7 +67,7 @@ export default function DashboardOrganization(props) {
 
         const preparingDays = today < start_date;
         const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-        if (project.cancel === false && !preparingDays && !activeDays) {
+        if (!preparingDays && !activeDays) {
             countCompletedProject.push(project)
         }
     }
@@ -96,7 +75,7 @@ export default function DashboardOrganization(props) {
 
     let countPreparingProject = [];
     projects.forEach((project) => {
-        if (project.cancel === false && today < new Date(project.project_start_date)) {
+        if (today < new Date(project.project_start_date)) {
             countPreparingProject.push(project)
         }
     }
@@ -115,7 +94,7 @@ export default function DashboardOrganization(props) {
 
         const preparingDays = today < start_date;
         const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-        if (project.cancel === false && !preparingDays && activeDays) {
+        if (!preparingDays && activeDays) {
             countActiveProject.push(project)
         }
     }
@@ -173,7 +152,6 @@ export default function DashboardOrganization(props) {
                     countPreparingProject={countPreparingProject}
                     countActiveProject={countActiveProject}
                     countCompletedProject={countCompletedProject}
-                    countCancelledProject={countCancelledProject}
                     projects={projects}
                 />
             </Grid>

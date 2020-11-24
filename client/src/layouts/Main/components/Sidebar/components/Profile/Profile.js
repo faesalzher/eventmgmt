@@ -5,33 +5,14 @@ import { makeStyles } from "@material-ui/styles";
 import { Avatar, Typography } from "@material-ui/core";
 // import { useAuth } from "context/auth.jsx";
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import jwtDecode from "jwt-decode";
 import PersonIcon from "@material-ui/icons/Person";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      email
-      organization_name
-      picture
-    }
-  }
-`;
+import { ORGANIZATION_QUERY } from 'gql';
 
-const STAFF_QUERY = gql`
-  query staffById($staff_id: String!) {
-    staffById(_id: $staff_id) {
-      _id
-      staff_name
-      email
-      position_name
-      picture
-    }
-  }
-`;
+
+import { STAFF_QUERY } from "gql";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -80,7 +61,7 @@ const Profile = (props) => {
   } = useQuery(STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id },
     // onCompleted: () => {
-    //   setProfileStaff(dataStaff.staffById);
+    //   setProfileStaff(dataStaff.staff);
     // },
   });
 
@@ -106,7 +87,7 @@ const Profile = (props) => {
 
   useEffect(() => {
     const onCompleted = (dataStaff) => {
-      setProfileStaff(dataStaff.staffById);
+      setProfileStaff(dataStaff.staff);
     };
     const onError = (error) => {
       /* magic */
@@ -151,9 +132,11 @@ const Profile = (props) => {
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           {decodedToken.user_type === "staff" ? (
-            <PersonIcon style={{ padding: '8px 2px',fontSize: 18 }} />
+            <PersonIcon style={{ padding: "8px 2px", fontSize: 18 }} />
           ) : (
-            <SupervisorAccountIcon style={{ padding: '8px 2px',fontSize: 18 }} />
+            <SupervisorAccountIcon
+              style={{ padding: "8px 2px", fontSize: 18 }}
+            />
           )}
           <Typography variant="body2" className={classes.name}>
             {decodedToken.user_type === "organization"

@@ -12,25 +12,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
-const ADD_DIVISION = gql`
-  mutation addDivision(
-    $_id: String!,
-    $division_name: String!
-    $project_id: String!
-    ) {
-    addDivision(
-      _id: $_id,
-      division_name: $division_name
-      project_id: $project_id
-      ) {
-      _id
-      division_name
-      project_id
-    }
-  }
-`;
+import { ADD_COMMITTEE } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -53,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function DivisionAddForm(props) {
+export default function CommitteeAddForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -61,30 +43,29 @@ export default function DivisionAddForm(props) {
   // const [anchorEl, setAnchorEl] = React.useState(null);
   const intitialFormState = {
     _id: uuid(),
-    division_name: "",
-    project_id: props.project_id,
+    committee_name: "",
+    organization_id: props.decodedToken.organization_id,
   }
 
-  const [divisionForm, setDivisionForm] = useState(intitialFormState);
-  const [addDivision] = useMutation(ADD_DIVISION);
-  console.log(props.project_id)
+  const [committeeForm, setCommitteeForm] = useState(intitialFormState);
+  const [addCommittee] = useMutation(ADD_COMMITTEE);
   const handleSaveButton = () => {
-    props.handleSaveButton(divisionForm)
-    setDivisionForm(intitialFormState);
+    props.handleSaveButton(committeeForm)
+    setCommitteeForm(intitialFormState);
     props.close();
-    addDivision(
+    addCommittee(
       {
         variables:
         {
-          _id: divisionForm._id,
-          division_name: divisionForm.division_name,
-          project_id: divisionForm.project_id,
+          _id: committeeForm._id,
+          committee_name: committeeForm.committee_name,
+          organization_id: committeeForm.organization_id,
         }
       });
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setDivisionForm({ ...divisionForm, [id]: value })
+    setCommitteeForm({ ...committeeForm, [id]: value })
   }
 
   return (
@@ -96,7 +77,7 @@ export default function DivisionAddForm(props) {
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle title={"Add New Division"} onClose={props.close} />
+      <DialogTitle title={"Add New Committee"} onClose={props.close} />
       <DialogContent style={{}}>
         <form noValidate >
           <div >
@@ -104,11 +85,11 @@ export default function DivisionAddForm(props) {
               <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="division_name"
-                label="Division Name"
+                id="committee_name"
+                label="Committee Name"
                 type="text"
                 variant="outlined"
-                value={divisionForm.division_name}
+                value={committeeForm.committee_name}
                 onChange={handleInputChange}
               />
             </FormControl>
@@ -119,7 +100,7 @@ export default function DivisionAddForm(props) {
         close={props.close}
         validation={
           (
-            divisionForm.division_name === ""
+            committeeForm.committee_name === ""
           ) ?
             ("invalid") : ("valid")
         }

@@ -11,23 +11,12 @@ import {
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
-const DELETE_DIVISION = gql`
-mutation deleteDivision ($_id: String!) {
-  deleteDivision(_id:$_id){
-    _id
-  }
-}
-`;
-const EDIT_DIVISION = gql`
-  mutation editDivision($_id: String!,$division_name: String!) {
-    editDivision(_id: $_id,division_name: $division_name) {
-      _id
-      division_name
-    }
-  }
-`;
+import {
+  EDIT_COMMITTEE,
+  DELETE_COMMITTEE,
+} from 'gql';
+
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -54,48 +43,48 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-export default function DivisionEditForm(props) {
+export default function CommitteeEditForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
 
-  const [divisionForm, setDivisionForm] = useState(props.division);
+  const [committeeForm, setCommitteeForm] = useState(props.committee);
 
   React.useEffect(() => {
-    setDivisionForm(props.division)
-  }, [setDivisionForm, props.division]);
+    setCommitteeForm(props.committee)
+  }, [setCommitteeForm, props.committee]);
 
-  const [deleteDivision] = useMutation(DELETE_DIVISION);
-  const [editDivision] = useMutation(EDIT_DIVISION);
+  const [deleteCommittee] = useMutation(DELETE_COMMITTEE);
+  const [editCommittee] = useMutation(EDIT_COMMITTEE);
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(divisionForm)
-    // setDivisionForm(intitialFormState);
+    props.handleSaveEditButton(committeeForm)
+    // setCommitteeForm(intitialFormState);
     props.close();
-    editDivision(
+    editCommittee(
       {
         variables:
         {
-          _id: divisionForm._id,
-          division_name: divisionForm.division_name,
+          _id: committeeForm._id,
+          committee_name: committeeForm.committee_name,
         }
       });
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setDivisionForm({ ...divisionForm, [id]: value })
+    setCommitteeForm({ ...committeeForm, [id]: value })
   }
 
   const handleDelete = () => {
-    props.handleDeleteDivision(props.division._id, props.index);
-    // setDivisionForm(intitialFormState);
+    props.handleDeleteCommittee(props.committee._id, props.index);
+    // setCommitteeForm(intitialFormState);
     props.close();
-    deleteDivision({ variables: { _id: props.division._id, } });
+    deleteCommittee({ variables: { _id: props.committee._id, } });
   }
 
   const handleClose = () => {
-    setDivisionForm(props.division)
+    setCommitteeForm(props.committee)
     props.close();
   }
 
@@ -109,7 +98,7 @@ export default function DivisionEditForm(props) {
         fullWidth={true}
         maxWidth={'xs'}
       >
-        <DialogTitle title="Edit Division" onClose={() => handleClose()} />
+        <DialogTitle title="Edit Committee" onClose={() => handleClose()} />
         <DialogContent style={{}}>
           <form noValidate >
             <div >
@@ -117,11 +106,11 @@ export default function DivisionEditForm(props) {
                 <TextField
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
-                  id="division_name"
-                  label="Division Name"
+                  id="committee_name"
+                  label="Committee Name"
                   type="text"
                   variant="outlined"
-                  value={divisionForm.division_name}
+                  value={committeeForm.committee_name}
                   onChange={handleInputChange}
                 />
               </FormControl>
@@ -131,12 +120,12 @@ export default function DivisionEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              divisionForm.division_name === ""
+              committeeForm.committee_name === ""
             ) ?
               ("invalid") : ("valid")
           }
-          content="Division"
-          name={divisionForm.division_name}
+          content="Committee"
+          name={committeeForm.committee_name}
           submit={() => handleSaveEditButton()}
           delete={() => handleDelete()}
           close={props.close}

@@ -18,44 +18,14 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import signInImage from "assets/planer_desk.jpg";
 import logo from 'assets/image.png';
 import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import { useAuth } from "context/auth.jsx";
 
 import { SECRET_KEY } from '../../secret_key.js'
+import { CHECK_ORGANIZATION, CHECK_STAFF } from 'gql';
+
 // const { SECRET_KEY } = require('../../secret_key');
 const jwt = require('jsonwebtoken');
 
-
-const CHECK_ORGANIZATION = gql`
-  query check_organization($email: String!){
-    check_organization(email:$email) {
-      _id
-      email
-      password
-    }
-  }
-`;
-
-const CHECK_STAFF = gql`
-  query check_staff($email: String!){
-    check_staff(email:$email) {
-      _id
-      email
-      password
-      organization_id
-    }
-  }
-`;
-// const LOGIN = gql`
-//   query login($email: String!){
-//     login(email:$email) {
-//       _id
-//       organization_name
-//       email
-//       password
-//     }
-//   }
-// `;
 
 const schema = {
   email: {
@@ -189,7 +159,6 @@ const LogIn = props => {
     touched: {},
     errors: {}
   });
-
   useEffect(() => {
     const errors = validate(formState.values, schema);
 
@@ -263,7 +232,7 @@ const LogIn = props => {
   }, [loadingOrganization, dataOrganization, errorOrganization]);
 
   useEffect(() => {
-    const onCompleted = (data) => { setStaff(data.check_staff) };
+    const onCompleted = (dataStaff) => { setStaff(dataStaff.check_staff) };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !loadingStaff && !errorStaff) {

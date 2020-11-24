@@ -9,7 +9,7 @@ import {
   Dialog,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+
 import FormControl from '@material-ui/core/FormControl';
 
 import 'date-fns';
@@ -25,50 +25,7 @@ import {
   StatusBox,
   EditImageForm,
 } from 'components';
-
-const EDIT_EVENT = gql`
-  mutation editEvent(
-    $_id: String!,
-    $event_name: String!,
-    $event_description: String!,
-    $event_location: String!,
-    $cancel: Boolean!,
-    $event_start_date: String!,
-    $event_end_date: String!,
-    $picture:String!,
-    $project_id:String!
-    ) {
-    editEvent(
-      _id: $_id,
-      event_name: $event_name,
-      event_description: $event_description,
-      event_location: $event_location,
-      cancel:$cancel,
-      event_start_date:$event_start_date,
-      event_end_date:$event_end_date,
-      picture:$picture,
-      project_id:$project_id
-      ) {
-      _id
-      event_name
-      event_description
-      event_location
-      cancel
-      event_start_date
-      event_end_date
-      picture
-      project_id
-    }
-  }
-`;
-
-const DELETE_EVENT = gql`
-mutation deleteEvent ($_id: String!) {
-  deleteEvent(_id:$_id){
-    _id
-  }
-}
-`;
+import { EDIT_EVENT, DELETE_EVENT } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -97,7 +54,6 @@ export default function EventEditModal(props) {
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const [eventForm, setEventForm] = React.useState([]);
-  const [openCancelModal, setOpenCancelModal] = useState(false);
   const [navigate, setNavigate] = useState(false);
 
   useEffect(() => {
@@ -154,7 +110,6 @@ export default function EventEditModal(props) {
         event_name: eventForm.event_name,
         event_description: eventForm.event_description,
         event_location: eventForm.event_location,
-        cancel: eventForm.cancel,
         event_start_date: eventForm.event_start_date,
         event_end_date: eventForm.event_end_date,
         picture: eventForm.picture,
@@ -166,30 +121,9 @@ export default function EventEditModal(props) {
 
   const handleCloseModal = () => {
     props.close();
-    setEventForm(props.event)    
+    setEventForm(props.event)
   }
 
-  const handleCancelModal = () => {
-    setOpenCancelModal(true);
-  }
-
-  const handleCloseCancelModal = () => {
-    setOpenCancelModal(false);
-  };
-
-  const handleCancel = () => {
-    if (eventForm.cancel === true) {
-      setEventForm({
-        ...eventForm,
-        cancel: false
-      })
-    } else {
-      setEventForm({
-        ...eventForm,
-        cancel: true
-      })
-    }
-  }
 
   const handleDelete = () => {
     deleteEvent({ variables: { _id: props.event._id, } });
@@ -276,29 +210,9 @@ export default function EventEditModal(props) {
             </FormControl>
             <FormControl className={classes.formControl} style={{ padding: '5px 0px' }} >
               <StatusBox
-                cancel={eventForm.cancel}
                 style={{ width: 'auto' }}
                 start_date={eventForm.event_start_date}
                 end_date={eventForm.event_end_date}
-              />
-            </FormControl>
-            <FormControl className={classes.formControl} style={{ display: 'flex' }}>
-              {eventForm.cancel === true ?
-                <Button color="primary" variant="outlined" onClick={handleCancelModal}>
-                  Uncancel Event
-                  </Button>
-                :
-                <Button color="secondary" variant="outlined" onClick={handleCancelModal}>
-                  Cancel Event
-                  </Button>
-              }
-              <ConfirmationDialog
-                type="Cancel"
-                name={eventForm.event_name}
-                content="Event"
-                open={openCancelModal}
-                handleConfirm={handleCancel}
-                close={handleCloseCancelModal}
               />
             </FormControl>
           </div>
@@ -323,7 +237,7 @@ export default function EventEditModal(props) {
             eventForm.event_description === "" ||
             eventForm.event_start_date === "" ||
             eventForm.event_end_date === "" ||
-            eventForm.event_location === "" 
+            eventForm.event_location === ""
           ) ?
             ("invalid") : ("valid")
         }

@@ -6,10 +6,24 @@ import {
   Button,
   Dialog,
 } from "@material-ui/core";
-import { useMutation } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import FormControl from "@material-ui/core/FormControl";
-
+import {
+  EDIT_PROJECT,
+  EXTERNALS_QUERY_BY_PROJECT,
+  AGENDAS_QUERY_BY_PROJECT,
+  ROADMAPS_QUERY_BY_PROJECT,
+  TASKS_QUERY_BY_PROJECT,
+  TASK_ASSIGNED_TOS_QUERY_BY_PROJECT,
+  DELETE_PROJECT,
+  DELETE_EVENT,
+  DELETE_PERSON_IN_CHARGE,
+  DELETE_ROADMAP,
+  DELETE_EXTERNAL,
+  DELETE_AGENDA,
+  DELETE_TASK,
+  DELETE_TASK_ASSIGNED_TO,
+} from 'gql';
 import "date-fns";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
@@ -21,55 +35,6 @@ import { Redirect } from "react-router";
 
 import { ConfirmationDialog, EditImageForm } from "components";
 
-
-const EDIT_PROJECT = gql`
-  mutation editProject(
-    $_id: String!
-    $project_name: String!
-    $project_description: String!
-    $cancel: Boolean!
-    $project_start_date: String!
-    $project_end_date: String!
-    $picture: String!
-    $organization_id: String!
-  ) {
-    editProject(
-      _id: $_id
-      project_name: $project_name
-      project_description: $project_description
-      cancel: $cancel
-      project_start_date: $project_start_date
-      project_end_date: $project_end_date
-      picture: $picture
-      organization_id: $organization_id
-    ) {
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
-
-const DELETE_PROJECT = gql`
-  mutation deleteProject($_id: String!) {
-    deleteProject(_id: $_id) {
-      _id
-    }
-  }
-`;
-
-const DELETE_DIVISION = gql`
-  mutation deleteDivision($_id: String!) {
-    deleteDivision(_id: $_id) {
-      _id
-    }
-  }
-`;
 const useStyles = makeStyles((theme) => ({
   form: {
     display: "flex",
@@ -96,7 +61,6 @@ export default function ProjectEditModal(props) {
   const fullScreen = useMediaQuery(theme.breakpoints.down("xs"));
 
   const [projectForm, setProjectForm] = React.useState([]);
-  const [openCancelModal, setOpenCancelModal] = useState(false);
   const [navigate, setNavigate] = useState(false);
 
   useEffect(() => {
@@ -140,7 +104,14 @@ export default function ProjectEditModal(props) {
 
   const [editProject] = useMutation(EDIT_PROJECT);
   const [deleteProject] = useMutation(DELETE_PROJECT);
-  const [deleteDivision] = useMutation(DELETE_DIVISION);
+  const [deletePersonInCharge] = useMutation(DELETE_PERSON_IN_CHARGE);
+  const [deleteEvent] = useMutation(DELETE_EVENT);
+  const [deleteRoadmap] = useMutation(DELETE_ROADMAP);
+  const [deleteExternal] = useMutation(DELETE_EXTERNAL);
+  const [deleteAgenda] = useMutation(DELETE_AGENDA);
+  const [deleteTask] = useMutation(DELETE_TASK);
+  const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
+
 
   const handleButton = (e) => {
     props.handleSaveEditButton(projectForm);
@@ -149,10 +120,10 @@ export default function ProjectEditModal(props) {
         _id: projectForm._id,
         project_name: projectForm.project_name,
         project_description: projectForm.project_description,
-        cancel: projectForm.cancel,
         project_start_date: projectForm.project_start_date,
         project_end_date: projectForm.project_end_date,
         picture: projectForm.picture,
+        created_at: projectForm.created_at,
         organization_id: props.organization_id,
       },
     });
@@ -164,34 +135,75 @@ export default function ProjectEditModal(props) {
     setProjectForm(props.project);
   };
 
-  const handleCancelModal = () => {
-    setOpenCancelModal(true);
+  const { data: roadmapsData, refetch: roadmapsRefetch } = useQuery(ROADMAPS_QUERY_BY_PROJECT,
+    { variables: { project_id: props.project_id }, }
+  )
+  const { data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY_BY_PROJECT,
+    { variables: { project_id: props.project_id }, }
+  )
+  const { data: agendasData, refetch: agendasRefetch } = useQuery(AGENDAS_QUERY_BY_PROJECT,
+    { variables: { project_id: props.project_id }, }
+  )
+
+  const { data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_PROJECT,
+    { variables: { project_id: props.project_id }, }
+  )
+
+  const { data: taskAssignedTosData, refetch: taskAssignedTosRefetch } = useQuery(TASK_ASSIGNED_TOS_QUERY_BY_PROJECT,
+    { variables: { project_id: props.project_id }, }
+  )
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    roadmapsRefetch();
+    externalsRefetch();
+    agendasRefetch();
+    tasksRefetch();
+    taskAssignedTosRefetch();
   };
 
-  const handleCloseCancelModal = () => {
-    setOpenCancelModal(false);
-  };
-
-  const handleCancel = () => {
-    if (projectForm.cancel === true) {
-      setProjectForm({
-        ...projectForm,
-        cancel: false,
-      });
-    } else {
-      setProjectForm({
-        ...projectForm,
-        cancel: true,
-      });
-    }
-  };
 
   const handleDelete = () => {
+
+    //delete task_assogned_to
+    taskAssignedTosData.task_assigned_tos.forEach((taskAssignedTo) => {
+      deleteTaskAssignedTo({ variables: { _id: taskAssignedTo._id } })
+    })
+
+    //delete task
+    tasksData.tasks.forEach((task) => {
+      deleteTask({ variables: { _id: task._id } })
+    })
+
+    //delete agenda
+    agendasData.agendas.forEach((agenda) => {
+      deleteAgenda({ variables: { _id: agenda._id } })
+    })
+    //delete external
+    externalsData.externals.forEach((external) => {
+      deleteExternal({ variables: { _id: external._id } })
+    })
+
+    //delete roadmaps
+    roadmapsData.roadmaps.forEach((roadmap) => {
+      deleteRoadmap({ variables: { _id: roadmap._id } })
+    })
+
+    //delete event
+    props.events.forEach((event) => {
+      deleteEvent({ variables: { _id: event._id, } });
+    })
+
+    //delete Person In Charge
+    props.personInCharges.forEach((personInCharge) => {
+      deletePersonInCharge({ variables: { _id: personInCharge._id, } });
+    })
+
+    //delete project
     deleteProject({ variables: { _id: props.project._id } });
-    props.divisions.map((division) => {
-      deleteDivision({ variables: { _id: division._id } });
-      return null;
-    });
 
     setNavigate(true);
   };
@@ -213,7 +225,6 @@ export default function ProjectEditModal(props) {
   if (navigate) {
     return <Redirect push to="/project" />;
   }
-
 
   return (
     <Dialog
@@ -276,40 +287,8 @@ export default function ProjectEditModal(props) {
             >
               <StatusBox
                 style={{ width: 'auto' }}
-                cancel={projectForm.cancel}
                 start_date={projectForm.project_start_date}
                 end_date={projectForm.project_end_date}
-              />
-            </FormControl>
-            <FormControl
-              className={classes.formControl}
-              style={{ display: "flex" }}
-            >
-
-              {projectForm.cancel === true ? (
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={handleCancelModal}
-                >
-                  Uncancel Project
-                </Button>
-              ) : (
-                  <Button
-                    color="secondary"
-                    variant="outlined"
-                    onClick={handleCancelModal}
-                  >
-                    Cancel Project
-                  </Button>
-                )}
-              <ConfirmationDialog
-                type="Cancel"
-                name={projectForm.project_name}
-                content="Project"
-                open={openCancelModal}
-                handleConfirm={handleCancel}
-                close={handleCloseCancelModal}
               />
             </FormControl>
           </div>
@@ -335,8 +314,9 @@ export default function ProjectEditModal(props) {
             ("invalid") : ("valid")
         }
         deleteButton={
-          props.project_comitee.position_id === '1' ?
-            false : true
+          props.project_personInCharge.position_id === '1'
+            || props.decodedToken.user_type === 'organization' ?
+            true : false
         }
         content="Project"
         name={projectForm.project_name}

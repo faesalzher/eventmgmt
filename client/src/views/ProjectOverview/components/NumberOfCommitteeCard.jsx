@@ -2,21 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import FolderIcon from '@material-ui/icons/Folder';
-
-
-// const COMITEESBYPROJECT_QUERY = gql`
-//   query comiteesByProject($project_id: String!){
-//      comiteesByProject(project_id:$project_id) {
-//       _id
-//       staff_id
-//       position_id
-//       division_id
-//       project_id
-//     }
-//   }
-// `;
-
+import BusinessIcon from '@material-ui/icons/Business';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,7 +16,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700
   },
   avatar: {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: theme.palette.primary.main,
     height: 56,
     width: 56
   },
@@ -52,33 +38,31 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CancelledComiteeCard(props) {
-  const { countCancelledProject,className, ...rest } = props;
+export default function NumberOfCommitteeCard(props) {
+  const { className, ...rest } = props;
 
   const classes = useStyles();
-  // const [comitees, setComitees] = useState([]);
 
-  // const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
-  //   variables: { project_id: props.project._id },
-  //   onCancelled: () => {
-  //     setComitees(
-  //       comiteesData.comiteesByProject
-  //     )
-  //   }
-  // }
-  // );
+  const groupCommitteesObject = props.personInCharges.reduce((committees, personInCharge) => {
+    const committee_id = personInCharge.committee_id;
+    if (!committees[committee_id]) {
+      committees[committee_id] = [];
+    }
+    committees[committee_id].push(personInCharge);
+    return committees;
+  }, {});
 
-  // useEffect(() => {
-  //   refresh();
-  // });
 
-  // const refresh = () => {
-  //   comiteesRefetch();
-  // };
+  const groupCommittees = Object.keys(groupCommitteesObject).map((committee_id) => {
+    return {
+      committee_id,
+      personInCharges: groupCommitteesObject[committee_id]
+    };
+  });
+
   return (
     <Card
-      {...rest}
-      className={clsx(classes.root, className)}
+      className={clsx(classes.root)}
     >
       <CardContent>
         <Grid
@@ -92,13 +76,13 @@ export default function CancelledComiteeCard(props) {
               gutterBottom
               variant="body2"
             >
-              Cancelled Projects
+              Number of Committees
             </Typography>
-            <Typography variant="h3">{props.countCancelledProject.length}</Typography>
+            <Typography variant="h3">{groupCommittees.length}</Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <FolderIcon className={classes.icon} />
+              <BusinessIcon className={classes.icon} />
             </Avatar>
           </Grid>
         </Grid>
@@ -106,3 +90,4 @@ export default function CancelledComiteeCard(props) {
     </Card>
   );
 };
+

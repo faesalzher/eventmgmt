@@ -1,6 +1,6 @@
 
 
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 
@@ -13,52 +13,10 @@ import {
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+
 import validate from 'validate.js';
+import { DELETE_STAFF,EDIT_STAFF } from 'gql';
 
-const DELETE_STAFF = gql`
-mutation deleteStaff ($_id: String!) {
-  deleteStaff(_id:$_id){
-    _id
-  }
-}
-`;
-
-const EDIT_STAFF = gql`
-  mutation editStaff(
-    $_id: String!,
-    $staff_name: String!,
-    $position_name: String!,
-    $email: String!,
-    $phone_number: String!,
-    $password: String!,
-    $picture: String!,
-    $departement_id: String!,
-    $organization_id: String!,
-    ){
-    editStaff(
-      _id: $_id,
-      staff_name: $staff_name,
-      position_name: $position_name,
-      email:$email,
-      phone_number:$phone_number,
-      password:$password,
-      picture:$picture,
-      departement_id:$departement_id,
-      organization_id:$organization_id,
-    ){
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
-    }
-  }
-`;
 const useStyles = makeStyles(theme => ({
   form: {
     display: 'flex',
@@ -187,7 +145,7 @@ export default function StaffEditForm(props) {
   }
 
   const hasError = field =>
-  staffForm.touched[field] && staffForm.errors[field] ? true : false;
+    staffForm.touched[field] && staffForm.errors[field] ? true : false;
 
   return (
     <Dialog
@@ -307,7 +265,7 @@ export default function StaffEditForm(props) {
               staffForm.values.departement_id === "" ||
               staffForm.values.position_name === "" ||
               staffForm.values.email === "" ||
-              staffForm.values.phone_number === ""||
+              staffForm.values.phone_number === "" ||
               !staffForm.isValid
             )
           ) ?

@@ -5,7 +5,7 @@ export { default as NotFound } from './NotFound/NotFound.jsx';
 export { default as Organization } from './Organization/Organization.jsx';
 export { default as RoadmapTaskList } from './RoadmapTaskList/RoadmapTaskList.jsx';
 export { default as ProjectList } from './ProjectList/ProjectList.jsx';
-export { default as ProjectComitee } from './ProjectComitee/ProjectComitee.jsx';
+export { default as ProjectPersonInCharge } from './ProjectPersonInCharge/ProjectPersonInCharge.jsx';
 export { default as ProjectDetail } from './ProjectDetail/ProjectDetail.jsx';
 export { default as ProjectEventList } from './ProjectEventList/ProjectEventList.jsx';
 export { default as EventDetail } from './EventDetail/EventDetail.jsx';
@@ -19,6 +19,8 @@ export { default as AccountProfile } from './AccountProfile/AccountProfile.jsx';
 export { default as LogIn } from './Authentication/LogIn.jsx';
 export { default as Register } from './Authentication/Register.jsx';
 export { default as MyTasks } from './MyTasks/MyTasks.jsx';
+export { default as Committee } from './Committee/CommitteeView.jsx';
+
 
 
 

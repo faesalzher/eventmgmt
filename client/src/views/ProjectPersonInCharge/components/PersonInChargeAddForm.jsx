@@ -1,6 +1,6 @@
 
 
-import React, { useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import { AvatarName } from 'components';
@@ -16,32 +16,8 @@ import uuid from 'uuid/v1';
 import {
   useMutation,
 } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
-
-const ADD_COMITEE = gql`
-  mutation addComitee(
-    $_id: String!,
-    $staff_id: String!,
-    $division_id: String!,
-    $position_id: String!,
-    $project_id: String!,
-    ){
-    addComitee(
-      _id: $_id,
-      staff_id: $staff_id,
-      division_id: $division_id,
-      position_id:$position_id,
-      project_id:$project_id,
-    ){
-      _id
-      staff_id
-      division_id
-      position_id
-      project_id
-    }
-  }
-`;
+import { ADD_PERSON_IN_CHARGE, COMMITTEES__QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -76,20 +52,17 @@ const useStyles = makeStyles(theme => ({
 //   },
 // };
 
-export default function ComiteeAddForm(props) {
+export default function PersonInChargeAddForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
   // const [anchorEl, setAnchorEl] = React.useState(null);
-  const [division_id, setDivision_id] = useState("");
-  // React.useEffect(() => {
-  //   if (props.division_id === 'all') {
-  //     setDivision_id("");
-  //   } else {
-  //     setDivision_id(props.division_id);
-  //   }
-  // }, [setDivision_id, props.division_id])
+  const [committee_id, setCommittee_id] = useState("");
+  const [committees, setCommittees] = useState(props.committees);
+  React.useEffect(() => {
+    setCommittees(props.committees)
+  }, [setCommittees, props.committees])
 
   const [position_id, setPosition_id] = useState("");
   const [staff_id, setStaff_id] = useState("");
@@ -97,86 +70,85 @@ export default function ComiteeAddForm(props) {
     _id: uuid(),
     staff_id: "",
     position_id: "",
-    division_id: "",
+    committee_id: "",
     project_id: props.project_id,
   }
-  const [comiteeForm, setComiteeForm] = useState(intitialFormState);
 
-
-  const [addComitee] = useMutation(ADD_COMITEE);
+  const [personInChargeForm, setPersonInChargeForm] = useState(intitialFormState);
+  const [addPersonInCharge] = useMutation(ADD_PERSON_IN_CHARGE);
   // React.useEffect(() => {
-  //   if (props.division_id !== "all") {
-  //     comiteeForm.division_id = props.division_id;
+  //   if (props.committee_id !== "all") {
+  //     personInChargeForm.committee_id = props.committee_id;
   //   }
-  // }, [props.division_id, comiteeForm.division_id]);
-  
+  // }, [props.committee_id, personInChargeForm.committee_id]);
+
   const handleSaveButton = () => {
-    props.handleSaveButton(comiteeForm)
+    props.handleSaveButton(personInChargeForm)
     props.close();
-    addComitee({
+    addPersonInCharge({
       variables:
       {
-        _id: comiteeForm._id,
-        staff_id: comiteeForm.staff_id,
-        division_id: comiteeForm.division_id,
-        position_id: comiteeForm.position_id,
-        project_id: comiteeForm.project_id,
+        _id: personInChargeForm._id,
+        staff_id: personInChargeForm.staff_id,
+        committee_id: personInChargeForm.committee_id,
+        position_id: personInChargeForm.position_id,
+        project_id: personInChargeForm.project_id,
       }
     });
-    setComiteeForm(intitialFormState);
-    setDivision_id("");
+    setPersonInChargeForm(intitialFormState);
+    setCommittee_id("");
     setPosition_id("");
     setStaff_id("");
   }
 
-  const handleChangeDivision = (event) => {
-    comiteeForm.division_id = event.target.value;
+  const handleChangeCommittee = (event) => {
+    personInChargeForm.committee_id = event.target.value;
     // setAgendaForm({ ...agendaForm, date: day.toString().slice(0, 16) })
-    // setComiteeForm({...comiteeForm, division_id: '1'})
-    setDivision_id(event.target.value);
+    // setPersonInChargeForm({...personInChargeForm, committee_id: '1'})
+    setCommittee_id(event.target.value);
     setPosition_id("");
-    setComiteeForm({ ...comiteeForm, position_id: "" })
-    // comiteeForm.position_id = "";
+    setPersonInChargeForm({ ...personInChargeForm, position_id: "" })
+    // personInChargeForm.position_id = "";
   };
 
   const handleChangePosition = (event) => {
-    comiteeForm.position_id = event.target.value;
+    personInChargeForm.position_id = event.target.value;
     setPosition_id(event.target.value);
   };
 
   const handleChangeStaff = (event) => {
-    // comiteeForm.staff_id = event.target.value;
-    setComiteeForm({ ...comiteeForm, staff_id: event.target.value })
+    // personInChargeForm.staff_id = event.target.value;
+    setPersonInChargeForm({ ...personInChargeForm, staff_id: event.target.value })
     setStaff_id(event.target.value);
   };
 
   const handleCloseModal = () => {
     props.close();
-    setComiteeForm(intitialFormState);
-    setDivision_id("");
+    setPersonInChargeForm(intitialFormState);
+    setCommittee_id("");
     setPosition_id("");
     setStaff_id("");
   }
 
-  let checkComiteeStaffId = [];
-  props.comitees.forEach((comitee) => {
+  let checkPersonInChargeStaffId = [];
+  props.personInCharges.forEach((personInCharge) => {
     props.staffs.forEach((staff) => {
-      if (staff._id === comitee.staff_id && props.project_id === comitee.project_id) {
-        checkComiteeStaffId.push(staff._id)
+      if (staff._id === personInCharge.staff_id && props.project_id === personInCharge.project_id) {
+        checkPersonInChargeStaffId.push(staff._id)
       }
     })
   }
   );
 
-  let checkComiteePositionId = [];
-  props.comitees.forEach((comitee) => {
+  let checkPersonInChargePositionId = [];
+  props.personInCharges.forEach((personInCharge) => {
     props.positions.forEach((position) => {
-      if (position._id === comitee.position_id
-        && props.project_id === comitee.project_id
-        && division_id === comitee.division_id
+      if (position._id === personInCharge.position_id
+        && props.project_id === personInCharge.project_id
+        && committee_id === personInCharge.committee_id
         && position._id !== "7"
       ) {
-        checkComiteePositionId.push(position._id)
+        checkPersonInChargePositionId.push(position._id)
       } else {
         return null
       }
@@ -186,10 +158,10 @@ export default function ComiteeAddForm(props) {
   }
   );
 
-  let checkCoreDivisionId = [];
-  props.divisions.forEach((division) => {
-    if (division_id === division._id && division.division_name === "Core Comitee")
-      checkCoreDivisionId.push(division._id)
+  let checkCoreCommitteeId = [];
+  committees.forEach((committee) => {
+    if (committee_id === committee._id && committee.committee_name === "Core Committee")
+      checkCoreCommitteeId.push(committee._id)
   });
 
   return (
@@ -201,7 +173,7 @@ export default function ComiteeAddForm(props) {
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle title={"Add New Comitee"} onClose={() => handleCloseModal()} />
+      <DialogTitle title={"Add New Person In Charge"} onClose={() => handleCloseModal()} />
       <DialogContent style={{}}>
         <form noValidate >
           <div >
@@ -212,7 +184,7 @@ export default function ComiteeAddForm(props) {
                 select
                 margin="dense"
                 style={{ backgroundColor: 'white' }}
-                label="Comitee Name"
+                label="Person In Charge Name"
                 value={staff_id}
                 onChange={handleChangeStaff}
                 variant="outlined"
@@ -220,7 +192,7 @@ export default function ComiteeAddForm(props) {
               >
                 {
                   props.staffs.map((staff) => {
-                    if (checkComiteeStaffId.indexOf(staff._id) > -1) {
+                    if (checkPersonInChargeStaffId.indexOf(staff._id) > -1) {
                       return <MenuItem key={staff.staff_name} disabled={true}>
                         <AvatarName
                           name={staff.staff_name}
@@ -242,28 +214,28 @@ export default function ComiteeAddForm(props) {
             <FormControl className={classes.formControl}>
               {
                 <TextField
-                  id="division_id"
+                  id="committee_id"
                   select
                   size="small"
                   margin="dense"
                   style={{ backgroundColor: 'white' }}
-                  label="Division"
-                  value={division_id}
-                  onChange={handleChangeDivision}
+                  label="Committee"
+                  value={committee_id}
+                  onChange={handleChangeCommittee}
                   variant="outlined"
                 >
-                  {props.divisions.map((division) => {
-                    if (division._id === props.project_comitee.division_id
+                  {committees.map((committee) => {
+                    if (committee._id === props.project_personInCharge.committee_id
                       || props.decodedToken.user_type === "organization"
-                      || props.project_comitee.position_id === '1'
-                      || props.project_comitee.position_id === '2'
-                      || props.project_comitee.position_id === '3'
+                      || props.project_personInCharge.position_id === '1'
+                      || props.project_personInCharge.position_id === '2'
+                      || props.project_personInCharge.position_id === '3'
                     )
                       return (
-                        <MenuItem key={division.division_name}
-                          value={division._id}
+                        <MenuItem key={committee.committee_name}
+                          value={committee._id}
                         >
-                          {division.division_name}
+                          {committee.committee_name}
                         </MenuItem>)
                     return null
                   })}
@@ -272,7 +244,7 @@ export default function ComiteeAddForm(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               {
-                comiteeForm.division_id === "" || comiteeForm.division_id === "all" ?
+                personInChargeForm.committee_id === "" || personInChargeForm.committee_id === "all" ?
                   <TextField
                     style={{ backgroundColor: 'white' }}
                     margin="dense"
@@ -295,19 +267,19 @@ export default function ComiteeAddForm(props) {
                     variant="outlined"
                   >
                     {
-                      division_id === checkCoreDivisionId[0] ?
+                      committee_id === checkCoreCommitteeId[0] ?
                         props.positions.map((position) => {
                           if (position.core === true)
-                            if (checkComiteePositionId.indexOf(position._id) > -1)
-                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
-                                && props.decodedToken.user_type !== "organiation")
+                            if (checkPersonInChargePositionId.indexOf(position._id) > -1)
+                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organization")
                                 return null
                               else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
-                                && props.decodedToken.user_type !== "organiation")
+                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organization")
                                 return null
                               else
                                 return <MenuItem key={position.position_name} value={position._id}>
@@ -318,16 +290,16 @@ export default function ComiteeAddForm(props) {
                         :
                         props.positions.map((position) => {
                           if (position.core === false)
-                            if (checkComiteePositionId.indexOf(position._id) > -1)
-                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
-                                && props.decodedToken.user_type !== "organiation")
+                            if (checkPersonInChargePositionId.indexOf(position._id) > -1)
+                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organization")
                                 return null
                               else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              if (parseInt(props.project_comitee.position_id) >= parseInt(position._id)
-                                && props.decodedToken.user_type !== "organiation")
+                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                                && props.decodedToken.user_type !== "organization")
                                 return null
                               else
                                 return <MenuItem key={position.position_name} value={position._id}>
@@ -346,10 +318,10 @@ export default function ComiteeAddForm(props) {
       <DialogActionsAdd
         validation={
           (
-            comiteeForm._id === "" ||
-            comiteeForm.staff_id === "" ||
-            comiteeForm.position_id === "" || position_id === "" ||
-            comiteeForm.division_id === "" || division_id === ""
+            personInChargeForm._id === "" ||
+            personInChargeForm.staff_id === "" ||
+            personInChargeForm.position_id === "" || position_id === "" ||
+            personInChargeForm.committee_id === "" || committee_id === ""
           ) ?
             ("invalid") : ("valid")
         }

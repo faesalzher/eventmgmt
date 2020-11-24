@@ -22,40 +22,13 @@ import 'rc-datetime-picker/dist/picker.css';
 import moment from 'moment';
 import EditIcon from '@material-ui/icons/Edit';
 import { useQuery, useLazyQuery, useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import { AvatarName } from 'components';
-import { AssigneesDivision, AssigneeAvatar } from '.';
-
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      email
-      organization_name
-      picture
-    }
-  }
-`;
-
-const STAFF_QUERY = gql`
-  query staffById($staff_id: String!) {
-    staffById(_id: $staff_id) {
-      _id
-      staff_name
-      email
-      position_name
-      picture
-    }
-  }
-`;
-
-const DELETE_TASK_ASSIGNED_TO = gql`
-mutation deleteTaskAssignedTo ($_id: String!) {
-  delete_task_assigned_to(_id:$_id){
-    _id
-  }
-}
-`;
+import { Assignees, AssigneeAvatar } from '.';
+import {
+  DELETE_TASK_ASSIGNED_TO,
+  ORGANIZATION_QUERY,
+  STAFF_QUERY
+} from 'gql';
 
 const useStyles = makeStyles(theme => ({
   row: {
@@ -155,10 +128,9 @@ export default function TaskProperties(props) {
 
   useEffect(() => {
     if (dataStaff) {
-      setCreatedBy(dataStaff.staffById);
+      setCreatedBy(dataStaff.staff);
     }
   }, [dataStaff])
-  console.log(dataStaff)
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showEditIcon, setShowEditIcon] = React.useState(false);
   const [descriptionForm, setDescriptionForm] = React.useState(false);
@@ -229,14 +201,14 @@ export default function TaskProperties(props) {
     props.handleCompletedChange(taskForm);
   };
 
-  const [openComitees, setOpenComitees] = React.useState(false);
+  const [openPersonInCharges, setOpenPersonInCharges] = React.useState(false);
 
-  const handleOpenComitees = () => {
-    setOpenComitees(true);
+  const handleOpenPersonInCharges = () => {
+    setOpenPersonInCharges(true);
   };
 
-  const handleCloseComitees = () => {
-    setOpenComitees(false);
+  const handleClosePersonInCharges = () => {
+    setOpenPersonInCharges(false);
   };
 
 
@@ -246,6 +218,7 @@ export default function TaskProperties(props) {
     props.handleDeleteTaskAssignedTo(e, id);
     deleteTaskAssignedTo({ variables: { _id: e, } });
   }
+  console.log(props.user_access)
 
   return (
     <div>
@@ -267,12 +240,7 @@ export default function TaskProperties(props) {
           />
         </EscapeOutside>
         :
-        (props.project_comitee.position_id === '1' ||
-          props.project_comitee.position_id === '2' ||
-          props.project_comitee.position_id === '3' ||
-          props.project_comitee.position_id === '5' ||
-          props.project_comitee.position_id === '6' ||
-          props.decodedToken.user_type === "organization") ?
+        (props.user_access) ?
           <Button
             elevation={0}
             size="small"
@@ -337,12 +305,7 @@ export default function TaskProperties(props) {
                 {taskForm.completed_date.slice(0, 21)}
               </Typography>
               :
-              (props.project_comitee.position_id === '1' ||
-                props.project_comitee.position_id === '2' ||
-                props.project_comitee.position_id === '3' ||
-                props.project_comitee.position_id === '5' ||
-                props.project_comitee.position_id === '6' ||
-                props.decodedToken.user_type === "organization") ?
+              (props.user_access) ?
                 taskForm.due_date === "" ?
                   <Button onClick={handleOpenCalendar} variant="outlined" disableElevation size="small" color="secondary">
                     <AddIcon />
@@ -405,12 +368,7 @@ export default function TaskProperties(props) {
               return <AssigneeAvatar
                 type="chip"
                 deleteButton={
-                  (props.project_comitee.position_id === '1' ||
-                    props.project_comitee.position_id === '2' ||
-                    props.project_comitee.position_id === '3' ||
-                    props.project_comitee.position_id === '5' ||
-                    props.project_comitee.position_id === '6' ||
-                    props.decodedToken.user_type === "organization") ?
+                  (props.user_access) ?
                     true : false
                 }
                 key={index}
@@ -419,18 +377,13 @@ export default function TaskProperties(props) {
             })
           }
           {
-            (props.project_comitee.position_id === '1' ||
-              props.project_comitee.position_id === '2' ||
-              props.project_comitee.position_id === '3' ||
-              props.project_comitee.position_id === '5' ||
-              props.project_comitee.position_id === '6' ||
-              props.decodedToken.user_type === "organization") ?
+            (props.user_access) ?
               <Chip
                 size="small"
                 color="secondary"
                 variant="outlined"
                 clickable
-                onClick={handleOpenComitees}
+                onClick={handleOpenPersonInCharges}
                 icon={<AddIcon />}
                 label="More"
               /> : <div>
@@ -443,13 +396,16 @@ export default function TaskProperties(props) {
                 }
               </div>
           }
-          <AssigneesDivision
+          <Assignees
             project_id={props.project_id}
+            event_id={props.event_id}
+            roadmap_id={props.roadmap_id}
+            roadmap={props.roadmap}
             task={props.task}
             handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
             handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
-            handleCloseComitees={handleCloseComitees}
-            openComitees={openComitees}
+            handleClosePersonInCharges={handleClosePersonInCharges}
+            openPersonInCharges={openPersonInCharges}
             tasksAssignedTo={props.tasksAssignedTo}
           />
         </div>
@@ -466,12 +422,7 @@ export default function TaskProperties(props) {
         </div>
         <div className={classes.field}>
           {
-            (props.project_comitee.position_id === '1' ||
-              props.project_comitee.position_id === '2' ||
-              props.project_comitee.position_id === '3' ||
-              props.project_comitee.position_id === '5' ||
-              props.project_comitee.position_id === '6' ||
-              props.decodedToken.user_type === "organization") ?
+            (props.user_access) ?
               <ButtonGroup variant="contained" style={{ width: '70%' }} size="small" aria-label="outlined primary button group">
                 {taskForm.priority === "low" ?
                   <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.low].join(" ")}>Low</Button>

@@ -10,8 +10,8 @@ import {
 import {
   PictureCard,
   NumberOfEventCard,
-  NumberOfComiteeCard,
-  NumberOfDivisionCard,
+  NumberOfPersonInChargeCard,
+  NumberOfCommitteeCard,
   DetailOverview
 } from './components';
 
@@ -43,43 +43,30 @@ export default function ProjectOverview(props) {
       </Grid>
       <Grid
         item
-        lg={12}
-        md={12}
-        xl={12}
+        lg={4}
+        sm={4}
+        xl={4}
         xs={12}
       >
-        <Grid
-          container
-          spacing={1}
-        >
-          <Grid
-            item
-            lg={4}
-            sm={6}
-            xl={6}
-            xs={12}
-          >
-            <NumberOfEventCard project={props.project} />
-          </Grid>
-          <Grid
-            item
-            lg={4}
-            sm={6}
-            xl={6}
-            xs={12}
-          >
-            <NumberOfDivisionCard divisions={props.divisions} />
-          </Grid>
-          <Grid
-            item
-            lg={4}
-            sm={6}
-            xl={6}
-            xs={12}
-          >
-            <NumberOfComiteeCard project={props.project} />
-          </Grid>
-        </Grid>
+        <NumberOfEventCard project={props.project} />
+      </Grid>
+      <Grid
+        item
+        lg={4}
+        sm={4}
+        xl={4}
+        xs={12}
+      >
+        <NumberOfCommitteeCard personInCharges={props.personInCharges} />
+      </Grid>
+      <Grid
+        item
+        lg={4}
+        sm={4}
+        xl={4}
+        xs={12}
+      >
+        <NumberOfPersonInChargeCard project={props.project} />
       </Grid>
     </Grid>
 

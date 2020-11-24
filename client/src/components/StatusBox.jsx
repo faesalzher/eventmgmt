@@ -7,9 +7,6 @@ import {
 
 
 const useStyles = makeStyles(theme => ({
-  cancelled: {
-    backgroundColor: theme.palette.error.main
-  },
   preparing: {
     backgroundColor: theme.palette.warning.main
   },
@@ -58,25 +55,19 @@ export default function StatusBox(props) {
   const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
 
   return (
-    (props.cancel === true) ? (
-      <Box borderRadius={4} style={props.style} className={[classes.cancelled, classes.boxStatus].join(" ")}>
-        <Typography variant="subtitle2" className={classes.fontStatus}>Cancelled</Typography>
+    (preparingDays) ? (
+      <Box borderRadius={4} style={props.style} className={[classes.preparing, classes.boxStatus].join(" ")}>
+        <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Preparing</Typography>
       </Box>
     ) : (
-        (preparingDays) ? (
-          <Box borderRadius={4} style={props.style}  className={[classes.preparing, classes.boxStatus].join(" ")}>
-            <Typography variant="subtitle2" className={[classes.fontStatus, classes.primaryColor].join(" ")}>Preparing</Typography>
+        (activeDays) ? (
+          <Box borderRadius={4} style={props.style} className={[classes.active, classes.boxStatus].join(" ")}>
+            <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
           </Box>
         ) : (
-            (activeDays) ? (
-              <Box borderRadius={4}  style={props.style} className={[classes.active, classes.boxStatus].join(" ")}>
-                <Typography variant="subtitle2" className={classes.fontStatus}>Active</Typography>
-              </Box>
-            ) : (
-                <Box borderRadius={4}  style={props.style}  className={[classes.completed, classes.boxStatus].join(" ")}>
-                  <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
-                </Box>
-              )
+            <Box borderRadius={4} style={props.style} className={[classes.completed, classes.boxStatus].join(" ")}>
+              <Typography variant="subtitle2" className={classes.fontStatus}>Completed</Typography>
+            </Box>
           )
       )
   );

@@ -1,4 +1,4 @@
-import React,{ forwardRef }  from 'react';
+import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -7,10 +7,12 @@ import {
   CardContent,
   Divider,
   Grid,
-  Button
+  Button,
+  IconButton,
 } from '@material-ui/core';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { NavLink as RouterLink } from 'react-router-dom';
 
 import ProjectCard from 'views/ProjectList/components/ProjectCard';
@@ -36,6 +38,16 @@ export default function RecentlyAddedProject(props) {
 
   }
 
+  const sortedProjects = (props.projects.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    // nextArrow: <SampleNextArrow />,
+    // prevArrow: <SamplePrevArrow />
+  };
   return (
     <Card
       {...rest}
@@ -56,16 +68,19 @@ export default function RecentlyAddedProject(props) {
         }
       />
       <Divider />
-      <CardContent style={{ padding: 0 }}>
-        <Carousel showThumbs={false} showStatus={false} autoPlay swipeable infiniteLoop>
+      <CardContent style={{ padding: '10px 50px 25px', backgroundColor: "#e7e7e7" }}>
+        <Slider
+          {...settings}
+          style={{ padding: '0px 25px', display: 'flex', justifyContent: 'center' }}
+        >
           {
-            props.projects.slice().reverse().map((project, index) => {
+            sortedProjects.slice(0, 3).map((project, index) => {
               return (
                 <Grid
                   container
                   key={project._id}
                   spacing={1}
-                  style={{padding:'10px 40px',backgroundColor:'#d6d6d6'}}
+                  style={{ backgroundColor: '#d6d6d6', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}
                 >
                   <Grid
                     item
@@ -74,18 +89,17 @@ export default function RecentlyAddedProject(props) {
                     xl={12}
                     xs={12}
                   >
-                  <ProjectCard
-                    project={project}
-                    handleDelete={handleDelete}
-                  />
-                </Grid>
+                    <ProjectCard
+                      project={project}
+                      handleDelete={handleDelete}
+                    />
+                  </Grid>
                 </Grid>
               )
             })
           }
-        </Carousel>
+        </Slider>
       </CardContent>
     </Card >
   );
 };
-

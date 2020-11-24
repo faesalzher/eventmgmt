@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 // import Button from '@material-ui/core/Button';
 import {
   // Popover,
@@ -16,20 +15,10 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import {
-  ComiteeEditForm
+  PersonInChargeEditForm
 } from '.';
 
-const STAFFSBYID_QUERY = gql`
-  query staffById($_id: String!){
-    staffById(_id:$_id) {
-      _id
-      staff_name
-      phone_number
-      email
-      picture
-    }
-  }
-`;
+import { STAFF_QUERY } from 'gql';
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -50,9 +39,9 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
-export default function Comitees(props) {
+export default function PersonInCharge(props) {
   // const classes = useStyles();
-  // console.log(props.comitees.imageUrl)
+  // console.log(props.personInCharges.imageUrl)
 
 
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -67,18 +56,19 @@ export default function Comitees(props) {
   };
 
   // const handleSaveButton = (e) => {
-  //   // setComiteess([...comiteess, e])
+  //   // setPersonInChargess([...personInChargess, e])
   // }
 
-  const { data } = useQuery(STAFFSBYID_QUERY,
+  const { data } = useQuery(STAFF_QUERY,
     {
-      variables: { _id: props.comitee.staff_id },
-      onCompleted: () => { setStaff(data.staffById) }
+      variables: { staff_id: props.personInCharge.staff_id },
+      onCompleted: () => { setStaff(data.staff) }
     });
 
   return (
-    <StyledTableRow style={props.project_comitee._id === props.comitee._id ? { backgroundColor: "#ececec" } : {}}>
-      <StyledTableCell component="th" scope="row" style={{ display: 'flex', justifyContent: 'center', width: 70 }}>
+    <StyledTableRow style={
+      (props.decodedToken.user_type === "organization") ? {} : props.project_personInCharge._id === props.personInCharge._id ? { backgroundColor: "#ececec" } : {}}>
+      <StyledTableCell style={{ display: 'flex', justifyContent: 'center',padding:'2px 10px'}}>
         <Avatar style={{ width: 30, height: 30 }} src={staff.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
@@ -92,7 +82,7 @@ export default function Comitees(props) {
       </StyledTableCell>
       <StyledTableCell align="left">
         {props.positions.map((position, index) => {
-          if (position._id === props.comitee.position_id) {
+          if (position._id === props.personInCharge.position_id) {
             return <div key={index}>{position.position_name}</div>
           }
           return null;
@@ -109,11 +99,11 @@ export default function Comitees(props) {
               </IconButton>
             </Tooltip>
             :
-            (props.project_comitee.position_id === "1"
-              || props.project_comitee.position_id === "2"
-              || props.project_comitee.position_id === "3"
+            (props.project_personInCharge.position_id === "1"
+              || props.project_personInCharge.position_id === "2"
+              || props.project_personInCharge.position_id === "3"
             ) ?
-              ((parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id)))
+              ((parseInt(props.project_personInCharge.position_id) >= parseInt(props.personInCharge.position_id)))
                 ?
                 <></>
                 :
@@ -126,8 +116,8 @@ export default function Comitees(props) {
 
                 </>
               :
-              (parseInt(props.project_comitee.position_id) >= parseInt(props.comitee.position_id))
-              || (props.project_comitee.division_id !== props.comitee.division_id)
+              (parseInt(props.project_personInCharge.position_id) >= parseInt(props.personInCharge.position_id))
+                || (props.project_personInCharge.committee_id !== props.personInCharge.committee_id)
                 ?
                 <></>
                 :
@@ -137,16 +127,16 @@ export default function Comitees(props) {
                   </IconButton>
                 </Tooltip>
         }
-        <ComiteeEditForm
-          comitee={props.comitee}
+        <PersonInChargeEditForm
+          personInCharge={props.personInCharge}
           project_id={props.project_id}
-          comitees={props.comitees}
-          divisions={props.divisions}
+          personInCharges={props.personInCharges}
+          committees={props.committees}
           positions={props.positions}
           staffs={props.staffs}
           departements={props.departements}
           open={openEditModal}
-          handleDeleteComitee={props.handleDeleteComitee}
+          handleDeletePersonInCharge={props.handleDeletePersonInCharge}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}
         />

@@ -95,7 +95,6 @@ export default function DetailOverview(props) {
             <StatusBox
               start_date={props.event.event_start_date}
               end_date={props.event.event_end_date}
-              cancel={props.event.cancel}
             />
           </div>
         </div>

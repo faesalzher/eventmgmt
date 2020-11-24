@@ -27,13 +27,13 @@ import LastPageIcon from '@material-ui/icons/LastPage'
 
 
 import {
-  Division,
-  DivisionAddForm
+  Committee,
+  CommitteeAddForm
 } from '.';
 
 
 
-// import mockData from '../dataDivision';
+// import mockData from '../dataCommittee';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -118,19 +118,19 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-export default function Divisions(props) {
+export default function Committees(props) {
   const classes = useStyles();
-  // const [divisions, setDivisions] = useState(mockData);
+  // const [committees, setCommittees] = useState(mockData);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [divisions, setDivisions] = useState(props.divisions)
-  // console.log(divisions)
+  const [committees, setCommittees] = useState(props.committees)
+  // console.log(committees)
   useEffect(() => {
-    setDivisions(props.divisions)
-  }, [setDivisions, props.divisions])
+    setCommittees(props.committees)
+  }, [setCommittees, props.committees])
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, divisions.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, committees.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
     setOpenAddModal(true);
@@ -153,24 +153,21 @@ export default function Divisions(props) {
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
         <Typography style={{ color: 'black' }} variant='subtitle2'>
-          List of Division
+          List of Committee
         </Typography>
         {
-          props.project_comitee.position_id === "1" ||
-            props.project_comitee.position_id === "2" ||
-            props.project_comitee.position_id === "3" ||
             props.decodedToken.user_type === "organization"
             ?
-            <Tooltip arrow title="Add New Divisions" aria-label="confirm">
+            <Tooltip arrow title="Add New Committees" aria-label="confirm">
               <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
                 <AddIcon />
               </IconButton>
             </Tooltip>
             : <></>
         }
-        <DivisionAddForm
+        <CommitteeAddForm
           // guests={guests}
-          project_id={props.project_id}
+          decodedToken={props.decodedToken}
           open={openAddModal}
           handleSaveButton={props.handleSaveButton}
           close={handleCloseAddModal}
@@ -183,9 +180,6 @@ export default function Divisions(props) {
               <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
-                  props.project_comitee.position_id === "1" ||
-                    props.project_comitee.position_id === "2" ||
-                    props.project_comitee.position_id === "3" ||
                     props.decodedToken.user_type === "organization"
                     ?
                     "Action" : ""
@@ -197,15 +191,15 @@ export default function Divisions(props) {
           <TableBody>
             {
               (rowsPerPage > 0
-                ? divisions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : divisions
-              ).map((division, index) => {
-                return <Division
+                ? committees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : committees
+              ).map((committee, index) => {
+                return <Committee
                   key={index}
-                  project_comitee={props.project_comitee}
+                  project_personInCharge={props.project_personInCharge}
                   decodedToken={props.decodedToken}
-                  handleDeleteDivision={props.handleDeleteDivision}
-                  division={division}
+                  handleDeleteCommittee={props.handleDeleteCommittee}
+                  committee={committee}
                   handleSaveEditButton={props.handleSaveEditButton}
                 />
               })
@@ -221,7 +215,7 @@ export default function Divisions(props) {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={6}
-                count={divisions.length}
+                count={committees.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{
@@ -240,7 +234,7 @@ export default function Divisions(props) {
         rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
         // colSpan={6}
         component="div"
-        count={divisions.length}
+        count={committees.length}
         rowsPerPage={rowsPerPage}
         page={page}
         // SelectProps={{

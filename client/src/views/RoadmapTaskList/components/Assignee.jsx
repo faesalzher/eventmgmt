@@ -5,52 +5,13 @@ import ListItem from '@material-ui/core/ListItem';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import CheckIcon from '@material-ui/icons/Check';
+
 import { ConfirmationDialog } from 'components';
 
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import uuid from 'uuid/v1';
 
-const STAFFSBYID_QUERY = gql`
-  query staffById($_id: String!){
-    staffById(_id:$_id) {
-      _id
-      staff_name
-      phone_number
-      email
-      picture
-    }
-  }
-`;
-
-const POSITION_QUERY = gql`
-  query position($_id: String!){
-    position(_id:$_id) {
-      _id
-      position_name
-      core
-    }
-  }
-`;
-
-const ADD_TASK_ASSIGNED_TO = gql`
-  mutation addTaskAssignedTo(
-    $_id: String!,
-    $task_id: String!,
-    $comitee_id: String!,
-    ){
-    addTask_assigned_to(
-      _id: $_id,
-      task_id: $task_id,
-      comitee_id: $comitee_id,
-    ){
-      _id
-      task_id
-      comitee_id
-    }
-  }
-`;
-
+import { STAFF_QUERY, ADD_TASK_ASSIGNED_TO, POSITION_QUERY } from 'gql';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -68,13 +29,20 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: 2
   }
 }));
-export default function ComiteeDialog(props) {
+
+export default function Assignee(props) {
   const classes = useStyles();
+
   const initialFormState =
   {
     _id: uuid(),
     task_id: props.task._id,
-    comitee_id: props.comitee._id,
+    person_in_charge_id: props.personInCharge._id,
+    event_id: props.event_id,
+    project_id: props.project_id,
+    roadmap_id: props.roadmap_id,
+    staff_id: props.personInCharge.staff_id,
+    created_at: new Date().toString(),
   };
 
   const [staff, setStaff] = useState([]);
@@ -84,26 +52,26 @@ export default function ComiteeDialog(props) {
   const [addTaskAssignedTo] = useMutation(ADD_TASK_ASSIGNED_TO);
 
 
-  let assignedComiteeId = null;
+  let assignedPersonInChargeId = null;
 
   props.tasksAssignedTo.map((taskAssignedTo) => {
-    if (taskAssignedTo.comitee_id === props.comitee._id) {
-      assignedComiteeId = taskAssignedTo._id
+    if (taskAssignedTo.person_in_charge_id === props.personInCharge._id) {
+      assignedPersonInChargeId = taskAssignedTo._id
     }
     return null;
   }
   );
 
-  const { data: staffData, loading: staffLoading } = useQuery(STAFFSBYID_QUERY,
+  const { data: staffData, loading: staffLoading } = useQuery(STAFF_QUERY,
     {
-      variables: { _id: props.comitee.staff_id },
-      onCompleted: () => { setStaff(staffData.staffById) }
+      variables: { staff_id: props.personInCharge.staff_id },
+      onCompleted: () => { setStaff(staffData.staff) }
     });
 
 
 
   const { data: positionData, loading: positionLoading } = useQuery(POSITION_QUERY, {
-    variables: { _id: props.comitee.position_id },
+    variables: { _id: props.personInCharge.position_id },
     onCompleted: () => {
       if (positionData !== undefined && positionData.position !== null) {
         setPosition(
@@ -119,13 +87,17 @@ export default function ComiteeDialog(props) {
   const handleListClickAdd = () => {
     setSelected(true);
     props.handleAddTaskAssignedTo(addTaskAssignedToForm)
-
     addTaskAssignedTo({
       variables:
       {
         _id: addTaskAssignedToForm._id,
         task_id: addTaskAssignedToForm.task_id,
-        comitee_id: addTaskAssignedToForm.comitee_id,
+        person_in_charge_id: addTaskAssignedToForm.person_in_charge_id,
+        event_id: addTaskAssignedToForm.event_id,
+        project_id: addTaskAssignedToForm.project_id,
+        roadmap_id: addTaskAssignedToForm.roadmap_id,
+        staff_id: addTaskAssignedToForm.staff_id,
+        created_at: addTaskAssignedToForm.created_at,
       }
     });
   }
@@ -137,7 +109,7 @@ export default function ComiteeDialog(props) {
 
   const handleDelete = () => {
     setSelected(false)
-    props.handleDeleteTaskAssignedTo(assignedComiteeId, props.comitee._id)
+    props.handleDeleteTaskAssignedTo(assignedPersonInChargeId, props.personInCharge._id)
   }
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
 
@@ -149,7 +121,7 @@ export default function ComiteeDialog(props) {
   }
 
 
-  if (staffLoading || positionLoading) {
+  if (staffLoading || positionLoading || props.personInChargesLoading) {
     return <div style={{ textAlign: 'center' }}>
       <CircularProgress />
     </div>
@@ -167,7 +139,7 @@ export default function ComiteeDialog(props) {
       />
       <ListItem button className={classes.list}
         onClick={
-          assignedComiteeId || selected ? () => handleOpenConfirmationDialog() : () => handleListClickAdd()
+          assignedPersonInChargeId || selected ? () => handleOpenConfirmationDialog() : () => handleListClickAdd()
         }>
         <ListItemAvatar>
           <Avatar src={staff.picture} />
@@ -177,7 +149,7 @@ export default function ComiteeDialog(props) {
           secondary={position.position_name}
         />
         {
-          assignedComiteeId || selected ?
+          assignedPersonInChargeId || selected ?
             <ListItemSecondaryAction>
               <CheckIcon />
             </ListItemSecondaryAction>

@@ -28,10 +28,10 @@ const ProjectType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     project_name: { type: GraphQLString },
     project_description: { type: GraphQLString },
-    cancel: { type: GraphQLBoolean },
     project_start_date: { type: GraphQLString },
     project_end_date: { type: GraphQLString },
     picture: { type: GraphQLString },
+    created_at: { type: GraphQLString },
     organization_id: { type: GraphQLString },
   }),
 });
@@ -88,23 +88,23 @@ const PositionType = new GraphQLObjectType({
   }),
 });
 
-const Division = require("./model/Division");
-const DivisionType = new GraphQLObjectType({
-  name: "Division",
+const Committee = require("./model/Committee");
+const CommitteeType = new GraphQLObjectType({
+  name: "Committee",
   fields: () => ({
     _id: { type: GraphQLID },
-    division_name: { type: GraphQLString },
-    project_id: { type: GraphQLString },
+    committee_name: { type: GraphQLString },
+    organization_id: { type: GraphQLString },
   }),
 });
 
-const Comitee = require("./model/Comitee");
-const ComiteeType = new GraphQLObjectType({
-  name: "Comitee",
+const Person_in_charge = require("./model/Person_in_charge");
+const Person_in_chargeType = new GraphQLObjectType({
+  name: "Person_in_charge",
   fields: () => ({
     _id: { type: GraphQLID },
     staff_id: { type: GraphQLString },
-    division_id: { type: GraphQLString },
+    committee_id: { type: GraphQLString },
     position_id: { type: GraphQLString },
     project_id: { type: GraphQLString },
   }),
@@ -119,7 +119,9 @@ const RoadmapType = new GraphQLObjectType({
     start_date: { type: GraphQLString },
     end_date: { type: GraphQLString },
     color: { type: GraphQLString },
+    committee_id: { type: GraphQLString },
     event_id: { type: GraphQLString },
+    project_id: { type: GraphQLString },
   }),
 });
 
@@ -131,10 +133,11 @@ const ExternalType = new GraphQLObjectType({
     external_name: { type: GraphQLString },
     external_type: { type: GraphQLString },
     email: { type: GraphQLString },
-    event_id: { type: GraphQLString },
     phone_number: { type: GraphQLString },
     details: { type: GraphQLString },
     picture: { type: GraphQLString },
+    event_id: { type: GraphQLString },
+    project_id: { type: GraphQLString },
   }),
 });
 
@@ -149,6 +152,7 @@ const AgendaType = new GraphQLObjectType({
     end_time: { type: GraphQLString },
     details: { type: GraphQLString },
     event_id: { type: GraphQLString },
+    project_id: { type: GraphQLString },
   }),
 });
 
@@ -166,6 +170,8 @@ const TaskType = new GraphQLObjectType({
     created_at: { type: GraphQLString },
     created_by: { type: GraphQLString },
     roadmap_id: { type: GraphQLString },
+    project_id: { type: GraphQLString },
+    event_id: { type: GraphQLString },
   }),
 });
 
@@ -175,7 +181,12 @@ const Task_assigned_toType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     task_id: { type: GraphQLString },
-    comitee_id: { type: GraphQLString },
+    person_in_charge_id: { type: GraphQLString },
+    roadmap_id: { type: GraphQLString },
+    project_id: { type: GraphQLString },
+    event_id: { type: GraphQLString },
+    staff_id: { type: GraphQLString },
+    created_at: { type: GraphQLString },
   }),
 });
 
@@ -210,13 +221,6 @@ const RootQuery = new GraphQLObjectType({
         return Project.findById(args._id);
       },
     },
-    // projectByStatus: {
-    //   type: new GraphQLList(ProjectType),
-    //   args: { status: { type: GraphQLString } },
-    //   resolve(parent, args) {
-    //     return Project.find({ status: args.status });
-    //   }
-    // },
     check_staff: {
       type: new GraphQLList(StaffType),
       args: { email: { type: GraphQLString } },
@@ -226,23 +230,24 @@ const RootQuery = new GraphQLObjectType({
     },
     staffs: {
       type: new GraphQLList(StaffType),
-      args: { organization_id: { type: GraphQLString } },
+      args: {
+        organization_id: { type: GraphQLString },
+        departement_id: { type: GraphQLString },
+      },
       resolve(parent, args) {
-        return Staff.find({ organization_id: args.organization_id });
+        if (args.organization_id) {
+          return Staff.find({ organization_id: args.organization_id });
+        }
+        if (args.departement_id) {
+          return Staff.find({ departement_id: args.departement_id });
+        }
       },
     },
-    staffById: {
+    staff: {
       type: StaffType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Staff.findById(args._id);
-      },
-    },
-    staffsByDepartement: {
-      type: new GraphQLList(StaffType),
-      args: { departement_id: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Staff.find({ departement_id: args.departement_id });
       },
     },
     departements: {
@@ -259,17 +264,11 @@ const RootQuery = new GraphQLObjectType({
         return Departement.findById(args._id);
       },
     },
-    eventsByProject: {
+    events: {
       type: new GraphQLList(EventType),
       args: { project_id: { type: GraphQLString } },
       resolve(parent, args) {
         return Event.find({ project_id: args.project_id });
-      },
-    },
-    events: {
-      type: new GraphQLList(EventType),
-      resolve(parent, args) {
-        return Event.find({});
       },
     },
     event: {
@@ -292,79 +291,88 @@ const RootQuery = new GraphQLObjectType({
         return Position.findById(args._id);
       },
     },
-    divisionsByProject: {
-      type: new GraphQLList(DivisionType),
-      args: { project_id: { type: GraphQLString } },
+    committees: {
+      type: new GraphQLList(CommitteeType),
+      args: { organization_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Division.find({ project_id: args.project_id });
+        return Committee.find({ organization_id: args.organization_id });
       },
     },
-    division: {
-      type: DivisionType,
+    committee: {
+      type: CommitteeType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Division.findById(args._id);
+        return Committee.findById(args._id);
       },
     },
-    comiteesByProject: {
-      type: new GraphQLList(ComiteeType),
-      args: { project_id: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Comitee.find({ project_id: args.project_id });
-      },
-    },
-    comitee: {
-      type: ComiteeType,
-      args: { _id: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Comitee.findById(args._id);
-      },
-    },
-    comiteeByStaffAndProject: {
-      type: new GraphQLList(ComiteeType),
+    person_in_charges: {
+      type: new GraphQLList(Person_in_chargeType),
       args: {
         staff_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
+        position_id: { type: GraphQLString },
+        committee_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return Comitee.find({
-          staff_id: args.staff_id,
-          project_id: args.project_id,
-        });
+        if (args.staff_id) {
+          return Person_in_charge.find({ staff_id: args.staff_id });
+        }
+        if (args.project_id) {
+          return Person_in_charge.find({ project_id: args.project_id });
+        }
+        if (args.committee_id) {
+          return Person_in_charge.find({ committee_id: args.committee_id });
+        }
       },
     },
-    comiteesByHeadProject: {
-      type: new GraphQLList(ComiteeType),
+    person_in_charges_by_project_and_position: {
+      type: new GraphQLList(Person_in_chargeType),
       args: {
         project_id: { type: GraphQLString },
         position_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return Comitee.find({
+        return Person_in_charge.find({
           project_id: args.project_id,
           position_id: args.position_id,
         });
       },
     },
-    comiteesByStaff: {
-      type: new GraphQLList(ComiteeType),
-      args: { staff_id: { type: GraphQLString } },
+    person_in_charges_by_staff_and_project: {
+      type: new GraphQLList(Person_in_chargeType),
+      args: {
+        staff_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
       resolve(parent, args) {
-        return Comitee.find({ staff_id: args.staff_id });
+        return Person_in_charge.find({
+          staff_id: args.staff_id,
+          project_id: args.project_id,
+        });
+      },
+    },
+    person_in_charge: {
+      type: Person_in_chargeType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Person_in_charge.findById(args._id);
       },
     },
     roadmaps: {
       type: new GraphQLList(RoadmapType),
-      args: { event_id: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Roadmap.find({ event_id: args.event_id });
+      args: {
+        event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
-    },
-    roadmapByEvent: {
-      type: new GraphQLList(RoadmapType),
-      args: { event_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Roadmap.find({ event_id: args.event_id });
+        query = {};
+        if (args.event_id) {
+          query = Roadmap.find({ event_id: args.event_id });
+        }
+        if (args.project_id) {
+          query = Roadmap.find({ project_id: args.project_id });
+        }
+        return query;
       },
     },
     roadmap: {
@@ -376,16 +384,32 @@ const RootQuery = new GraphQLObjectType({
     },
     externals: {
       type: new GraphQLList(ExternalType),
-      args: { event_id: { type: GraphQLString } },
+      args: {
+        event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
       resolve(parent, args) {
-        return External.find({ event_id: args.event_id });
+        if (args.event_id) {
+          return External.find({ event_id: args.event_id });
+        }
+        if (args.project_id) {
+          return External.find({ project_id: args.project_id });
+        }
       },
     },
     agendas: {
       type: new GraphQLList(AgendaType),
-      args: { event_id: { type: GraphQLString } },
+      args: {
+        event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
       resolve(parent, args) {
-        return Agenda.find({ event_id: args.event_id });
+        if (args.event_id) {
+          return Agenda.find({ event_id: args.event_id });
+        }
+        if (args.project_id) {
+          return Agenda.find({ project_id: args.project_id });
+        }
       },
     },
     task: {
@@ -397,30 +421,54 @@ const RootQuery = new GraphQLObjectType({
     },
     tasks: {
       type: new GraphQLList(TaskType),
-      args: { roadmap_id: { type: GraphQLString } },
+      args: {
+        roadmap_id: { type: GraphQLString },
+        created_by: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
       resolve(parent, args) {
-        return Task.find({ roadmap_id: args.roadmap_id });
+        if (args.roadmap_id) {
+          return Task.find({ roadmap_id: args.roadmap_id });
+        }
+        if (args.created_by) {
+          return Task.find({ created_by: args.created_by });
+        }
+        if (args.project_id) {
+          return Task.find({ project_id: args.project_id });
+        }
+        if (args.event_id) {
+          return Task.find({ event_id: args.event_id });
+        }
       },
     },
-    tasks_by_creator: {
-      type: new GraphQLList(TaskType),
-      args: { created_by: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Task.find({ created_by: args.created_by });
-      },
-    },
-    tasks_assigned_to: {
+    task_assigned_tos: {
       type: new GraphQLList(Task_assigned_toType),
-      args: { task_id: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Task_assigned_to.find({ task_id: args.task_id });
+      args: {
+        task_id: { type: GraphQLString },
+        person_in_charge_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        roadmap_id: { type: GraphQLString },
       },
-    },
-    tasks_assigned_to_by_comitee: {
-      type: new GraphQLList(Task_assigned_toType),
-      args: { comitee_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Task_assigned_to.find({ comitee_id: args.comitee_id });
+        if (args.task_id) {
+          return Task_assigned_to.find({ task_id: args.task_id });
+        }
+        if (args.person_in_charge_id) {
+          return Task_assigned_to.find({
+            person_in_charge_id: args.person_in_charge_id,
+          });
+        }
+        if (args.project_id) {
+          return Task_assigned_to.find({ project_id: args.project_id });
+        }
+        if (args.event_id) {
+          return Task_assigned_to.find({ event_id: args.event_id });
+        }
+        if (args.roadmap_id) {
+          return Task_assigned_to.find({ roadmap_id: args.roadmap_id });
+        }
       },
     },
   },
@@ -493,10 +541,10 @@ const Mutation = new GraphQLObjectType({
         _id: { type: GraphQLString },
         project_name: { type: GraphQLString },
         project_description: { type: GraphQLString },
-        cancel: { type: GraphQLBoolean },
         project_start_date: { type: GraphQLString },
         project_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
+        created_at: { type: GraphQLString },
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
@@ -504,10 +552,10 @@ const Mutation = new GraphQLObjectType({
           _id: args._id,
           project_name: args.project_name,
           project_description: args.project_description,
-          cancel: args.cancel,
           project_start_date: args.project_start_date,
           project_end_date: args.project_end_date,
           picture: args.picture,
+          created_at: args.created_at,
           organization_id: args.organization_id,
         });
         return project.save();
@@ -519,20 +567,20 @@ const Mutation = new GraphQLObjectType({
         _id: { type: GraphQLString },
         project_name: { type: GraphQLString },
         project_description: { type: GraphQLString },
-        cancel: { type: GraphQLBoolean },
         project_start_date: { type: GraphQLString },
         project_end_date: { type: GraphQLString },
         picture: { type: GraphQLString },
+        created_at: { type: GraphQLString },
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {
           project_name: args.project_name,
           project_description: args.project_description,
-          cancel: args.cancel,
           project_start_date: args.project_start_date,
           project_end_date: args.project_end_date,
           picture: args.picture,
+          created_at: args.created_at,
           organization_id: args.organization_id,
         };
         let project = Project.findByIdAndUpdate(args._id, edit, { new: true });
@@ -743,73 +791,73 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
-    addDivision: {
-      type: DivisionType,
+    addCommittee: {
+      type: CommitteeType,
       args: {
         _id: { type: GraphQLString },
-        division_name: { type: GraphQLString },
-        project_id: { type: GraphQLString },
+        committee_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let division = new Division({
+        let committee = new Committee({
           _id: args._id,
-          division_name: args.division_name,
-          project_id: args.project_id,
+          committee_name: args.committee_name,
+          organization_id: args.organization_id,
         });
-        return division.save();
+        return committee.save();
       },
     },
-    editDivision: {
-      type: DivisionType,
+    editCommittee: {
+      type: CommitteeType,
       args: {
         _id: { type: GraphQLString },
-        division_name: { type: GraphQLString },
+        committee_name: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let division = Division.findByIdAndUpdate(
+        let committee = Committee.findByIdAndUpdate(
           args._id,
-          { division_name: args.division_name },
+          { committee_name: args.committee_name },
           { new: true }
         );
-        return division;
+        return committee;
       },
     },
-    deleteDivision: {
-      type: DivisionType,
+    deleteCommittee: {
+      type: CommitteeType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let division = Division.findByIdAndDelete(args._id);
-        return division;
+        let committee = Committee.findByIdAndDelete(args._id);
+        return committee;
       },
     },
 
-    addComitee: {
-      type: ComiteeType,
+    addPerson_in_charge: {
+      type: Person_in_chargeType,
       args: {
         _id: { type: GraphQLString },
         staff_id: { type: GraphQLString },
-        division_id: { type: GraphQLString },
+        committee_id: { type: GraphQLString },
         position_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let comitee = new Comitee({
+        let person_in_charge = new Person_in_charge({
           _id: args._id,
           staff_id: args.staff_id,
-          division_id: args.division_id,
+          committee_id: args.committee_id,
           position_id: args.position_id,
           project_id: args.project_id,
         });
-        return comitee.save();
+        return person_in_charge.save();
       },
     },
-    editComitee: {
-      type: ComiteeType,
+    editPerson_in_charge: {
+      type: Person_in_chargeType,
       args: {
         _id: { type: GraphQLString },
         staff_id: { type: GraphQLString },
         position_id: { type: GraphQLString },
-        division_id: { type: GraphQLString },
+        committee_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
@@ -817,8 +865,8 @@ const Mutation = new GraphQLObjectType({
         if (args.staff_id) {
           edit.staff_id = args.staff_id;
         }
-        if (args.division_id) {
-          edit.division_id = args.division_id;
+        if (args.committee_id) {
+          edit.committee_id = args.committee_id;
         }
         if (args.position_id) {
           edit.position_id = args.position_id;
@@ -826,19 +874,24 @@ const Mutation = new GraphQLObjectType({
         if (args.project_id) {
           edit.project_id = args.project_id;
         }
-        let comitee = Comitee.findByIdAndUpdate(args._id, edit, { new: true });
-        return comitee;
+        let person_in_charge = Person_in_charge.findByIdAndUpdate(
+          args._id,
+          edit,
+          { new: true }
+        );
+        return person_in_charge;
       },
     },
-    deleteComitee: {
-      type: ComiteeType,
+    deletePerson_in_charge: {
+      type: Person_in_chargeType,
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
-        let comitee = Comitee.findByIdAndDelete(args._id);
-        return comitee;
+        let person_in_charge = Person_in_charge.findByIdAndDelete(args._id);
+        return person_in_charge;
       },
     },
 
+    //roadmap
     addRoadmap: {
       type: RoadmapType,
       args: {
@@ -847,7 +900,9 @@ const Mutation = new GraphQLObjectType({
         start_date: { type: GraphQLString },
         end_date: { type: GraphQLString },
         color: { type: GraphQLString },
+        committee_id: { type: GraphQLString },
         event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let roadmap = new Roadmap({
@@ -856,7 +911,9 @@ const Mutation = new GraphQLObjectType({
           start_date: args.start_date,
           end_date: args.end_date,
           color: args.color,
+          committee_id: args.committee_id,
           event_id: args.event_id,
+          project_id: args.project_id,
         });
         return roadmap.save();
       },
@@ -869,25 +926,21 @@ const Mutation = new GraphQLObjectType({
         end_date: { type: GraphQLString },
         start_date: { type: GraphQLString },
         color: { type: GraphQLString },
+        committee_id: { type: GraphQLString },
         event_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.roadmap_name) {
-          edit.roadmap_name = args.roadmap_name;
-        }
-        if (args.start_date) {
-          edit.start_date = args.start_date;
-        }
-        if (args.end_date) {
-          edit.end_date = args.end_date;
-        }
-        if (args.color) {
-          edit.color = args.color;
-        }
-        if (args.event_id) {
-          edit.event_id = args.event_id;
-        }
+        let edit = {
+          roadmap_name: args.roadmap_name,
+          start_date: args.start_date,
+          end_date: args.end_date,
+          color: args.color,
+          committee_id: args.committee_id,
+          event_id: args.event_id,
+          project_id: args.project_id,
+        };
+
         let roadmap = Roadmap.findByIdAndUpdate(args._id, edit, { new: true });
         return roadmap;
       },
@@ -901,6 +954,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    //external
     addExternal: {
       type: ExternalType,
       args: {
@@ -912,6 +966,7 @@ const Mutation = new GraphQLObjectType({
         event_id: { type: GraphQLString },
         details: { type: GraphQLString },
         picture: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let external = new External({
@@ -923,6 +978,7 @@ const Mutation = new GraphQLObjectType({
           event_id: args.event_id,
           details: args.details,
           picture: args.picture,
+          project_id: args.project_id,
         });
         return external.save();
       },
@@ -938,30 +994,20 @@ const Mutation = new GraphQLObjectType({
         event_id: { type: GraphQLString },
         details: { type: GraphQLString },
         picture: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.external_name) {
-          edit.external_name = args.external_name;
-        }
-        if (args.external_type) {
-          edit.external_type = args.external_type;
-        }
-        if (args.email) {
-          edit.email = args.email;
-        }
-        if (args.phone_number) {
-          edit.phone_number = args.phone_number;
-        }
-        if (args.event_id) {
-          edit.event_id = args.event_id;
-        }
-        if (args.details) {
-          edit.details = args.details;
-        }
-        if (args.picture) {
-          edit.picture = args.picture;
-        }
+        let edit = {
+          external_name: args.external_name,
+          external_type: args.external_type,
+          email: args.email,
+          phone_number: args.phone_number,
+          event_id: args.event_id,
+          details: args.details,
+          picture: args.picture,
+          project_id: args.project_id,
+        };
+
         let external = External.findByIdAndUpdate(args._id, edit, {
           new: true,
         });
@@ -977,6 +1023,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    //agenda
     addAgenda: {
       type: AgendaType,
       args: {
@@ -987,6 +1034,7 @@ const Mutation = new GraphQLObjectType({
         date: { type: GraphQLString },
         event_id: { type: GraphQLString },
         details: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let external = new Agenda({
@@ -997,6 +1045,7 @@ const Mutation = new GraphQLObjectType({
           date: args.date,
           event_id: args.event_id,
           details: args.details,
+          project_id: args.project_id,
         });
         return external.save();
       },
@@ -1011,27 +1060,19 @@ const Mutation = new GraphQLObjectType({
         date: { type: GraphQLString },
         event_id: { type: GraphQLString },
         details: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.agenda_name) {
-          edit.agenda_name = args.agenda_name;
-        }
-        if (args.start_time) {
-          edit.start_time = args.start_time;
-        }
-        if (args.end_time) {
-          edit.end_time = args.end_time;
-        }
-        if (args.date) {
-          edit.date = args.date;
-        }
-        if (args.event_id) {
-          edit.event_id = args.event_id;
-        }
-        if (args.details) {
-          edit.details = args.details;
-        }
+        let edit = {
+          agenda_name: args.agenda_name,
+          start_time: args.start_time,
+          end_time: args.end_time,
+          date: args.date,
+          event_id: args.event_id,
+          details: args.details,
+          project_id: args.project_id,
+        };
+
         let external = Agenda.findByIdAndUpdate(args._id, edit, {
           new: true,
         });
@@ -1047,6 +1088,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
 
+    //task
     addTask: {
       type: TaskType,
       args: {
@@ -1059,7 +1101,9 @@ const Mutation = new GraphQLObjectType({
         completed_date: { type: GraphQLString },
         created_at: { type: GraphQLString },
         created_by: { type: GraphQLString },
+        event_id: { type: GraphQLString },
         roadmap_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let task = new Task({
@@ -1072,7 +1116,9 @@ const Mutation = new GraphQLObjectType({
           completed_date: args.completed_date,
           created_at: args.created_at,
           created_by: args.created_by,
+          event_id: args.event_id,
           roadmap_id: args.roadmap_id,
+          project_id: args.project_id,
         });
         return task.save();
       },
@@ -1089,7 +1135,9 @@ const Mutation = new GraphQLObjectType({
         completed_date: { type: GraphQLString },
         created_at: { type: GraphQLString },
         created_by: { type: GraphQLString },
+        event_id: { type: GraphQLString },
         roadmap_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {
@@ -1101,7 +1149,9 @@ const Mutation = new GraphQLObjectType({
           completed_date: args.completed_date,
           created_at: args.created_at,
           created_by: args.created_by,
+          event_id: args.event_id,
           roadmap_id: args.roadmap_id,
+          project_id: args.project_id,
         };
         let task = Task.findByIdAndUpdate(args._id, edit, { new: true });
         return task;
@@ -1121,13 +1171,23 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         task_id: { type: GraphQLString },
-        comitee_id: { type: GraphQLString },
+        person_in_charge_id: { type: GraphQLString },
+        event_id: { type: GraphQLString },
+        roadmap_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+        staff_id: { type: GraphQLString },
+        created_at: { type: GraphQLString },
       },
       resolve(parent, args) {
         let task_assigned_to = new Task_assigned_to({
           _id: args._id,
           task_id: args.task_id,
-          comitee_id: args.comitee_id,
+          roadmap_id: args.roadmap_id,
+          person_in_charge_id: args.person_in_charge_id,
+          event_id: args.event_id,
+          project_id: args.project_id,
+          staff_id: args.staff_id,
+          created_at: args.created_at,
         });
         return task_assigned_to.save();
       },

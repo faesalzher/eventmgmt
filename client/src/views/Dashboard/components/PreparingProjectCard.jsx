@@ -4,20 +4,6 @@ import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
 import FolderIcon from '@material-ui/icons/Folder';
 
-
-// const COMITEESBYPROJECT_QUERY = gql`
-//   query comiteesByProject($project_id: String!){
-//      comiteesByProject(project_id:$project_id) {
-//       _id
-//       staff_id
-//       position_id
-//       division_id
-//       project_id
-//     }
-//   }
-// `;
-
-
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%'
@@ -52,29 +38,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function PreparingComiteeCard(props) {
+export default function PreparingPersonInChargeCard(props) {
   const { className,countPreparingProject, ...rest } = props;
 
   const classes = useStyles();
-  // const [comitees, setComitees] = useState([]);
-
-  // const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
-  //   variables: { project_id: props.project._id },
-  //   onCompleted: () => {
-  //     setComitees(
-  //       comiteesData.comiteesByProject
-  //     )
-  //   }
-  // }
-  // );
-
-  // useEffect(() => {
-  //   refresh();
-  // });
-
-  // const refresh = () => {
-  //   comiteesRefetch();
-  // };
 
 
   return (

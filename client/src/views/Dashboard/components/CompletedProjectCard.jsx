@@ -38,30 +38,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CompletedComiteeCard(props) {
+export default function CompletedPersonInChargeCard(props) {
   const { countCompletedProject,className, ...rest } = props;
   const classes = useStyles();
-  // const [comitees, setComitees] = useState([]);
-
-  // const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
-  //   variables: { project_id: props.project._id },
-  //   onCompleted: () => {
-  //     setComitees(
-  //       comiteesData.comiteesByProject
-  //     )
-  //   }
-  // }
-  // );
-
-  // useEffect(() => {
-  //   refresh();
-  // });
-
-  // const refresh = () => {
-  //   comiteesRefetch();
-  // };
-
-
+ 
   return (
     <Card
       {...rest}

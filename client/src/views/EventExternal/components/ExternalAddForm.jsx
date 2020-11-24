@@ -11,43 +11,10 @@ import {
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import uuid from 'uuid/v1';
 import { EditImageForm, EditAvatarForm } from "components";
 
-
-const ADD_EXTERNAL = gql`
-  mutation addExternal(
-    $_id: String!,
-    $external_name: String!,
-    $external_type: String!,
-    $email: String!,
-    $event_id: String!,
-    $phone_number: String!,
-    $picture:String!,
-    $details:String!
-    ) {
-    addExternal(
-      _id: $_id,
-      external_name: $external_name,
-      external_type: $external_type,
-      email:$email,
-      event_id:$event_id,
-      phone_number:$phone_number,
-      picture:$picture,
-      details:$details
-      ) {
-      _id
-      external_name
-      external_type
-      email
-      event_id
-      phone_number
-      picture
-      details
-    }
-  }
-`;
+import { ADD_EXTERNAL } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -83,6 +50,7 @@ export default function ExternalAddForm(props) {
     phone_number: "",
     details: "",
     picture: " ",
+    project_id: props.project_id
   }
 
   const [externalForm, setExternalForm] = useState(initialFormState);
@@ -104,6 +72,7 @@ export default function ExternalAddForm(props) {
             details: externalForm.details,
             picture: externalForm.picture,
             event_id: externalForm.event_id,
+            project_id: externalForm.project_id
           }
         });
       setExternalForm(initialFormState);

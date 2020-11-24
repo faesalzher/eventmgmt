@@ -3,58 +3,10 @@ import { makeStyles } from '@material-ui/styles';
 import { ProfileDetailCard, OrganizationDetailCard } from './components';
 
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import jwtDecode from "jwt-decode";
 
-
-const STAFFSBYID_QUERY = gql`
-query staffById($staff_id: String!){
-  staffById(_id:$staff_id) {
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
-  }
-}
-`;
-
-const DEPARTEMENT_QUERY = gql`
-query departememt($departement_id: String!){
-  departement(_id:$departement_id) {
-      departement_name
-  }
-}
-`;
-
-const ORGANIZATION_NAME_QUERY = gql`
-  query organization($_oid: String!) {
-    organization(_id: $_oid) {
-      _id
-      organization_name
-      picture
-    }
-  }
-`;
-
-
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      organization_name
-      email
-      description
-      password
-      picture
-    }
-  }
-`;
+import { ORGANIZATION_QUERY,ORGANIZATION_NAME_QUERY,STAFF_QUERY,DEPARTEMENT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -78,13 +30,13 @@ const AccountProfile = () => {
   const [departement, setDepartement] = useState({});
   const [organization, setOrganization] = useState({});
 
-  const { data: dataStaff, refetch: refetchProfile} = useQuery(STAFFSBYID_QUERY, {
+  const { data: dataStaff, refetch: refetchProfile } = useQuery(STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id },
     onCompleted: () => {
       if (decodedToken.user_type === 'staff') {
         console.log('jalanin')
         setProfile(
-          dataStaff.staffById
+          dataStaff.staff
         )
         org();
         dept();
@@ -93,9 +45,9 @@ const AccountProfile = () => {
   }
   );
 
-  
+
   const [org, { data: dataOrganizationName }] = useLazyQuery(ORGANIZATION_NAME_QUERY, {
-    variables: { _oid: profile.organization_id },
+    variables: { _id: profile.organization_id },
     onCompleted: () => {
       if (dataOrganizationName.organization !== null) {
         setOrganization(dataOrganizationName.organization);
@@ -136,7 +88,7 @@ const AccountProfile = () => {
   // useEffect(() => {
   //   const onCompleted = (dataStaff) => {
   //     setProfile(
-  //       dataStaff.staffById
+  //       dataStaff.staff
   //     )
   //   };
   //   const onError = (error) => {

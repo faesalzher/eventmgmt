@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/styles";
 import { Divider } from "@material-ui/core";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
+import ContactsIcon from '@material-ui/icons/Contacts';
 // import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 // import TextFieldsIcon from '@material-ui/icons/TextFields';
 // import ImageIcon from '@material-ui/icons/Image';
@@ -14,7 +15,7 @@ import { Link as RouterLink } from "react-router-dom";
 import logo from "assets/image.png";
 // import { StatusBullet } from 'components';
 import AssignmentIcon from "@material-ui/icons/Assignment";
-import FolderIcon from '@material-ui/icons/Folder';
+import FolderIcon from "@material-ui/icons/Folder";
 import jwtDecode from "jwt-decode";
 
 import { Profile, SidebarNav } from "./components";
@@ -69,10 +70,15 @@ const Sidebar = (props) => {
       icon: <AssignmentIcon />,
     },
     {
+      title: "Committeee",
+      href: "/committeee",
+      icon: <ContactsIcon />,
+    },
+    {
       title: "User Management",
       href: "/user_management",
       icon: <PeopleAltIcon />,
-    },
+    }
   ];
 
   const StaffPages = [
@@ -91,6 +97,7 @@ const Sidebar = (props) => {
       href: "/mytasks",
       icon: <AssignmentIcon />,
     },
+    
   ];
 
   return (

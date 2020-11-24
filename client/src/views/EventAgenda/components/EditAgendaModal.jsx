@@ -18,48 +18,10 @@ import { useTheme } from '@material-ui/core/styles';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import { useMutation } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
 
 import DayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
-
-const EDIT_AGENDA = gql`
-  mutation editAgenda(
-    $_id: String!
-    $agenda_name: String!
-    $date: String!
-    $start_time: String!
-    $end_time: String!
-    $details: String!
-    $event_id: String!
-  ) {
-    editAgenda(
-      _id: $_id
-      agenda_name: $agenda_name
-      date: $date
-      start_time: $start_time
-      end_time: $end_time
-      details: $details
-      event_id: $event_id
-    ) {
-      _id
-      agenda_name
-      date
-      start_time
-      end_time
-      details
-      event_id
-    }
-  }
-`;
-
-const DELETE_AGENDA = gql`
-  mutation deleteAgenda($_id: String!) {
-    deleteAgenda(_id: $_id) {
-      _id
-    }
-  }
-`;
+import { EDIT_AGENDA,DELETE_AGENDA } from 'gql';
 
 
 const useStyles = makeStyles(theme => ({
@@ -135,6 +97,7 @@ export default function EditAgendaModal(props) {
         end_time: agendaForm.end_time,
         details: agendaForm.details,
         event_id: agendaForm.event_id,
+        project_id: agendaForm.project_id,
       },
     });
     props.close();
@@ -173,7 +136,7 @@ export default function EditAgendaModal(props) {
     deleteAgenda({ variables: { _id: agendaForm._id } });
     props.handleDelete(props.agenda._id);
     props.close();
-    // deleteComitee({ variables: { _id: props.comitee._id, } });
+    // deletePerson_in_charge({ variables: { _id: props.personInCharge._id, } });
   }
   const [validateTime, setValidateTime] = React.useState(false);
   const dtStart = new Date(agendaForm.date + agendaForm.start_time);
@@ -187,7 +150,6 @@ export default function EditAgendaModal(props) {
     }
   }, [difference_in_milliseconds])
 
-  console.log(selectedDays)
   const openDate = Boolean(popoverDate);
   const id_date = openDate ? 'AddDateForm' : undefined;
 

@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   PictureCard,
@@ -16,25 +15,11 @@ import {
   DetailOverview
 } from './components';
 
-
-const EXTERNALS_QUERY = gql`
-  query externals($event_id:String!){
-    externals(event_id: $event_id){
-      _id,
-      external_name,
-      external_type,
-      email,
-      event_id,
-      phone_number,
-      details,
-      picture,
-    }
-  }
-`;
+import { EXTERNALS_QUERY } from 'gql';
 
 export default function EventOverview(props) {
   const [externals, setExternals] = useState([]);
-  const { loading:externalsLoading, error: externalsError, data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
+  const { loading: externalsLoading, error: externalsError, data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
     {
       variables: { event_id: props.event._id },
     }

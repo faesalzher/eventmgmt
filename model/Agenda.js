@@ -9,5 +9,6 @@ const Agenda = new Schema({
   end_time: String,
   details: String,
   event_id: String,
+  project_id:String,
 });
 module.exports = mongo.model("Agenda", Agenda);

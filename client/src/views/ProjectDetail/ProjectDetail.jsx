@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Tabs, Tab, Box, AppBar, Typography } from '@material-ui/core';
+import {
+  Tabs,
+  Tab,
+  Box,
+  AppBar,
+  Typography,
+  Snackbar,
+} from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useParams } from "react-router-dom";
 import { createBrowserHistory } from 'history';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
+import MuiAlert from '@material-ui/lab/Alert';
 // import { UseSimeContext } from "context/context.jsx";
-
 // import useMediaQuery from '@material-ui/core/useMediaQuery';
 import jwtDecode from "jwt-decode";
 
@@ -21,50 +26,24 @@ import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 
 import {
   ProjectEventList,
-  ProjectComitee,
+  ProjectPersonInCharge,
   ProjectOverview,
 } from 'views';
 
 import {
   ProjectEditModal
 } from './components';
+import { MyPersonInCharge } from 'components';
 
-const PROJECT_QUERY = gql`
-  query project($project_id: String!){
-    project(_id:$project_id) {
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
+import {
+  PROJECT_QUERY,
+  ORGANIZATION_QUERY,
+  EVENTS_QUERY,
+  PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY,
+  PERSON_IN_CHARGES_BY_PROJECT_QUERY,
+} from 'gql';
 
-const DIVISIONSBYPROJECT_QUERY = gql`
-  query divisionsByProject($project_id: String!){
-    divisionsByProject(project_id:$project_id) {
-      _id
-      division_name
-      project_id
-    }
-  }
-`;
 
-const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
-  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
-    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -120,14 +99,19 @@ export default function ProjectDetail() {
   let { project_id } = useParams();
   const staff_id = decodedToken.staff_id
   const [value, setValue] = React.useState(0);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   const [project, setProject] = useState({ project_name: "" });
-  const [project_comitee, setProject_comitee] = useState({ position_id: "" });
-  const [divisions, setDivisions] = useState([]);
+  const [project_personInCharge, setProject_personInCharge] = useState({ position_id: "", committee_id: "", staff_id: "" });
+  const [personInCharges, setPersonInCharges] = useState([]);
+  const [events, setEvents] = useState([]);
+
   const [openEditModal, setOpenEditModal] = useState(false);
+
+
 
   const { data } = useQuery(PROJECT_QUERY,
     {
@@ -137,56 +121,84 @@ export default function ProjectDetail() {
       }
     });
 
-  // const { data: comiteeData, refetch: comiteeRefetch } = useQuery(COMITEEBYSTAFFANDPROJECT_QUERY,
-  //   {
-  //     variables: { project_id: project_id, staff_id: staff_id },
-  //     onCompleted: () => {
-  //       if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
-  //         setComitee(comiteeData.comiteeByStaffAndProject[0])
-  //       }
-  //     }
-  //   });
-
-  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
-    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+  const { data: personInChargeData, loading: personInChargeLoading, error: personInChargeError, refetch: personInChargeRefetch } =
+    useQuery(PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY, {
       variables: { project_id: project_id, staff_id: staff_id },
     }
     );
 
+  const { data: personInChargesData, loading: personInChargesLoading, error: personInChargesError, refetch: personInChargesRefetch } =
+    useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
+      variables: { project_id: project_id },
+    }
+    );
+
+  const { loading: eventsLoading, error: eventsError, data: eventsData, refetch: eventsRefetch } =
+    useQuery(EVENTS_QUERY,
+      {
+        variables: { project_id: project_id },
+      });
+
   useEffect(() => {
-    const onCompleted = (comiteeData) => {
-      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
-        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+    const onCompleted = (personInChargesData) => {
+      setPersonInCharges(
+        personInChargesData.person_in_charges
+      )
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !personInChargesLoading && !personInChargesError) {
+        onCompleted(personInChargesData);
+      } else if (onError && !personInChargesLoading && personInChargesError) {
+        onError(personInChargesError);
+      }
+    }
+  }, [personInChargesLoading, personInChargesData, personInChargesError]);
+
+  useEffect(() => {
+    const onCompleted = (personInChargeData) => {
+      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
       }
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
-      if (onCompleted && !comiteeLoading && !comiteeError) {
-        onCompleted(comiteeData);
-      } else if (onError && !comiteeLoading && comiteeError) {
-        onError(comiteeError);
+      if (onCompleted && !personInChargeLoading && !personInChargeError) {
+        onCompleted(personInChargeData);
+      } else if (onError && !personInChargeLoading && personInChargeError) {
+        onError(personInChargeError);
       }
     }
-  }, [comiteeLoading, comiteeData, comiteeError]);
+  }, [personInChargeLoading, personInChargeData, personInChargeError]);
 
-  const { data: divisionsData, refetch: divisionsRefetch } = useQuery(DIVISIONSBYPROJECT_QUERY, {
-    variables: { project_id: project_id },
-    onCompleted: () => {
-      setDivisions(
-        divisionsData.divisionsByProject
-      )
+  useEffect(() => {
+    const onCompleted = (eventsData) => { setEvents(eventsData.events) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !eventsLoading && !eventsError) {
+        onCompleted(eventsData);
+      } else if (onError && !eventsLoading && eventsError) {
+        onError(eventsError);
+      }
     }
-  }
-  );
+  }, [eventsLoading, eventsData, eventsError]);
 
   useEffect(() => {
     refresh();
   });
 
   const refresh = () => {
-    divisionsRefetch();
-    comiteeRefetch();
+    personInChargeRefetch();
+    personInChargesRefetch();
+    eventsRefetch();
   };
+
+  const { data: organizationData } =
+    useQuery(ORGANIZATION_QUERY, {
+      variables: { _id: decodedToken.organization_id },
+    }
+    );
+  if (!organizationData) return (<></>)
 
   const handleOpenEditModal = () => {
     setOpenEditModal(true);
@@ -200,37 +212,70 @@ export default function ProjectDetail() {
     setProject(e)
   };
 
-  const handleSaveDivisionButton = (e) => {
-    setDivisions([...divisions, e])
+  const handleSaveEventButton = (e) => {
+    setEvents([...events, e]);
+  }
+
+
+  const handleOpenSnackbar = () => {
+    setOpenSnackbar(true);
   };
 
-  const handleSaveEditDivisionButton = (e) => {
-    const temp = [...divisions];
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
+
+
+  const handleSaveEditPersonInChargeButton = (e) => {
+    const temp = [...personInCharges];
     const index = temp.map(function (item) {
       return item._id
     }).indexOf(e._id);
     temp[index] = e;
-    setDivisions(temp)
+    setPersonInCharges(temp)
   };
 
-  const handleDeleteDivision = (e) => {
-    const temp = [...divisions];
+
+
+  const handleDeletePersonInCharge = (e) => {
+    const temp = [...personInCharges];
     const index = temp.map(function (item) {
       return item._id
     }).indexOf(e);
     temp.splice(index, 1);
-    setDivisions(temp);
-    // setTimeout(() => {
-    //   handleOpenSnackbar();
-    // }, 700);
+    setPersonInCharges(temp);
+    setTimeout(() => {
+      handleOpenSnackbar();
+    }, 700);
+  };
+
+  const handleSavePersonInChargeButton = (e) => {
+    setPersonInCharges([...personInCharges, e])
   };
 
   const breadcrumb_item = [
-    { name: 'Project List', link: '/project' },
-    { name: project.project_name, link: '/project' }
+    { name: organizationData.organization.organization_name, link: '/project' },
+    { name: project.project_name }
   ]
+
   return (
     <div className={classes.tabs_root}>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}>
+        <MuiAlert elevation={6} variant="filled" onClose={handleCloseSnackbar} severity="success">
+          Succes!
+         </MuiAlert>
+      </Snackbar>
       <AppBar position="static" className={classes.appBar} elevation={2} color="primary">
         <div style={{ display: "flex", flexDirection: "row" }}>
           <IconButton style={{ marginLeft: 1 }} onClick={browserHistory.goBack}>
@@ -249,25 +294,28 @@ export default function ProjectDetail() {
           style={{}}
         >
           <Tab label="Event List" {...a11yProps(0)} />
-          <Tab label="Comitee" {...a11yProps(1)} />
+          <Tab label="Committee" {...a11yProps(1)} />
           <Tab label="Overview Project" {...a11yProps(2)} />
         </Tabs>
         {/* </div> */}
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_comitee.position_id === '1' || decodedToken.user_type === "organization") ?
+            (project_personInCharge.position_id === '1' || decodedToken.user_type === "organization") ?
               <>
                 <IconButton onClick={handleOpenEditModal} >
                   <SettingsIcon />
                 </IconButton>
                 <ProjectEditModal
                   open={openEditModal}
+                  decodedToken={decodedToken}
                   organization_id={decodedToken.organization_id}
-                  divisions={divisions}
-                  project_comitee={project_comitee}
+                  personInCharges={personInCharges}
+                  events={events}
+                  project_personInCharge={project_personInCharge}
                   close={handleCloseEditModal}
                   handleSaveEditButton={handleSaveEditProjectButton}
                   project={project}
+                  project_id={project_id}
                 />
               </>
               :
@@ -277,24 +325,37 @@ export default function ProjectDetail() {
         </div>
       </AppBar>
       <div className={classes.root}>
-        <div style={{ paddingLeft: 30, paddingTop: 8 }}>
-          <BreadCrumbs breadcrumb_item={breadcrumb_item} />
+        <div style={{ justifyContent: 'space-between', padding: '8px 30px' }}>
+          <div>
+            <BreadCrumbs breadcrumb_item={breadcrumb_item} />
+          </div>
+          <MyPersonInCharge
+            project_personInCharge={project_personInCharge}
+          />
         </div>
         <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px' }}>
-          <ProjectEventList project={project} project_id={project_id} project_comitee={project_comitee} decodedToken={decodedToken} />
+          <ProjectEventList
+            events={events}
+            loading={eventsLoading}
+            project={project}
+            project_id={project_id}
+            project_personInCharge={project_personInCharge}
+            decodedToken={decodedToken}
+            handleSaveEventButton={handleSaveEventButton}
+          />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction} style={{ padding: '0px 30px', paddingBottom: 10 }}>
-          <ProjectComitee
+          <ProjectPersonInCharge
             project_id={project_id}
-            divisions={divisions}
-            project_comitee={project_comitee}
-            handleSaveEditButton={handleSaveEditDivisionButton}
-            handleSaveButton={handleSaveDivisionButton}
-            handleDeleteDivision={handleDeleteDivision}
+            personInCharges={personInCharges}
+            project_personInCharge={project_personInCharge}
+            handleSavePersonInChargeButton={handleSavePersonInChargeButton}
+            handleSaveEditPersonInChargeButton={handleSaveEditPersonInChargeButton}
+            handleDeletePersonInCharge={handleDeletePersonInCharge}
           />
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction} style={{ padding: '0px 30px' }} >
-          <ProjectOverview project={project} project_id={project_id} divisions={divisions} />
+          <ProjectOverview project={project} project_id={project_id} personInCharges={personInCharges} />
         </TabPanel>
       </div>
     </div >

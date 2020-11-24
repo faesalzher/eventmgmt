@@ -11,7 +11,6 @@ export { default as DashboardOrganization } from './DashboardOrganization';
 export { default as PreparingProjectCard } from './PreparingProjectCard';
 export { default as ActiveProjectCard } from './ActiveProjectCard';
 export { default as CompletedProjectCard } from './CompletedProjectCard';
-export { default as CancelledProjectCard } from './CancelledProjectCard';
 export { default as ProjectDoughnutChart } from './ProjectDoughnutChart';
 export { default as RecentlyAddedProject } from './RecentlyAddedProject';
 export { default as RecentlyAddedTask } from './RecentlyAddedTask';

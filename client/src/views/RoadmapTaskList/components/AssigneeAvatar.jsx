@@ -7,28 +7,9 @@ import {
 } from "@material-ui/core";
 
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import { ConfirmationDialog } from 'components';
-const STAFFSBYID_QUERY = gql`
-  query staffById($_id: String!){
-    staffById(_id:$_id) {
-      _id
-      staff_name
-      phone_number
-      email
-      picture
-    }
-  }
-`;
+import { STAFF_QUERY,PERSON_IN_CHARGE_QUERY } from 'gql';
 
-const COMITEE_QUERY = gql`
-  query comitee($_id: String!){
-    comitee(_id:$_id) {
-      _id
-      staff_id
-    }
-  }
-`;
 
 const useStyles = makeStyles(theme => ({
   small: {
@@ -43,24 +24,24 @@ const useStyles = makeStyles(theme => ({
 export default function StatusBox(props) {
   const classes = useStyles();
   const [staff, setStaff] = useState([]);
-  const [comitee, setComitee] = useState([]);
+  const [personInCharge, setPersonInCharge] = useState([]);
   const deleteButton = props.deleteButton === true ? true : false;
 
-  const [staffFetch, { data: staffData, loading: staffLoading }] = useLazyQuery(STAFFSBYID_QUERY,
+  const [staffFetch, { data: staffData, loading: staffLoading }] = useLazyQuery(STAFF_QUERY,
     {
-      variables: { _id: comitee.staff_id },
-      onCompleted: () => { setStaff(staffData.staffById) }
+      variables: { staff_id: personInCharge.staff_id },
+      onCompleted: () => { setStaff(staffData.staff) }
     });
 
-  const { data: comiteeData } = useQuery(COMITEE_QUERY,
+  const { data: personInChargeData } = useQuery(PERSON_IN_CHARGE_QUERY,
     {
-      variables: { _id: props.taskAssignedTo.comitee_id },
-      onCompleted: () => { setComitee(comiteeData.comitee); staffFetch(); }
+      variables: { _id: props.taskAssignedTo.person_in_charge_id },
+      onCompleted: () => { setPersonInCharge(personInChargeData.person_in_charge); staffFetch(); }
 
     });
 
   const handleDelete = () => {
-    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id, props.taskAssignedTo.comitee_id)
+    props.handleDeleteTaskAssignedTo(props.taskAssignedTo._id, props.taskAssignedTo.person_in_charge_id)
   }
 
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)

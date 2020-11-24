@@ -12,25 +12,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
-const ADD_DEPARTEMENT = gql`
-  mutation addDepartement(
-    $_id: String!,
-    $departement_name: String!,
-    $organization_id: String!
-    ) {
-    addDepartement(
-      _id: $_id,
-      departement_name: $departement_name,
-      organization_id:$organization_id
-      ) {
-      _id
-      departement_name
-      organization_id
-    }
-  }
-`;
+import { ADD_DEPARTEMENT } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {

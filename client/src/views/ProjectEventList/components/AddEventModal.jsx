@@ -9,7 +9,6 @@ import {
 } from '@material-ui/core';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import FormControl from '@material-ui/core/FormControl';
 // import MenuItem from '@material-ui/core/MenuItem';
 import 'date-fns';
@@ -17,45 +16,9 @@ import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRange } from 'react-date-range';
 import { StatusBox, EditImageForm } from "components";
-
+import { ADD_EVENT } from 'gql';
 import uuid from 'uuid/v1';
-
-const ADD_EVENT = gql`
-  mutation addEvent(
-    $_id: String!,
-    $event_name: String!,
-    $event_description: String!,
-    $event_location: String!,
-    $cancel: Boolean!,
-    $event_start_date: String!,
-    $event_end_date: String!,
-    $picture:String!,
-    $project_id:String!
-    ) {
-    addEvent(
-      _id: $_id,
-      event_name: $event_name,
-      event_description: $event_description,
-      event_location: $event_location,
-      cancel:$cancel,
-      event_start_date:$event_start_date,
-      event_end_date:$event_end_date,
-      picture:$picture,
-      project_id:$project_id
-      ) {
-      _id
-      event_name
-      event_description
-      event_location
-      cancel
-      event_start_date
-      event_end_date
-      picture
-      project_id
-    }
-  }
-`;
-
+import { useParams } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -78,6 +41,7 @@ export default function AddEventModal(props) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
+  let { project_id } = useParams();
 
   const initialFormState =
   {
@@ -85,11 +49,10 @@ export default function AddEventModal(props) {
     event_name: "",
     event_description: "",
     event_location: "",
-    cancel: false,
     event_start_date: new Date().toString(),
     event_end_date: new Date().toString(),
     picture: " ",
-    project_id: props.project_id,
+    project_id: project_id,
   };
 
   const [daysSelected, setDaysSelected] = useState(false);
@@ -116,7 +79,7 @@ export default function AddEventModal(props) {
   const [addEvent] = useMutation(ADD_EVENT);
   const handleButton = e => {
     handleClose();
-    props.addEvent(eventForm);
+    props.handleSaveEventButton(eventForm);
     addEvent(
       {
         variables:
@@ -125,7 +88,6 @@ export default function AddEventModal(props) {
           event_name: eventForm.event_name,
           event_description: eventForm.event_description,
           event_location: eventForm.event_location,
-          cancel: eventForm.cancel,
           event_start_date: eventForm.event_start_date,
           event_end_date: eventForm.event_end_date,
           picture: eventForm.picture,
@@ -215,7 +177,6 @@ export default function AddEventModal(props) {
             >
               <StatusBox
                 style={{ width: 'auto' }}
-                cancel={eventForm.cancel}
                 start_date={eventForm.event_start_date}
                 end_date={eventForm.event_end_date}
               />

@@ -6,20 +6,8 @@ import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
-const COMITEESBYPROJECT_QUERY = gql`
-  query comiteesByProject($project_id: String!){
-     comiteesByProject(project_id:$project_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
-
+import { PERSON_IN_CHARGES_BY_PROJECT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -55,17 +43,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const NumberOfComiteeCard = props => {
+const NumberOfPersonInChargeCard = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
-  const [comitees, setComitees] = useState([]);
+  const [personInCharges, setPersonInCharges] = useState([]);
 
-  const { data: comiteesData, refetch: comiteesRefetch } = useQuery(COMITEESBYPROJECT_QUERY, {
+  const { data: personInChargesData, refetch: personInChargesRefetch } = useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
     variables: { project_id: props.project._id },
     onCompleted: () => {
-      setComitees(
-        comiteesData.comiteesByProject
+      setPersonInCharges(
+        personInChargesData.person_in_charges
       )
     }
   }
@@ -76,7 +64,7 @@ const NumberOfComiteeCard = props => {
   });
 
   const refresh = () => {
-    comiteesRefetch();
+    personInChargesRefetch();
   };
 
   return (
@@ -96,9 +84,9 @@ const NumberOfComiteeCard = props => {
               gutterBottom
               variant="body2"
             >
-              Number of Comitee
+              Number of Person In Charge
             </Typography>
-            <Typography variant="h3">{comitees.length}</Typography>
+            <Typography variant="h3">{personInCharges.length}</Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
@@ -111,8 +99,8 @@ const NumberOfComiteeCard = props => {
   );
 };
 
-NumberOfComiteeCard.propTypes = {
+NumberOfPersonInChargeCard.propTypes = {
   className: PropTypes.string
 };
 
-export default NumberOfComiteeCard;
+export default NumberOfPersonInChargeCard;

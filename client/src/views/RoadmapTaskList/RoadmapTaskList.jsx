@@ -14,9 +14,9 @@ import { createBrowserHistory } from 'history';
 // import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 import { useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import jwtDecode from "jwt-decode";
+import { MyPersonInCharge } from 'components';
 
 import {
   IconButton,
@@ -31,73 +31,10 @@ import {
   RoadmapEditForm,
 } from './components';
 
-// const DIVISIONSBYPROJECT_QUERY = gql`
-//   query divisionsByProject($project_id: String!){
-//     divisionsByProject(project_id:$project_id) {
-//       _id
-//       division_name
-//       project_id
-//     }
-//   }
-// `;
 
-const PROJECT_QUERY = gql`
-  query project($project_id: String!){
-    project(_id:$project_id) {
-      _id
-      project_name
-    }
-  }
-`;
-
-const EVENT_QUERY = gql`
-  query event($event_id: String!){
-    event(_id:$event_id) {
-      _id
-      event_name
-    }
-  }
-`;
-
-
-const ROADMAP_QUERY = gql`
-  query roadmap($roadmap_id: String!){
-    roadmap(_id:$roadmap_id) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
-
-const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
-  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
-    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
-
-// const ROADMAPBYEVENTID_QUERY = gql`
-//   query roadmapByEvent($event_id: String!){
-//     roadmapByEvent(event_id:$event_id) {
-//       _id
-//       roadmap_name
-//       start_date
-//       end_date
-//       color
-//       event_id
-//     }
-//   }
-// `;
-
+import { ROADMAP_QUERY, EVENT_QUERY, ORGANIZATION_QUERY } from 'gql';
+import { PROJECT_QUERY } from 'gql';
+import { PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -161,35 +98,35 @@ export default function RoadamapTaskList() {
       }
     });
 
-  const [project_comitee, setProject_comitee] = useState([])
-  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
-    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+  const [project_personInCharge, setProject_personInCharge] = useState({ position_id: "", committee_id: "", staff_id: "" })
+  const { data: personInChargeData, loading: personInChargeLoading, error: personInChargeError, refetch: personInChargeRefetch } =
+    useQuery(PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY, {
       variables: { project_id: project_id, staff_id: decodedToken.staff_id },
     }
     );
 
   useEffect(() => {
-    const onCompleted = (comiteeData) => {
-      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
-        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+    const onCompleted = (personInChargeData) => {
+      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
       }
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
-      if (onCompleted && !comiteeLoading && !comiteeError) {
-        onCompleted(comiteeData);
-      } else if (onError && !comiteeLoading && comiteeError) {
-        onError(comiteeError);
+      if (onCompleted && !personInChargeLoading && !personInChargeError) {
+        onCompleted(personInChargeData);
+      } else if (onError && !personInChargeLoading && personInChargeError) {
+        onError(personInChargeError);
       }
     }
-  }, [comiteeLoading, comiteeData, comiteeError]);
+  }, [personInChargeLoading, personInChargeData, personInChargeError]);
 
   useEffect(() => {
     refresh();
   });
 
   const refresh = () => {
-    comiteeRefetch();
+    personInChargeRefetch();
     roadmapRefetch()
   };
 
@@ -205,9 +142,15 @@ export default function RoadamapTaskList() {
   const handleSaveEditRoadmapButton = (e) => {
     setRoadmap(e)
   };
+  const { data: organizationData } =
+    useQuery(ORGANIZATION_QUERY, {
+      variables: { _id: decodedToken.organization_id },
+    }
+    );
+  if (!organizationData) return (<></>)
 
   const breadcrumb_item = [
-    { name: 'Project List', link: '/project' },
+    { name: organizationData.organization.organization_name, link: '/project' },
     { name: project.project_name, link: `/project/${project_id}` },
     { name: event.event_name, link: `/project/${project_id}/${event_id}` },
     { name: roadmap.roadmap_name, link: `/` }
@@ -227,11 +170,11 @@ export default function RoadamapTaskList() {
         </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_comitee.position_id === '1' ||
-              project_comitee.position_id === '2' ||
-              project_comitee.position_id === '3' ||
-              project_comitee.position_id === '5' ||
-              project_comitee.position_id === '6' ||
+            (project_personInCharge.position_id === '1' ||
+              project_personInCharge.position_id === '2' ||
+              project_personInCharge.position_id === '3' ||
+              project_personInCharge.position_id === '5' ||
+              project_personInCharge.position_id === '6' ||
               decodedToken.user_type === "organization") ?
               <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
                 <SettingsIcon />
@@ -241,16 +184,21 @@ export default function RoadamapTaskList() {
           <RoadmapEditForm
             open={openEditModal}
             close={handleCloseEditModal}
+            project_id={project_id}
+            project_personInCharge={project_personInCharge}
             handleSaveEditButton={handleSaveEditRoadmapButton}
             roadmap={roadmap}
           />
         </div>
       </Paper>
       <div className={classes.root}>
-        <div style={{ paddingTop: 8 }}>
+        <div style={{ justifyContent: 'space-between', padding: '8px 0px' }}>
           {fullScreen ? <></> :
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           }
+          <MyPersonInCharge
+            project_personInCharge={project_personInCharge}
+          />
         </div>
         <Grid container spacing={1} style={{ justifyContent: 'center' }}>
           <Grid
@@ -263,7 +211,8 @@ export default function RoadamapTaskList() {
               roadmap={roadmap}
               roadmap_id={roadmap_id}
               project_id={project_id}
-              project_comitee={project_comitee}
+              event_id={event_id}
+              project_personInCharge={project_personInCharge}
               decodedToken={decodedToken}
             />
           </Grid>

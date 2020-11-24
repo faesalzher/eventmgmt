@@ -66,9 +66,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     flexDirection: 'column'
   },
-  cancelled: {
-    backgroundColor: theme.palette.error.main
-  },
   preparing: {
     backgroundColor: theme.palette.warning.main,
   },
@@ -180,7 +177,6 @@ const EventCard = (props) => {
               <div style={{ justifyContent: 'space-between', display: 'flex' }}>
                 <div style={{ display: 'flex' }}>
                   <Percentage
-                    cancel={props.event.cancel}
                     start_date={props.event.event_start_date}
                     end_date={props.event.event_end_date}
                   />
@@ -190,14 +186,12 @@ const EventCard = (props) => {
                 </Typography>
                 </div>
                 <StatusProgressDays
-                  cancel={props.event.cancel}
                   start_date={props.event.event_start_date}
                   end_date={props.event.event_end_date}
                 />
               </div>
               <div style={{ justifyContent: 'space-between' }}>
                 <StatusProgressBar
-                  cancel={props.event.cancel}
                   start_date={props.event.event_start_date}
                   end_date={props.event.event_end_date}
                 />
@@ -216,7 +210,6 @@ const EventCard = (props) => {
           <StatusBox
             start_date={props.event.event_start_date}
             end_date={props.event.event_end_date}
-            cancel={props.event.cancel}
           />
           <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
             <DateRangeIcon className={classes.iconDate} />

@@ -11,28 +11,13 @@ import {
 } from '@material-ui/core';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { useSoftRiseShadowStyles } from '@mui-treasury/styles/shadow/softRise';
 
-const TASKS_QUERY = gql`
-query tasks($roadmap_id:String!){
-  tasks(roadmap_id: $roadmap_id){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-      roadmap_id
-  }
-}
-`;
+import { TASKS_QUERY, COMMITTEE_QUERY } from 'gql';
+
 const CustomRouterLink = forwardRef((props, ref) => (
   <div
     ref={ref}
@@ -79,6 +64,11 @@ export default function Roadmap(props) {
       variables: { roadmap_id: props.roadmap._id },
     });
 
+  const { data: committeeData } = useQuery(COMMITTEE_QUERY,
+    {
+      variables: { _id: props.roadmap.committee_id },
+    });
+
   useEffect(() => {
     const onCompleted = (tasksData) => { setTasks(tasksData.tasks) };
     const onError = (error) => { /* magic */ };
@@ -113,6 +103,9 @@ export default function Roadmap(props) {
     setCountCompleted(countCompleted);
   }, [tasksByRoadmap])
 
+  if (!committeeData) {
+    return (<></>)
+  }
 
   return (
     <div className={clsx(shadowStyles.root)} style={{ padding: '2px 0px' }}>
@@ -125,16 +118,16 @@ export default function Roadmap(props) {
           <div style={{ padding: "10px 13px", width: '100%', display: 'flex' }}>
             <Grid
               container
-              spacing={2}
             >
               <Grid
                 item
-                sm={8}
+                sm={7}
                 xs={12}
               >
                 <Typography variant="h5">
                   {props.roadmap.roadmap_name}
                 </Typography>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex' }}>
                     <DateRangeIcon className={classes.icon} color="secondary" />
@@ -148,7 +141,17 @@ export default function Roadmap(props) {
               </Grid>
               <Grid
                 item
-                sm={4}
+                sm={2}
+                xs={12}
+                style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+              >
+                <Typography variant="body2" color="textSecondary">
+                  {committeeData.committee.committee_name}
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                sm={3}
                 xs={12}
                 style={{ justifyContent: 'center', width: 90, display: 'flex', flexDirection: 'column' }}
               >

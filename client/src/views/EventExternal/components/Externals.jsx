@@ -162,6 +162,7 @@ export default function Externals(props) {
         </Tooltip>
         <ExternalAddForm
           // props.externals={props.externals}
+          project_id={props.project_id}
           event_id={props.event_id}
           type={props.type}
           open={openAddModal}
@@ -191,6 +192,7 @@ export default function Externals(props) {
               ).map((external, index) => {
                 return <External
                   key={index}
+                  project_id={props.project_id}
                   type={props.type}
                   external={external}
                   handleDelete={props.handleDelete}

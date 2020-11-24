@@ -12,47 +12,14 @@ import {
 } from '@material-ui/core';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   PasswordChangeForm
 } from '.';
 
-const EDIT_STAFF = gql`
-  mutation editStaff(
-    $_id: String!,
-    $staff_name: String!,
-    $position_name: String!,
-    $email: String!,
-    $phone_number: String!,
-    $password: String!,
-    $picture: String!,
-    $departement_id: String!,
-    $organization_id: String!,
-    ){
-    editStaff(
-      _id: $_id,
-      staff_name: $staff_name,
-      position_name: $position_name,
-      email:$email,
-      phone_number:$phone_number,
-      password:$password,
-      picture:$picture,
-      departement_id:$departement_id,
-      organization_id:$organization_id,
-    ){
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
-    }
-  }
-`;
+import {
+  EDIT_STAFF
+} from 'gql';
 
 const useStyles = makeStyles(() => ({
   root: {},

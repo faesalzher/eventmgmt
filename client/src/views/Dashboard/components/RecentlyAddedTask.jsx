@@ -1,4 +1,4 @@
-import React,{ forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function RecentlyAddedTask(props) {
-  const { className,decodedToken, ...rest } = props;
+  const { className, decodedToken, ...rest } = props;
 
   const classes = useStyles();
   // const theme = useTheme();
@@ -70,7 +70,7 @@ export default function RecentlyAddedTask(props) {
                     project={project}
                     handleDelete={handleDelete}
                   /> */}
-                  <TaskCreatedByMe decodedToken={props.decodedToken} dashboard={true}/>
+            <TaskCreatedByMe decodedToken={props.decodedToken} slice={3} />
           </Grid>
         </Grid>
       </CardContent>

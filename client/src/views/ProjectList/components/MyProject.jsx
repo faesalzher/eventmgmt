@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 //   Typography
 // } from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+
 // import CircularProgress from '@material-ui/core/CircularProgress';
 // import { NotificationContainer, NotificationManager } from "react-light-notifications";
 // import "react-light-notifications/lib/main.css";
@@ -17,20 +17,7 @@ import {
 // import MuiAlert from '@material-ui/lab/Alert';
 // import jwtDecode from "jwt-decode";
 
-const PROJECT_QUERY = gql`
-  query project($project_id:String!){
-    project(_id: $project_id){
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
+import { PROJECT_QUERY } from 'gql';
 
 // const useStyles = makeStyles(theme => ({
 //   root: {
@@ -62,7 +49,7 @@ export default function MyProject(props) {
   const [project, setProject] = useState(initialFormState);
 
   const { loading, error, data, refetch } = useQuery(PROJECT_QUERY, {
-    variables: { project_id: props.comitee.project_id },
+    variables: { project_id: props.personInCharge.project_id },
     // onCompleted: () => { setProjects(data.projects) }
   });
 
@@ -96,7 +83,6 @@ export default function MyProject(props) {
   return (
     <ProjectCard
       project={project}
-      handleDelete={props.handleDelete}
     />
   );
 }

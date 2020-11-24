@@ -9,7 +9,6 @@ import {
   Dialog,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import FormControl from '@material-ui/core/FormControl';
 import 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
@@ -19,57 +18,8 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { StatusBox, EditImageForm } from "components";
 
 import uuid from 'uuid/v1';
+import { ADD_PROJECT } from 'gql';
 
-const ADD_PROJECT = gql`
-  mutation addProject(
-    $_id: String!,
-    $project_name: String!,
-    $project_description: String!,
-    $cancel: Boolean!,
-    $project_start_date: String!,
-    $project_end_date: String!,
-    $picture:String!,
-    $organization_id:String!
-    ) {
-    addProject(
-      _id: $_id,
-      project_name: $project_name,
-      project_description: $project_description,
-      cancel:$cancel,
-      project_start_date:$project_start_date,
-      project_end_date:$project_end_date,
-      picture:$picture,
-      organization_id:$organization_id
-      ) {
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
-
-const ADD_DIVISION = gql`
-  mutation addDivision(
-    $_id: String!,
-    $division_name: String!,
-    $project_id: String!
-    ) {
-    addDivision(
-      _id: $_id,
-      division_name: $division_name,
-      project_id: $project_id
-      ) {
-      _id
-      division_name
-      project_id
-    }
-  }
-`;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -97,23 +47,23 @@ export default function AddProjectModal(props) {
     _id: uuid(),
     project_name: "",
     project_description: "",
-    cancel: false,
     project_start_date: new Date().toString(),
     project_end_date: new Date().toString(),
     picture: " ",
+    created_at: new Date().toString(),
     organization_id: props.organization_id,
   };
 
-  const divisionName = [
-    'Core Comitee',
-    'Program Subcomitee',
-    'Secretariat Subcomitee',
-    'Funding Subcomitee',
-    'Food Subcomitee',
-    'Security Subcomitee',
-    'Publication and Documentation Subcomitee',
-    'Equipment and Transportation Subcomitee',
-  ]
+  // const committeeName = [
+  //   'Core Committee',
+  //   'Program Subcommittee',
+  //   'Secretariat Subcommittee',
+  //   'Funding Subcommittee',
+  //   'Food Subcommittee',
+  //   'Security Subcommittee',
+  //   'Publication and Documentation Subcommittee',
+  //   'Equipment and Transportation Subcommittee',
+  // ]
 
   const [projects, setProjects] = useState(initialFormState);
 
@@ -138,7 +88,6 @@ export default function AddProjectModal(props) {
   };
 
   const [addProject] = useMutation(ADD_PROJECT);
-  const [addDivision] = useMutation(ADD_DIVISION);
 
   const handleButton = e => {
     setTimeout(() => {
@@ -153,25 +102,14 @@ export default function AddProjectModal(props) {
             _id: projects._id,
             project_name: projects.project_name,
             project_description: projects.project_description,
-            cancel: projects.cancel,
             project_start_date: projects.project_start_date,
             project_end_date: projects.project_end_date,
             picture: projects.picture,
+            created_at: projects.created_at,
             organization_id: projects.organization_id,
           }
         });
 
-      for (let i = 0; i < divisionName.length; i++) {
-        addDivision(
-          {
-            variables:
-            {
-              _id: uuid(),
-              division_name: divisionName[i],
-              project_id: projects._id,
-            }
-          });
-      }
       setProjects(initialFormState);
     }, 400);
   };
@@ -244,7 +182,6 @@ export default function AddProjectModal(props) {
             >
               <StatusBox
                 style={{ width: 'auto' }}
-                cancel={projects.cancel}
                 start_date={projects.project_start_date}
                 end_date={projects.project_end_date}
               />
@@ -268,7 +205,7 @@ export default function AddProjectModal(props) {
             projects.project_name === "" ||
             projects.project_description === "" ||
             projects.project_start_date === "" ||
-            projects.project_end_date === "" 
+            projects.project_end_date === ""
           ) ?
             ("invalid") : ("valid")
         }

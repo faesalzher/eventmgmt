@@ -5,8 +5,7 @@ import {
   Paper,
   Typography
 } from '@material-ui/core';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+import { useQuery } from '@apollo/react-hooks';
 import CircularProgress from '@material-ui/core/CircularProgress';
 // import { NotificationContainer, NotificationManager } from "react-light-notifications";
 // import "react-light-notifications/lib/main.css";
@@ -19,40 +18,7 @@ import {
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import jwtDecode from "jwt-decode";
-const PROJECTS_QUERY = gql`
-  query projects($organization_id:String!){
-    projects(organization_id: $organization_id){
-      _id
-      project_name
-      project_description
-      cancel
-      project_start_date
-      project_end_date
-      picture
-      organization_id
-    }
-  }
-`;
-
-const DELETE_PROJECT = gql`
-mutation deleteProject ($_id: String!) {
-  deleteProject(_id:$_id){
-    _id
-  }
-}
-`;
-
-const COMITEESBYSTAFF_QUERY = gql`
-  query comiteesByStaff($staff_id: String!){
-    comiteesByStaff(staff_id:$staff_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
+import { PROJECTS_QUERY, PERSON_IN_CHARGES_BY_STAFF_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -114,31 +80,31 @@ const ProjectList = () => {
     refetch();
   };
 
-  const [comitees, setComitees] = useState([]);
-  const { data: comiteesData, loading: comiteesLoading, error: comiteesError, refetch: comiteesRefetch } = useQuery(COMITEESBYSTAFF_QUERY, {
+  const [personInCharges, setPersonInCharges] = useState([]);
+  const { data: personInChargesData, loading: personInChargesLoading, error: personInChargesError, refetch: personInChargesRefetch } = useQuery(PERSON_IN_CHARGES_BY_STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id }
   }
   );
 
   useEffect(() => {
-    const onCompleted = (comiteesData) => {
-      setComitees(
-        comiteesData.comiteesByStaff
+    const onCompleted = (personInChargesData) => {
+      setPersonInCharges(
+        personInChargesData.person_in_charges
       )
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
-      if (onCompleted && !comiteesLoading && !comiteesError) {
-        onCompleted(comiteesData);
-      } else if (onError && !comiteesLoading && comiteesError) {
-        onError(comiteesError);
+      if (onCompleted && !personInChargesLoading && !personInChargesError) {
+        onCompleted(personInChargesData);
+      } else if (onError && !personInChargesLoading && personInChargesError) {
+        onError(personInChargesError);
       }
     }
-  }, [comiteesLoading, comiteesData, comiteesError]);
+  }, [personInChargesLoading, personInChargesData, personInChargesError]);
 
   useEffect(() => {
     refresh();
-    comiteesRefetch();
+    personInChargesRefetch();
   });
 
   const addProject = useCallback(
@@ -149,20 +115,12 @@ const ProjectList = () => {
       }, 100);
     }, [projects]
   );
-  const [deleteProject] = useMutation(DELETE_PROJECT);
 
-  const handleDelete = e => {
-    deleteProject({ variables: { _id: e, } });
-    setTimeout(() => {
-      handleSucces();
-    }, 700);
-  }
-
+  const sortedProjects = (projects.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
   if (error) return <p>Error :(</p>;
   if (loading) return (
     <div className={classes.loading}><CircularProgress /></div>
   )
-  console.log(comitees);
   // console.log(decodedToken.organization_id)
 
   return (
@@ -195,7 +153,7 @@ const ProjectList = () => {
                   <>
                     <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
                     {
-                      projects.slice().reverse().map((project, index) => {
+                      sortedProjects.map((project, index) => {
                         return (
                           <Grid
                             item
@@ -207,7 +165,6 @@ const ProjectList = () => {
                           >
                             <ProjectCard
                               project={project}
-                              handleDelete={handleDelete}
                             />
                           </Grid>
                         )
@@ -217,7 +174,7 @@ const ProjectList = () => {
                   :
                   <>
                     {
-                      comitees.slice().reverse().map((comitee, index) => {
+                      personInCharges.slice().reverse().map((personInCharge, index) => {
                         return (
                           <Grid
                             key={index}
@@ -227,11 +184,10 @@ const ProjectList = () => {
                             xl={3}
                           >
                             <MyProject
-                              comitee={comitee}
-                              handleDelete={handleDelete}
+                              personInCharge={personInCharge}
                             />
                           </Grid>
-                          // <div>{console.log(comitee.project_id)}</div>
+                          // <div>{console.log(personInCharge.project_id)}</div>
                         )
                       })
                     }

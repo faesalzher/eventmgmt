@@ -22,6 +22,8 @@ import {
   RoadmapTaskList as RoadmapTaskListView,
   LandingPage as LandingPageView,
   MyTasks as MyTasksView,
+  Committee as CommitteeView,
+
 } from "./views";
 
 const Routes = (props) => {
@@ -90,18 +92,12 @@ const Routes = (props) => {
           layout={MainLayout}
           path="/mytasks"
         />
-        {/* <RouteWithLayout
-        component={DashboardView}
-        exact
-        layout={MainLayout}
-        path="/login"
-      />
-      <RouteWithLayout
-        component={DashboardView}
-        exact
-        layout={MainLayout}
-        path="/register"
-      /> */}
+          <RouteWithLayout
+          component={CommitteeView}
+          exact
+          layout={MainLayout}
+          path="/committeee"
+        />
         <RouteWithLayout
           component={NotFoundView}
           exact

@@ -17,12 +17,24 @@ import {
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import signInImage from "assets/planer_desk.jpg";
 import logo from 'assets/image.png'
-import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import { useQuery } from '@apollo/react-hooks';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import uuid from 'uuid/v1';
+import { CHECK_ORGANIZATION, REGISTER, ADD_COMMITTEE } from 'gql';
+
+
+const committeeName = [
+  'Core Committee',
+  'Program Subcommittee',
+  'Secretariat Subcommittee',
+  'Funding Subcommittee',
+  'Food Subcommittee',
+  'Security Subcommittee',
+  'Publication and Documentation Subcommittee',
+  'Equipment and Transportation Subcommittee',
+]
 
 const schema = {
   organization_name: {
@@ -148,7 +160,7 @@ const Register = props => {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     isValid: false,
-    values: { email: "" },
+    values: { _id: uuid(), email: "" },
     touched: {},
     errors: {}
   });
@@ -192,14 +204,15 @@ const Register = props => {
     //   // console.log(result)
     // },
     variables: {
-      _id: uuid(),
+      _id: form.values._id,
       organization_name: form.values.organization_name,
       email: form.values.email,
       password: form.values.password,
-      description:"",
-      picture:"",
+      description: "",
+      picture: "",
     },
   });
+  const [addCommittee] = useMutation(ADD_COMMITTEE);
 
   const [organization, setOrganization] = useState({});
 
@@ -229,11 +242,19 @@ const Register = props => {
     refetch();
   };
 
-  console.log(organization)
-
   const handleRegister = event => {
     refetch();
     // checkOrganization();
+    committeeName.forEach((committee) => {
+      addCommittee({
+        variables: {
+          _id: uuid(),
+          committee_name: committee,
+          organization_id: form.values._id
+        }
+      })
+    })
+
     event.preventDefault();
     setLoading(true);
     setTimeout(() => {
@@ -485,33 +506,5 @@ Register.propTypes = {
   history: PropTypes.object
 };
 
-const REGISTER = gql`
-  mutation register(
-    $_id: ID!,
-    $organization_name: String!,
-    $email: ID!,
-    $password: String!,
-    ) {
-    register(
-      _id:$_id,
-      organization_name: $organization_name,
-      email: $email,
-      password: $password,
-      ) {
-      _id
-      organization_name
-      email
-      password
-    }
-  }
-`;
-
-const CHECK_ORGANIZATION = gql`
-  query check_organization($email: String!){
-    check_organization(email:$email) {
-      email
-    }
-  }
-`;
 
 export default withRouter(Register);

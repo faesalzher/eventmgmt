@@ -19,38 +19,12 @@ import MuiAlert from '@material-ui/lab/Alert';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
 import {
   AgendaByDate,
   AddAgendaModal,
 } from './components';
 
-
-const AGENDAS_QUERY = gql`
-  query agendas($event_id:String!){
-    agendas(event_id: $event_id){
-      _id,
-      agenda_name,
-      date,
-      start_time,
-      end_time,
-      details,
-      event_id,
-    }
-  }
-`;
-
-const EVENT_QUERY = gql`
-  query event($event_id: String!){
-    event(_id:$event_id) {
-      _id
-      event_start_date
-      event_end_date
-    }
-  }
-`;
-
+import { AGENDAS_QUERY,EVENT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -96,7 +70,6 @@ export default function EventAgenda(props) {
         setEvent(eventData.event)
       }
     });
-
 
   useEffect(() => {
     const onCompleted = (data) => {
@@ -220,11 +193,13 @@ export default function EventAgenda(props) {
               <StyledTableCell align="left">Details</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 <AddAgendaModal
+                  project_id={props.project_id}
                   event={event}
                   open={openAddDialog}
                   event_id={props.event_id}
                   handleSaveAgendaButton={handleSaveAgendaButton}
                   close={handleCloseAddDialog}
+
                 />
                 <Tooltip arrow title="Add New Agenda" aria-label="confirm">
                   <IconButton onClick={handleOpenAddDialog} style={{ padding: 0 }}>
@@ -262,6 +237,7 @@ export default function EventAgenda(props) {
                     rundownDate.sortedAgendas.map((agenda, index) => {
                       return <AgendaByDate
                         key={index}
+                        project_id={props.project_id}
                         rundownDate={rundownDate}
                         agenda={agenda}
                         index={index}

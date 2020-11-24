@@ -11,32 +11,10 @@ import {
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
-const DELETE_DEPARTEMENT = gql`
-mutation deleteDepartement ($_id: String!) {
-  deleteDepartement(_id:$_id){
-    _id
-  }
-}
-`;
-const EDIT_DEPARTEMENT = gql`
-  mutation editDepartement(
-    $_id: String!,
-    $departement_name: String!,
-    $organization_id: String!
-    ) {
-    editDepartement(
-      _id: $_id,
-      departement_name: $departement_name
-      organization_id: $organization_id
-      ) {
-      _id
-      departement_name
-      organization_id
-    }
-  }
-`;
+import {
+  DELETE_DEPARTEMENT,
+  EDIT_DEPARTEMENT
+} from 'gql'
 
 const useStyles = makeStyles(theme => ({
   form: {

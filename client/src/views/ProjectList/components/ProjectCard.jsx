@@ -8,7 +8,6 @@ import { StatusBox, StatusProgressBar, Percentage, StatusProgressDays } from 'co
 // import AddprojectsModal from '../AddProjectModal';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import image from "assets/default-placeholder.png";
 
 // import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -26,25 +25,7 @@ import {
 // import { findByLabelText } from '@testing-library/react';
 // import LoadingOverlay from 'react-loading-overlay';
 import { NavLink as RouterLink } from 'react-router-dom';
-
-const HEADOFPROJECT_QUERY = gql`
-  query comiteesByHeadProject($project_id: String!,$position_id: String!){
-     comiteesByHeadProject(project_id:$project_id,position_id:$position_id) {
-      staff_id
-      }
-  }
-`;
-
-const STAFFBYID_QUERY = gql`
-query staffById($_id: String!){
-    staffById(_id:$_id) {
-      _id
-      staff_name
-      phone_number
-      email
-    }
-  }
-`;
+import { STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -97,14 +78,14 @@ const CustomRouterLink = forwardRef((props, ref) => (
 
 const ProjectCard = (props) => {
   // const [elevate, setElevate] = useState(1);
-  const { handleDelete, className, ...rest } = props;
+  const { className,handleDelete, ...rest } = props;
   const classes = useStyles();
   const shadowStyles = useBouncyShadowStyles();
 
   const [headOfProjectId, setHeadOfProjectId] = useState([{ staff_id: '0' }]);
   const [headOfProjectName, setHeadOfProjectName] = useState([]);
 
-  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
+  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION,
     {
       variables: { project_id: props.project._id, position_id: '1' },
     });
@@ -115,10 +96,10 @@ const ProjectCard = (props) => {
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectIdData.comiteesByHeadProject.length === 0) {
+      if (headOfProjectIdData.person_in_charges_by_project_and_position.length === 0) {
         return setHeadOfProjectId([{ staff_id: '0' }])
       } else {
-        return setHeadOfProjectId(data.comiteesByHeadProject)
+        return setHeadOfProjectId(data.person_in_charges_by_project_and_position)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -131,10 +112,10 @@ const ProjectCard = (props) => {
     }
   }, [loading, headOfProjectIdData, error]);
 
-  const { data: headOfProjectNameData, refetch: headOfProjectNameRefetch } = useQuery(STAFFBYID_QUERY,
+  const { data: headOfProjectNameData, refetch: headOfProjectNameRefetch } = useQuery(STAFF_QUERY,
     {
-      variables: { _id: headOfProjectId[0].staff_id },
-      // onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staffById) }
+      variables: { staff_id: headOfProjectId[0].staff_id },
+      // onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staff) }
     });
 
   useEffect(() => {
@@ -142,7 +123,7 @@ const ProjectCard = (props) => {
       if (data === undefined) {
         return
       } else {
-        return setHeadOfProjectName(data.staffById)
+        return setHeadOfProjectName(data.staff)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -168,98 +149,94 @@ const ProjectCard = (props) => {
     start_date.getFullYear() === end_date.getFullYear()
   )
 
-  return (  
-      <Card
-        {...rest}
-        className={clsx(classes.root, className, shadowStyles.root)}
-        elevation={1}
-      >
-        <Tooltip title={"See Details of ".concat(props.project.project_name)}>
-          <CardActionArea className={classes.root}
-            component={CustomRouterLink}
-            to={`/project/${props.project._id}`}
-          >
-            <CardMedia
-              className={classes.media}
-              image={props.project.picture === " " ? image : props.project.picture}
-              title={props.project.project_name}
-            />
-            <CardContent className={classes.root} style={{ paddingTop: 5 }} >
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-                className={classes.root}
-              >
-                <div style={{ width: 'fit-content' }} >
-                  <Typography
-                    className={classes.title}
-                    color="textSecondary"
-                    // gutterBottom
-                    variant="body2"
-                  >
-                    Head Of Project -
-                          {(headOfProjectName !== null) ?
-                      " " + headOfProjectName.staff_name : " (Vacant}"
-                    }
-
-                  </Typography>
-                  <Typography variant="h5" >
-                    {props.project.project_name}
-                  </Typography>
-                </div>
-              </div>
-              <div style={{ justifyContent: 'space-between', display: 'flex' }}>
-                <div style={{ display: 'flex' }}>
-                  <Percentage
-                    cancel={props.project.cancel}
-                    start_date={props.project.project_start_date}
-                    end_date={props.project.project_end_date}
-                  />
-                  <Typography
-                    className={classes.status} style={{ display: 'flex' }}>
-                    % Completed
-                </Typography>
-                </div>
-                <StatusProgressDays
-                  cancel={props.project.cancel}
-                  start_date={props.project.project_start_date}
-                  end_date={props.project.project_end_date}
-                />
-              </div>
-              <div style={{ justifyContent: 'space-between' }}>
-                <StatusProgressBar
-                  cancel={props.project.cancel}
-                  start_date={props.project.project_start_date}
-                  end_date={props.project.project_end_date}
-                />
-              </div>
-            </CardContent>
-          </CardActionArea>
-        </Tooltip>
-        <CardActions style={{
-          paddingLeft: 16,
-          paddingRight: 12,
-          paddingTop: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <StatusBox
-            start_date={props.project.project_start_date}
-            end_date={props.project.project_end_date}
-            cancel={props.project.cancel}
+  return (
+    <Card
+      {...rest}
+      className={clsx(classes.root, className, shadowStyles.root)}
+      elevation={1}
+    >
+      <Tooltip title={"See Details of ".concat(props.project.project_name)}>
+        <CardActionArea className={classes.root}
+          component={CustomRouterLink}
+          to={`/project/${props.project._id}`}
+        >
+          <CardMedia
+            className={classes.media}
+            image={props.project.picture === " " ? image : props.project.picture}
+            title={props.project.project_name}
           />
-          <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
-            <DateRangeIcon className={classes.iconDate} />
-            {
-              (sameDays) ?
-                <Typography className={classes.status}>{props.project.project_start_date.slice(4, 15)}</Typography>
-                :
-                <Typography className={classes.status}>
-                  {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
+          <CardContent className={classes.root} style={{ paddingTop: 5 }} >
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+              className={classes.root}
+            >
+              <div style={{ width: 'fit-content' }} >
+                <Typography
+                  className={classes.title}
+                  color="textSecondary"
+                  // gutterBottom
+                  variant="body2"
+                >
+                  Head Of Project -
+                          {(headOfProjectName !== null) ?
+                    " " + headOfProjectName.staff_name : " (Vacant}"
+                  }
+
                 </Typography>
-            }
-          </div>
-        </CardActions>
-      </Card>  
+                <Typography variant="h5" >
+                  {props.project.project_name}
+                </Typography>
+              </div>
+            </div>
+            <div style={{ justifyContent: 'space-between', display: 'flex' }}>
+              <div style={{ display: 'flex' }}>
+                <Percentage
+                  start_date={props.project.project_start_date}
+                  end_date={props.project.project_end_date}
+                />
+                <Typography
+                  className={classes.status} style={{ display: 'flex' }}>
+                  % Completed
+                </Typography>
+              </div>
+              <StatusProgressDays
+                start_date={props.project.project_start_date}
+                end_date={props.project.project_end_date}
+              />
+            </div>
+            <div style={{ justifyContent: 'space-between' }}>
+              <StatusProgressBar
+                start_date={props.project.project_start_date}
+                end_date={props.project.project_end_date}
+              />
+            </div>
+          </CardContent>
+        </CardActionArea>
+      </Tooltip>
+      <CardActions style={{
+        paddingLeft: 16,
+        paddingRight: 12,
+        paddingTop: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <StatusBox
+          start_date={props.project.project_start_date}
+          end_date={props.project.project_end_date}
+        />
+        <div style={{ width: "100%", display: 'flex', justifyContent: 'flex-end' }}>
+          <DateRangeIcon className={classes.iconDate} />
+          {
+            (sameDays) ?
+              <Typography className={classes.status}>{props.project.project_start_date.slice(4, 15)}</Typography>
+              :
+              <Typography className={classes.status}>
+                {props.project.project_start_date.slice(4, 10)} - {props.project.project_end_date.slice(4, 15)}
+              </Typography>
+          }
+        </div>
+      </CardActions>
+    </Card>
   );
 };
 

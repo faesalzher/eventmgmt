@@ -16,24 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Externals } from './components';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
-
-const EXTERNALS_QUERY = gql`
-  query externals($event_id:String!){
-    externals(event_id: $event_id){
-      _id,
-      external_name,
-      external_type,
-      email,
-      event_id,
-      phone_number,
-      details,
-      picture,
-    }
-  }
-`;
-
-
+import { EXTERNALS_QUERY } from 'gql';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -170,6 +153,7 @@ export default function EventExternal(props) {
       <TabPanel value={value} index={0} style={{ padding: 0 }}>
         <Externals
           event_id={props.event_id}
+          project_id={props.project_id}
           externals={externals}
           type="Sponsor"
           handleSaveButton={handleSaveButton}
@@ -180,6 +164,7 @@ export default function EventExternal(props) {
       <TabPanel value={value} index={1} style={{ padding: 0 }}>
         <Externals
           event_id={props.event_id}
+          project_id={props.project_id}
           externals={externals}
           type="Volunteer"
           handleDelete={handleDelete}
@@ -190,6 +175,7 @@ export default function EventExternal(props) {
       <TabPanel value={value} index={2} style={{ padding: 0 }}>
         <Externals
           event_id={props.event_id}
+          project_id={props.project_id}
           externals={externals}
           type="Guest"
           handleSaveButton={handleSaveButton}
@@ -200,6 +186,7 @@ export default function EventExternal(props) {
       <TabPanel value={value} index={3} style={{ padding: 0 }}>
         <Externals
           event_id={props.event_id}
+          project_id={props.project_id}
           externals={externals}
           type="Media Partner"
           handleSaveButton={handleSaveButton}

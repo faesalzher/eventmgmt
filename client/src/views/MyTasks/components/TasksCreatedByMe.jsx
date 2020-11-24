@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import { makeStyles } from '@material-ui/styles';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 // import {
 //   Button,
 // } from '@material-ui/core';
@@ -16,107 +15,14 @@ import { Task } from 'views/RoadmapTaskList/components';
 //   }
 // }));
 
-const TASKS_QUERY = gql`
-  query tasks_by_creator($created_by: String!){
-    tasks_by_creator(created_by:$created_by) {
-        _id,
-        task_name,
-        priority,
-        completed,
-        task_description,
-        due_date,
-        completed_date,
-        created_at,
-        created_by,
-        roadmap_id
-    }
-  }
-`;
-
-
-const PROJECT_QUERY = gql`
-  query project($project_id: String!){
-    project(_id:$project_id) {
-        _id,
-        project_name,
-    }
-  }
-`;
-
-const EVENT_QUERY = gql`
-  query event($event_id: String!){
-    event(_id:$event_id) {
-        _id,
-        event_name,
-        project_id
-    }
-  }
-`;
-
-const ROADMAP_QUERY = gql`
-  query roadmap($roadmap_id: String!){
-    roadmap(_id:$roadmap_id) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
-
-const COMITEEBYSTAFFANDPROJECT_QUERY = gql`
-  query comiteeByStaffAndProject($staff_id: String!,$project_id: String!){
-    comiteeByStaffAndProject(staff_id:$staff_id,project_id:$project_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
-
-const EDIT_TASK = gql`
-  mutation editTask(
-    $_id: String!,
-    $task_name: String!,
-    $priority: String!,
-    $completed: Boolean!,
-    $task_description: String!,
-    $due_date: String!,
-    $completed_date: String!,
-    $created_at: String!,
-    $created_by: String!,
-    $roadmap_id: String!,
-    ){
-    editTask(
-      _id: $_id,
-      task_name: $task_name,
-      priority: $priority,
-      completed:$completed,
-      task_description:$task_description,
-      due_date:$due_date,
-      completed_date:$completed_date,
-      created_at:$created_at,
-      created_by:$created_by,
-      roadmap_id:$roadmap_id,
-    ){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-      roadmap_id
-    }
-  }
-`;
-
+import {
+  TASKS_QUERY_BY_CREATOR,
+  PROJECT_QUERY,
+  PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY,
+  ROADMAP_QUERY,
+  EVENT_QUERY,
+  EDIT_TASK
+} from 'gql';
 
 const CreatedByMe = (props) => {
   // const classes = useStyles();
@@ -161,29 +67,28 @@ const CreatedByMe = (props) => {
       }
     });
 
-  const [project_comitee, setProject_comitee] = useState([])
-  const { data: comiteeData, loading: comiteeLoading, error: comiteeError, refetch: comiteeRefetch } =
-    useQuery(COMITEEBYSTAFFANDPROJECT_QUERY, {
+  const [project_personInCharge, setProject_personInCharge] = useState([])
+  const { data: personInChargeData, loading: personInChargeLoading, error: personInChargeError, refetch: personInChargeRefetch } =
+    useQuery(PERSON_IN_CHARGE_BY_STAFF_AND_PROJECT_QUERY, {
       variables: { project_id: event.project_id, staff_id: props.decodedToken.staff_id },
     }
     );
 
   useEffect(() => {
-    const onCompleted = (comiteeData) => {
-      if (comiteeData !== undefined && comiteeData.comiteeByStaffAndProject.length !== 0) {
-        setProject_comitee(comiteeData.comiteeByStaffAndProject[0])
+    const onCompleted = (personInChargeData) => {
+      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
       }
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
-      if (onCompleted && !comiteeLoading && !comiteeError) {
-        onCompleted(comiteeData);
-      } else if (onError && !comiteeLoading && comiteeError) {
-        onError(comiteeError);
+      if (onCompleted && !personInChargeLoading && !personInChargeError) {
+        onCompleted(personInChargeData);
+      } else if (onError && !personInChargeLoading && personInChargeError) {
+        onError(personInChargeError);
       }
     }
-  }, [comiteeLoading, comiteeData, comiteeError]);
-
+  }, [personInChargeLoading, personInChargeData, personInChargeError]);
 
   useEffect(() => {
     refresh();
@@ -192,17 +97,31 @@ const CreatedByMe = (props) => {
     roadmapRefetch();
     projectRefetch();
     eventRefetch();
-    comiteeRefetch();
+    personInChargeRefetch();
   };
 
   const breadcrumb_item = [
-    { name: project.project_name, link: `/project/${project._id}` },
-    { name: event.event_name, link: `/project/${project._id}/${event._id}` },
+    { name: project.project_name, link: `/ project / ${project._id} ` },
+    { name: event.event_name, link: `/ project / ${project._id} /${event._id}` },
     { name: roadmap.roadmap_name, link: `/project/${project._id}/${event._id}/${roadmap._id}` }
   ]
-  const handleDeleteTaskAssignedTo = (e, comitee_id) => {
+
+  const handleDeleteTaskAssignedTo = (e, person_in_charge_id) => {
 
   }
+
+  const user_access = (roadmap.committee_id === project_personInCharge.committee_id) ?
+    (project_personInCharge.position_id === '1' ||
+      project_personInCharge.position_id === '2' ||
+      project_personInCharge.position_id === '3' ||
+      project_personInCharge.position_id === '5' ||
+      project_personInCharge.position_id === '6') ?
+      true
+      :
+      false
+    :
+    props.decodedToken.user_type === "organization" ? true : false
+
   return (
     <div>
       <div style={{ backgroundColor: 'white', display: 'flex', padding: '0px 5px' }}      >
@@ -211,8 +130,11 @@ const CreatedByMe = (props) => {
       <Task
         task={props.task}
         project_id={project._id}
+        event_id={event._id}
+        roadmap_id={roadmap._id}
         roadmap={roadmap}
-        project_comitee={project_comitee}
+        user_access={user_access}
+        project_personInCharge={project_personInCharge}
         decodedToken={props.decodedToken}
         handleCompletedChange={props.handleCompletedChange}
         handleDelete={props.handleDelete}
@@ -225,7 +147,7 @@ const CreatedByMe = (props) => {
 
 export default function TasksCreatedByMe(props) {
   const [tasks, setTasks] = useState([]);
-  const { data: tasksData, loading: tasksLoading, error: tasksError, refetch: tasksRefetch } = useQuery(TASKS_QUERY,
+  const { data: tasksData, loading: tasksLoading, error: tasksError, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_CREATOR,
     props.decodedToken.user_type === "organization" ?
       {
         variables: { created_by: props.decodedToken.organization_id }
@@ -240,7 +162,7 @@ export default function TasksCreatedByMe(props) {
     const onCompleted = (tasksData) => {
       if (tasksData !== undefined) {
         setTasks(
-          tasksData.tasks_by_creator
+          tasksData.tasks
         )
       }
     };
@@ -271,6 +193,7 @@ export default function TasksCreatedByMe(props) {
     }).indexOf(e._id);
     temp[index] = e;
     setTasks(temp)
+    console.log(e)
     editTask({
       variables:
       {
@@ -284,6 +207,8 @@ export default function TasksCreatedByMe(props) {
         created_at: e.created_at,
         created_by: e.created_by,
         roadmap_id: e.roadmap_id,
+        event_id: e.event_id,
+        project_id: e.project_id,
       }
     });
   };
@@ -300,15 +225,16 @@ export default function TasksCreatedByMe(props) {
     // }, 700);
   }
 
+  const sortedTasks = (tasks.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
 
   return (
-    props.dashboard ?
-      tasks.slice(0,3).map((task, index) => {
+    props.slice ?
+      sortedTasks.slice(0, props.slice).map((task, index) => {
         return (
           <CreatedByMe
             key={index}
             task={task}
-            project_comitee={props.comitee}
+            project_personInCharge={props.personInCharge}
             decodedToken={props.decodedToken}
             handleCompletedChange={handleCompletedChange}
             handleDelete={handleDelete}
@@ -317,12 +243,12 @@ export default function TasksCreatedByMe(props) {
         )
       })
       :
-      tasks.slice().reverse().map((task, index) => {
+      sortedTasks.map((task, index) => {
         return (
           <CreatedByMe
             key={index}
             task={task}
-            project_comitee={props.comitee}
+            project_personInCharge={props.personInCharge}
             decodedToken={props.decodedToken}
             handleCompletedChange={handleCompletedChange}
             handleDelete={handleDelete}

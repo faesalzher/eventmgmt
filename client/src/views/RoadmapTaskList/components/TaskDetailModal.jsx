@@ -8,11 +8,13 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
+// import { CustomizedCheckbox } from 'components';
 
 import {
   TextField,
+  Checkbox,
   // Grid,
-  Checkbox, Tooltip, IconButton
+  Tooltip, IconButton
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
@@ -33,17 +35,13 @@ import {
   ConfirmationDialog
 } from 'components';
 
+import {
+  DELETE_TASK_ASSIGNED_TO,
+} from 'gql';
+
 const DELETE_TASK = gql`
 mutation deleteTask ($_id: String!) {
   deleteTask(_id:$_id){
-    _id
-  }
-}
-`;
-
-const DELETE_TASK_ASSIGNED_TO = gql`
-mutation deleteTaskAssignedTo ($_id: String!) {
-  delete_task_assigned_to(_id:$_id){
     _id
   }
 }
@@ -118,7 +116,7 @@ export default function TaskDetailModal(props) {
     setTask(props.task)
   }, [setTask, props.task]);
 
- 
+
 
   const handleChangeTaskName = e => {
     const { id, value } = e.target;
@@ -232,37 +230,26 @@ export default function TaskDetailModal(props) {
                   <Checkbox
                     checked={task.completed}
                     onChange={handleCompletedChange}
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                    style={{ padding: 5 }}
-                  />
+                    disabled={
+                      !props.isAssignedToMe}
+                    style={{ padding: 5 }} />
                 </Tooltip>
                 {
-                  (props.project_comitee.position_id === '1' ||
-                    props.project_comitee.position_id === '2' ||
-                    props.project_comitee.position_id === '3' ||
-                    props.project_comitee.position_id === '5' ||
-                    props.project_comitee.position_id === '6' ||
-                    props.decodedToken.user_type === "organization") ?
-                    <Tooltip title="Delete this task">
-                      <IconButton aria-label="delete"
-                        style={{ padding: 5 }}
-                        onClick={handleDeleteModal}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                    :
-                    <></>
+                  (props.user_access) ?
+                    <>
+                      <Tooltip title="Delete this task">
+                        <IconButton aria-label="delete"
+                          style={{ padding: 5 }}
+                          onClick={handleDeleteModal}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </> : <></>
                 }
-
               </div>
               {
-                (props.project_comitee.position_id === '1' ||
-                  props.project_comitee.position_id === '2' ||
-                  props.project_comitee.position_id === '3' ||
-                  props.project_comitee.position_id === '5' ||
-                  props.project_comitee.position_id === '6' ||
-                  props.decodedToken.user_type === "organization") ?
+                (props.user_access) ?
                   <Button
                     variant="contained"
                     color="primary"
@@ -310,13 +297,16 @@ export default function TaskDetailModal(props) {
         } >
           <TaskProperties
             project_id={props.project_id}
+            event_id={props.event_id}
+            roadmap_id={props.roadmap_id}
             task={task}
             roadmap={props.roadmap}
+            user_access={props.user_access}
             handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
             handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
             handleCompletedChange={props.handleCompletedChange}
             tasksAssignedTo={props.tasksAssignedTo}
-            project_comitee={props.project_comitee}
+            project_personInCharge={props.project_personInCharge}
             decodedToken={props.decodedToken}
           />
         </DialogContent  >

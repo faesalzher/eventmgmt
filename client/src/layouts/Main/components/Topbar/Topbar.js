@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/styles";
-import { Typography,useMediaQuery } from "@material-ui/core";
+import { Typography, useMediaQuery } from "@material-ui/core";
 
 import { useAuth } from "context/auth.jsx";
 import CustomizedMenus from "./components/CustomizedMenus/CustomizedMenus";
@@ -9,30 +9,10 @@ import jwtDecode from "jwt-decode";
 import { useTheme } from "@material-ui/core/styles";
 
 import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      email
-      organization_name
-      picture
-    }
-  }
-`;
+import { ORGANIZATION_QUERY } from "gql";
 
-const STAFF_QUERY = gql`
-  query staffById($staff_id: String!) {
-    staffById(_id: $staff_id) {
-      _id
-      staff_name
-      email
-      position_name
-      picture
-    }
-  }
-`;
+import { STAFF_QUERY } from "gql";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,7 +63,7 @@ const Topbar = (props) => {
   } = useQuery(STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id },
     // onCompleted: () => {
-    //   setProfileStaff(dataStaff.staffById);
+    //   setProfileStaff(dataStaff.staff);
     // },
   });
 
@@ -109,7 +89,7 @@ const Topbar = (props) => {
 
   useEffect(() => {
     const onCompleted = (dataStaff) => {
-      setProfileStaff(dataStaff.staffById);
+      setProfileStaff(dataStaff.staff);
     };
     const onError = (error) => {
       /* magic */
@@ -132,7 +112,7 @@ const Topbar = (props) => {
   return (
     <div className={classes.root}>
       <div className={classes.root}>
-        <Typography variant="h6" style={xs ? {fontSize:14 } : {}}>
+        <Typography variant="h6" style={xs ? { fontSize: 14 } : {}}>
           Event Management
           {decodedToken.user_type === "organization" ? " (Admin)" : ""}
         </Typography>

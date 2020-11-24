@@ -10,4 +10,6 @@ export { default as StatusProgressBar } from "./StatusProgressBar.jsx";
 export { default as AvatarName } from "./AvatarName.jsx";
 export { Percentage, StatusProgressDays } from "./StatusProgressBar.jsx";
 export { default as CustomizedCheckbox } from "./CustomizedCheckbox.jsx";
+export { default as MyPersonInCharge } from "./MyPersonInCharge.jsx";
+
 

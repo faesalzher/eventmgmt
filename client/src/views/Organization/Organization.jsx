@@ -24,28 +24,12 @@ import {
   Departements,
 } from './components';
 import jwtDecode from "jwt-decode";
-
+import { STAFFS_QUERY } from 'gql';
 const DEPARTEMENS_QUERY = gql`
 query departements($organization_id:String!){
   departements(organization_id: $organization_id){
     _id
     departement_name
-  }
-}
-`;
-
-const STAFFS_QUERY = gql`
-query staffs($organization_id:String!){
-  staffs(organization_id: $organization_id){
-      _id
-      staff_name
-      position_name
-      email
-      phone_number
-      password
-      picture
-      departement_id
-      organization_id
   }
 }
 `;
@@ -239,7 +223,7 @@ export default function Organization() {
               onChange={handleChange}
               centered
               style={{ color: 'white' }}
-              aria-label="project comitee tabs"
+              aria-label="project personInCharge tabs"
               className={classes.tabs}
             >
               <Tab label="Staff" {...a11yProps(0)} />

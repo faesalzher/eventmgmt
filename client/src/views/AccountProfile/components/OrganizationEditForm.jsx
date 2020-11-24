@@ -16,34 +16,9 @@ import {
 } from '.';
 
 import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
-const EDIT_ORGANIZATION = gql`
-mutation editOrganization(
-  $_id: String!,
-  $organization_name: String!,
-  $email: String!,
-  $password: String!,
-  $description: String!,
-  $picture: String!,
-  ){
-  editOrganization(
-    _id: $_id,
-    organization_name: $organization_name,
-    email: $email,
-    password:$password,
-    description:$description,
-    picture:$picture
-  ){
-    _id
-    organization_name
-    email
-    password
-    description
-    picture
-  }
-}
-`;
+import { EDIT_ORGANIZATION } from 'gql';
+
 
 const useStyles = makeStyles(() => ({
   root: {},

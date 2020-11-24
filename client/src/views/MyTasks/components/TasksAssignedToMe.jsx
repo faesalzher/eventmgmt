@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import { makeStyles } from '@material-ui/styles';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 // import {
 //   Button,
 // } from '@material-ui/core';
@@ -15,93 +14,8 @@ import { Task } from 'views/RoadmapTaskList/components';
 //     padding: theme.spacing(4)
 //   }
 // }));
-const TASK_QUERY = gql`
-  query task($task_id: String!){
-    task(_id:$task_id) {
-        _id,
-        task_name,
-        priority,
-        completed,
-        task_description,
-        due_date,
-        completed_date,
-        created_at,
-        created_by,
-        roadmap_id
-    }
-  }
-`;
-
-const PROJECT_QUERY = gql`
-  query project($project_id: String!){
-    project(_id:$project_id) {
-        _id,
-        project_name,
-    }
-  }
-`;
-
-const EVENT_QUERY = gql`
-  query event($event_id: String!){
-    event(_id:$event_id) {
-        _id,
-        event_name,
-    }
-  }
-`;
-
-const ROADMAP_QUERY = gql`
-  query roadmap($roadmap_id: String!){
-    roadmap(_id:$roadmap_id) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
-
-const EDIT_TASK = gql`
-  mutation editTask(
-    $_id: String!,
-    $task_name: String!,
-    $priority: String!,
-    $completed: Boolean!,
-    $task_description: String!,
-    $due_date: String!,
-    $completed_date: String!,
-    $created_at: String!,
-    $created_by: String!,
-    $roadmap_id: String!,
-    ){
-    editTask(
-      _id: $_id,
-      task_name: $task_name,
-      priority: $priority,
-      completed:$completed,
-      task_description:$task_description,
-      due_date:$due_date,
-      completed_date:$completed_date,
-      created_at:$created_at,
-      created_by:$created_by,
-      roadmap_id:$roadmap_id,
-    ){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-      roadmap_id
-    }
-  }
-`;
-
+import { TASK_QUERY, EVENT_QUERY } from 'gql';
+import { ROADMAP_QUERY, PROJECT_QUERY, EDIT_TASK } from 'gql';
 
 export default function TasksAssignedToMe(props) {
   // const classes = useStyles();
@@ -119,19 +33,24 @@ export default function TasksAssignedToMe(props) {
     completed_date: "",
     created_at: "",
     created_by: "",
+    event_id: "",
+    project_id: "",
   };
+
   const [task, setTask] = useState(initialFormState);
   const { data: taskData, loading: taskLoading, error: taskError, refetch: taskRefetch } = useQuery(TASK_QUERY, {
     variables: { task_id: props.taskAssignedTo.task_id }
   }
   );
-
+  // if(!taskData) return <></>
   useEffect(() => {
     const onCompleted = (taskData) => {
       if (taskData !== undefined) {
         setTask(
           taskData.task
         )
+      } else {
+        setTask(initialFormState)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -160,7 +79,7 @@ export default function TasksAssignedToMe(props) {
   const [project, setProject] = React.useState({ project_name: "" });
   const { data: projectData, refetch: projectRefetch } = useQuery(PROJECT_QUERY,
     {
-      variables: { project_id: props.comitee.project_id },
+      variables: { project_id: props.personInCharge.project_id },
       onCompleted: () => {
         if (projectData !== undefined && projectData.project !== null) {
           setProject(projectData.project)
@@ -210,6 +129,8 @@ export default function TasksAssignedToMe(props) {
         created_at: e.created_at,
         created_by: e.created_by,
         roadmap_id: e.roadmap_id,
+        event_id: e.event_id,
+        project_id: e.project_id,
       }
     });
   };
@@ -219,10 +140,22 @@ export default function TasksAssignedToMe(props) {
   // }
 
   const breadcrumb_item = [
-    { name: project.project_name, link: `/project/${props.comitee.project_id}` },
-    { name: event.event_name, link: `/project/${props.comitee.project_id}/${roadmap.event_id}` },
-    { name: roadmap.roadmap_name, link: `/project/${props.comitee.project_id}/${roadmap.event_id}/${task.roadmap_id}` }
+    { name: project.project_name, link: `/project/${props.personInCharge.project_id}` },
+    { name: event.event_name, link: `/project/${props.personInCharge.project_id}/${roadmap.event_id}` },
+    { name: roadmap.roadmap_name, link: `/project/${props.personInCharge.project_id}/${roadmap.event_id}/${task.roadmap_id}` }
   ]
+
+  const user_access = (roadmap.committee_id === props.personInCharge.committee_id) ?
+    (props.personInCharge.position_id === '1' ||
+      props.personInCharge.position_id === '2' ||
+      props.personInCharge.position_id === '3' ||
+      props.personInCharge.position_id === '5' ||
+      props.personInCharge.position_id === '6') ?
+      true
+      :
+      false
+    :
+    props.decodedToken.user_type === "organization" ? true : false
 
   return (
     <div>
@@ -232,9 +165,12 @@ export default function TasksAssignedToMe(props) {
       </div>
       <Task
         task={task}
-        project_comitee={props.comitee}
+        project_personInCharge={props.personInCharge}
         decodedToken={props.decodedToken}
-        project_id={props.comitee.project_id}
+        user_access={user_access}
+        project_id={props.personInCharge.project_id}
+        event_id={event._id}
+        roadmap_id={roadmap._id}
         roadmap={roadmap}
         handleCompletedChange={handleCompletedChange}
         handleDelete={props.handleDelete}

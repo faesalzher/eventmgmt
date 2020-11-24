@@ -9,23 +9,14 @@ import { useSoftRiseShadowStyles } from '@mui-treasury/styles/shadow/softRise';
 import clsx from 'clsx';
 import { CustomizedCheckbox } from 'components';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   TaskDetailModal, AssigneeAvatar
 } from '.';
 
 
+import { TASK_ASSIGNED_TOS_QUERY } from 'gql';
 
-const TASKS_ASSIGNED_TO_QUERY = gql`
-query tasks_assigned_to($task_id:String!){
-  tasks_assigned_to(task_id: $task_id){
-      _id
-      task_id
-      comitee_id
-  }
-}
-`;
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -71,13 +62,19 @@ export default function Task(props) {
     error: tasksAssignedToError,
     data: tasksAssignedToData,
     refetch: tasksAssignedToRefetch
-  } = useQuery(TASKS_ASSIGNED_TO_QUERY,
+  } = useQuery(TASK_ASSIGNED_TOS_QUERY,
     {
       variables: { task_id: task._id },
     });
 
   useEffect(() => {
-    const onCompleted = (tasksAssignedToData) => { setTasksAssignedTo(tasksAssignedToData.tasks_assigned_to) };
+    const onCompleted = (tasksAssignedToData) => {
+      if (tasksAssignedToData!==undefined && tasksAssignedToData.task_assigned_tos !== null) {
+        setTasksAssignedTo(tasksAssignedToData.task_assigned_tos)
+      } else {
+        setTasksAssignedTo([])
+      }
+    }
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !tasksAssignedToLoading && !tasksAssignedToError) {
@@ -142,31 +139,16 @@ export default function Task(props) {
   let isAssignedToMe = false;
   if (tasksAssignedTo.length !== 0) {
     tasksAssignedTo.forEach((taskAssignedTo, index) => {
-        if (
-          (taskAssignedTo.comitee_id === props.project_comitee._id)
-          ||
-          (props.project_comitee.position_id === '1' ||
-            props.project_comitee.position_id === '2' ||
-            props.project_comitee.position_id === '3' ||
-            props.project_comitee.position_id === '5' ||
-            props.project_comitee.position_id === '6' ||
-            props.decodedToken.user_type === "organization")
-        ) {
-          isAssignedToMe = true
-        }
+      if ((taskAssignedTo.person_in_charge_id === props.project_personInCharge._id) || props.user_access) {
+        isAssignedToMe = true
+      }
     })
   } else {
-    if (
-      (props.project_comitee.position_id === '1' ||
-        props.project_comitee.position_id === '2' ||
-        props.project_comitee.position_id === '3' ||
-        props.project_comitee.position_id === '5' ||
-        props.project_comitee.position_id === '6' ||
-        props.decodedToken.user_type === "organization")
-    ) {
+    if (props.user_access) {
       isAssignedToMe = true
     }
   }
+
   return (
     <div
       style={task.completed === true ?
@@ -232,6 +214,8 @@ export default function Task(props) {
       </ListItem>
       <TaskDetailModal
         project_id={props.project_id}
+        event_id={props.event_id}
+        roadmap_id={props.roadmap_id}
         openDialogDetail={openDialogDetail}
         handleAddTaskAssignedTo={handleAddTaskAssignedTo}
         closeDialogDetail={handleClose}
@@ -239,11 +223,13 @@ export default function Task(props) {
         handleDelete={props.handleDelete}
         // closeAfterTransition
         roadmap={props.roadmap}
+        isAssignedToMe={isAssignedToMe}
         tasksAssignedTo={tasksAssignedTo}
         handleChangeChecked={handleChangeChecked}
         handleCompletedChange={handleCompletedChange}
         task={props.task}
-        project_comitee={props.project_comitee}
+        project_personInCharge={props.project_personInCharge}
+        user_access={props.user_access}
         decodedToken={props.decodedToken}
       />
     </div >

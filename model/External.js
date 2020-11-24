@@ -10,5 +10,6 @@ const External = new Schema({
   phone_number: String,
   details: String,
   picture:String,
+  project_id:String,
 })
 module.exports = mongo.model('External', External)

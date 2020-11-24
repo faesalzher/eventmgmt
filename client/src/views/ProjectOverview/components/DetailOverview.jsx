@@ -10,44 +10,12 @@ import {
   // IconButton
 } from '@material-ui/core';
 
-import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 
 import AdjustIcon from '@material-ui/icons/Adjust';
 import EventIcon from '@material-ui/icons/Event';
 import { StatusBox, AvatarName } from 'components';
-const HEADOFPROJECT_QUERY = gql`
-  query comiteesByHeadProject($project_id: String!,$position_id: String!){
-     comiteesByHeadProject(project_id:$project_id,position_id:$position_id) {
-       _id
-      staff_id
-      }
-  }
-`;
-
-const STAFFBYID_QUERY = gql`
-query staffById($_id: String!){
-    staffById(_id:$_id) {
-      _id
-      staff_name
-      phone_number
-      email
-      picture
-      organization_id
-    }
-  }
-`;
-
-const ORGANIZATION_QUERY = gql`
-  query organization($_id: String!) {
-    organization(_id: $_id) {
-      _id
-      organization_name
-      picture
-    }
-  }
-`;
-
+import { ORGANIZATION_QUERY, STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION } from 'gql';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -81,7 +49,7 @@ export default function DetailOverview(props) {
   const [organization, setOrganization] = useState("");
 
 
-  const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(HEADOFPROJECT_QUERY,
+  const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION,
     {
       variables: { project_id: props.project_id, position_id: '1' },
     });
@@ -90,8 +58,8 @@ export default function DetailOverview(props) {
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectIdData !== undefined && headOfProjectIdData.comiteesByHeadProject.length !== 0) {
-        setHeadOfProjectId(data.comiteesByHeadProject[0].staff_id);
+      if (headOfProjectIdData !== undefined && headOfProjectIdData.person_in_charges_by_project_and_position.length !== 0) {
+        setHeadOfProjectId(data.person_in_charges_by_project_and_position[0].staff_id);
       } else {
         return setHeadOfProjectId('')
       }
@@ -106,17 +74,17 @@ export default function DetailOverview(props) {
     }
   }, [headOfProjectIdLoading, headOfProjectIdData, headOfProjectIdError]);
 
-  const { loading: headOfProjectLoading, error: headOfProjectError, data: headOfProjectData, refetch: headOfProjectRefetch } = useQuery(STAFFBYID_QUERY,
+  const { loading: headOfProjectLoading, error: headOfProjectError, data: headOfProjectData, refetch: headOfProjectRefetch } = useQuery(STAFF_QUERY,
     {
-      variables: { _id: headOfProjectId },
+      variables: { staff_id: headOfProjectId },
     });
 
 
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectData !== undefined && headOfProjectData.staffById !== null) {
-        setHeadOfProject(data.staffById)
+      if (headOfProjectData !== undefined && headOfProjectData.staff !== null) {
+        setHeadOfProject(data.staff)
       } else {
         setHeadOfProject([])
       }
@@ -217,7 +185,6 @@ export default function DetailOverview(props) {
             <StatusBox
               start_date={props.project.project_start_date}
               end_date={props.project.project_end_date}
-              cancel={props.project.cancel}
             />
           </div>
         </div>

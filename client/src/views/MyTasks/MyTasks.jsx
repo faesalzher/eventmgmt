@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 // import { Grid } from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 import jwtDecode from "jwt-decode";
 import { TasksAssignedToMe, TasksCreatedByMe } from './components';
 import {
@@ -21,27 +20,12 @@ import {
   // Snackbar,
   CircularProgress
 } from '@material-ui/core';
-const COMITEESBYSTAFF_QUERY = gql`
-  query comiteesByStaff($staff_id: String!){
-    comiteesByStaff(staff_id:$staff_id) {
-      _id
-      staff_id
-      position_id
-      division_id
-      project_id
-    }
-  }
-`;
+import {
+  TASK_ASSIGNED_TOS_QUERY_BY_PERSON_IN_CHARGE,
+  PERSON_IN_CHARGES_BY_STAFF_QUERY
+} from 'gql';
 
-const TASKS_ASSIGNED_TO_QUERY = gql`
-query tasks_assigned_to_by_comitee($comitee_id:String!){
-  tasks_assigned_to_by_comitee(comitee_id: $comitee_id){
-      _id
-      task_id
-      comitee_id
-  }
-}
-`;
+
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(4)
@@ -94,8 +78,8 @@ const AssignedToMe = (props) => {
     error: tasksAssignedToError,
     refetch: tasksAssignedToRefetch } =
     useQuery(
-      TASKS_ASSIGNED_TO_QUERY, {
-      variables: { comitee_id: props.comitee._id }
+      TASK_ASSIGNED_TOS_QUERY_BY_PERSON_IN_CHARGE, {
+      variables: { person_in_charge_id: props.personInCharge._id }
     }
     );
 
@@ -106,7 +90,7 @@ const AssignedToMe = (props) => {
   useEffect(() => {
     const onCompleted = (tasksAssignedToData) => {
       setTasksAssignedTo(
-        tasksAssignedToData.tasks_assigned_to_by_comitee
+        tasksAssignedToData.task_assigned_tos
       )
     };
     const onError = (error) => { /* magic */ };
@@ -123,8 +107,8 @@ const AssignedToMe = (props) => {
     tasksAssignedToRefetch();
   };
 
-  const handleDeleteTaskAssignedTo = (e, comitee_id) => {
-    if (comitee_id === props.comitee._id) {
+  const handleDeleteTaskAssignedTo = (e, person_in_charge_id) => {
+    if (person_in_charge_id === props.personInCharge._id) {
       const temp = [...tasksAssignedTo];
       const index = temp.map(function (item) {
         // console.log(item._id)
@@ -150,7 +134,7 @@ const AssignedToMe = (props) => {
         <List key={index} style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
           <TasksAssignedToMe
             taskAssignedTo={taskAssignedTo}
-            comitee={props.comitee}
+            personInCharge={props.personInCharge}
             handleDelete={handleDelete}
             handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
             decodedToken={props.decodedToken}
@@ -165,8 +149,8 @@ export default function MyTasks(props) {
   const classes = useStyles();
   // const styles = AwsSliderStyles();
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
-  const [comitees, setComitees] = useState([]);
-  const { data: comiteesData, loading: comiteesLoading, error: comiteesError, refetch: comiteesRefetch } = useQuery(COMITEESBYSTAFF_QUERY, {
+  const [personInCharges, setPersonInCharges] = useState([]);
+  const { data: personInChargesData, loading: personInChargesLoading, error: personInChargesError, refetch: personInChargesRefetch } = useQuery(PERSON_IN_CHARGES_BY_STAFF_QUERY, {
     variables: { staff_id: decodedToken.staff_id }
   }
   );
@@ -176,23 +160,23 @@ export default function MyTasks(props) {
   });
 
   useEffect(() => {
-    const onCompleted = (comiteesData) => {
-      setComitees(
-        comiteesData.comiteesByStaff
+    const onCompleted = (personInChargesData) => {
+      setPersonInCharges(
+        personInChargesData.person_in_charges
       )
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
-      if (onCompleted && !comiteesLoading && !comiteesError) {
-        onCompleted(comiteesData);
-      } else if (onError && !comiteesLoading && comiteesError) {
-        onError(comiteesError);
+      if (onCompleted && !personInChargesLoading && !personInChargesError) {
+        onCompleted(personInChargesData);
+      } else if (onError && !personInChargesLoading && personInChargesError) {
+        onError(personInChargesError);
       }
     }
-  }, [comiteesLoading, comiteesData, comiteesError]);
+  }, [personInChargesLoading, personInChargesData, personInChargesError]);
 
   const refresh = () => {
-    comiteesRefetch();
+    personInChargesRefetch();
   };
 
   const [value, setValue] = React.useState(0);
@@ -200,7 +184,6 @@ export default function MyTasks(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
   return (
     <div>
       <Paper color="default" position="static" style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
@@ -216,7 +199,7 @@ export default function MyTasks(props) {
               onChange={handleChange}
               centered
               style={{ color: 'white' }}
-              aria-label="project comitee tabs"
+              aria-label="project personInCharge tabs"
               className={classes.tabs}
             >
               <Tab label="Created By Me" {...a11yProps(decodedToken.user_type === "organization" ? 0 : 1)} />
@@ -227,7 +210,7 @@ export default function MyTasks(props) {
               onChange={handleChange}
               centered
               style={{ color: 'white' }}
-              aria-label="project comitee tabs"
+              aria-label="project personInCharge tabs"
               className={classes.tabs}
             >
               <Tab label="Assigned To Me" {...a11yProps(0)} />
@@ -239,16 +222,16 @@ export default function MyTasks(props) {
         {
           decodedToken.user_type === "staff" ?
             <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
-              {comiteesLoading ?
+              {personInChargesLoading ?
                 <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
                   <CircularProgress size={100} />
                 </div>
                 :
-                (comitees).map((comitee, index) => {
+                (personInCharges).map((personInCharge, index) => {
                   return (
                     <AssignedToMe
                       key={index}
-                      comitee={comitee}
+                      personInCharge={personInCharge}
                       decodedToken={decodedToken}
                     />
                   )

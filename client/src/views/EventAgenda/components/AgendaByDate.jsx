@@ -86,8 +86,8 @@ export default function Agenda(props) {
         </Tooltip>
         <EditAgendaModal
           open={openEditModal}
-          handleDelete={props.handleDelete}
           agenda={agenda}
+          handleDelete={props.handleDelete}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}
         />

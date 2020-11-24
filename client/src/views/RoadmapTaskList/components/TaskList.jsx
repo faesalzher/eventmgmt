@@ -22,7 +22,6 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import jwtDecode from "jwt-decode";
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
 
 import {
   Task
@@ -30,103 +29,7 @@ import {
 
 import uuid from 'uuid/v1';
 
-
-
-const TASKS_QUERY = gql`
-query tasks($roadmap_id:String!){
-  tasks(roadmap_id: $roadmap_id){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-      roadmap_id
-  }
-}
-`;
-
-const ADD_TASK = gql`
-  mutation addTask(
-    $_id: String!,
-    $task_name: String!,
-    $priority: String!,
-    $completed: Boolean!,
-    $task_description: String!,
-    $due_date: String!,
-    $completed_date: String!,
-    $created_at: String!,
-    $created_by: String!,
-    $roadmap_id: String!,
-    ){
-    addTask(
-      _id: $_id,
-      task_name: $task_name,
-      priority: $priority,
-      completed:$completed,
-      task_description:$task_description,
-      due_date:$due_date,
-      completed_date:$completed_date,
-      created_at:$created_at,
-      created_by:$created_by,
-       roadmap_id:$roadmap_id,
-    ){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-	roadmap_id
-    }
-  }
-`;
-
-
-const EDIT_TASK = gql`
-  mutation editTask(
-    $_id: String!,
-    $task_name: String!,
-    $priority: String!,
-    $completed: Boolean!,
-    $task_description: String!,
-    $due_date: String!,
-    $completed_date: String!,
-    $created_at: String!,
-    $created_by: String!,
-    $roadmap_id: String!,
-    ){
-    editTask(
-      _id: $_id,
-      task_name: $task_name,
-      priority: $priority,
-      completed:$completed,
-      task_description:$task_description,
-      due_date:$due_date,
-      completed_date:$completed_date,
-      created_at:$created_at,
-      created_by:$created_by,
-      roadmap_id:$roadmap_id,
-    ){
-      _id
-      task_name
-      priority
-      completed
-      task_description
-      due_date
-      completed_date
-      created_at
-      created_by
-      roadmap_id
-    }
-  }
-`;
+import { TASKS_QUERY, ADD_TASK, EDIT_TASK } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -169,7 +72,9 @@ export default function TaskList(props) {
     due_date: "",
     completed_date: "",
     created_at: new Date().toString(),
-    created_by: (decodedToken.user_type === "organization") ? decodedToken.organization_id : decodedToken.staff_id
+    created_by: (decodedToken.user_type === "organization") ? decodedToken.organization_id : decodedToken.staff_id,
+    event_id: props.event_id,
+    project_id: props.project_id,
   };
 
   const [countUncompleted, setCountUncompleted] = React.useState(0);
@@ -231,6 +136,8 @@ export default function TaskList(props) {
         created_at: e.created_at,
         created_by: e.created_by,
         roadmap_id: e.roadmap_id,
+        event_id: e.event_id,
+        project_id: e.project_id,
       }
     });
   };
@@ -251,6 +158,8 @@ export default function TaskList(props) {
         created_at: taskForm.created_at,
         created_by: taskForm.created_by,
         roadmap_id: taskForm.roadmap_id,
+        project_id: taskForm.project_id,
+        event_id: taskForm.event_id,
       }
     });
   }
@@ -275,21 +184,14 @@ export default function TaskList(props) {
 
   }
 
-  let tasksByRoadmap = (tasks.filter(function (task) {
-    if (task.roadmap_id === props.roadmap_id) {
-      return task
-    }
-    return null;
-  }));
-
-  let completedTasks = (tasksByRoadmap.filter(function (task) {
+  let completedTasks = (tasks.filter(function (task) {
     if (task.completed === true) {
       return task
     }
     return null;
   }));
 
-  let uncompletedTasks = (tasksByRoadmap.filter(function (task) {
+  let uncompletedTasks = (tasks.filter(function (task) {
     if (task.completed === false) {
       return task
     }
@@ -303,11 +205,25 @@ export default function TaskList(props) {
   );
 
   React.useEffect(() => {
-    const countUncompleted = tasksByRoadmap.filter((e) => e.completed === false).length;
+    const countUncompleted = tasks.filter((e) => e.completed === false).length;
     setCountUncompleted(countUncompleted);
-    const countCompleted = tasksByRoadmap.filter((e) => e.completed === true).length;
+    const countCompleted = tasks.filter((e) => e.completed === true).length;
     setCountCompleted(countCompleted);
-  }, [tasksByRoadmap])
+  }, [tasks])
+
+
+  const user_access = (props.roadmap.committee_id === props.project_personInCharge.committee_id) ?
+    (
+      props.project_personInCharge.position_id === '5' ||
+      props.project_personInCharge.position_id === '6') ?
+      true
+      :
+      false
+    :
+    decodedToken.user_type === "organization" ||
+      props.project_personInCharge.position_id === '1' ||
+      props.project_personInCharge.position_id === '2' ||
+      props.project_personInCharge.position_id === '3' ? true : false
 
   return (
     <Card className={classes.root} elevation={0} >
@@ -328,15 +244,11 @@ export default function TaskList(props) {
                 </IconButton>
               </Tooltip>
               {
-                (props.project_comitee.position_id === '1' ||
-                  props.project_comitee.position_id === '2' ||
-                  props.project_comitee.position_id === '3' ||
-                  props.project_comitee.position_id === '5' ||
-                  props.project_comitee.position_id === '6' ||
-                  decodedToken.user_type === "organization") ?
-                  <Tooltip title="Add New Task" arrow>
-                    <IconButton style={{ padding: 0, margin: '0px 6px' }} onClick={() => { setAddTaskForm(true) }}>
-                      <AddIcon style={{ fontSize: 20, }} />
+                //isRoadmapCommitteeSameAsPICCommittee
+                user_access ?
+                  < Tooltip title="Add New Task" arrow>
+                    <IconButton style={{ padding: 0, }} onClick={() => { setAddTaskForm(true) }}>
+                      <AddIcon />
                     </IconButton>
                   </Tooltip>
                   : <></>
@@ -397,17 +309,20 @@ export default function TaskList(props) {
                       <List style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
                         {
                           sortTask ?
-                            tasksByRoadmap.slice().reverse().map((task, index) => {
+                            tasks.slice().reverse().map((task, index) => {
                               return <div key={index}>
                                 <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
                                 <Task
                                   task={task}
                                   handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                                   project_id={props.project_id}
+                                  event_id={props.event_id}
+                                  roadmap_id={props.roadmap_id}
                                   roadmap={props.roadmap}
                                   handleCompletedChange={handleCompletedChange}
                                   handleDelete={handleDelete}
-                                  project_comitee={props.project_comitee}
+                                  project_personInCharge={props.project_personInCharge}
+                                  user_access={user_access}
                                   decodedToken={props.decodedToken}
                                 />
                               </div>
@@ -420,12 +335,15 @@ export default function TaskList(props) {
                                     <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
                                     <Task
                                       project_id={props.project_id}
+                                      event_id={props.event_id}
+                                      roadmap_id={props.roadmap_id}
                                       handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                                       task={task}
                                       roadmap={props.roadmap}
                                       handleCompletedChange={handleCompletedChange}
                                       handleDelete={handleDelete}
-                                      project_comitee={props.project_comitee}
+                                      project_personInCharge={props.project_personInCharge}
+                                      user_access={user_access}
                                       decodedToken={props.decodedToken}
                                     />
                                   </div>
@@ -443,12 +361,15 @@ export default function TaskList(props) {
                                 return <div key={index}>
                                   <Task
                                     project_id={props.project_id}
+                                    event_id={props.event_id}
+                                    roadmap_id={props.roadmap_id}
                                     handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
                                     task={task}
                                     roadmap={props.roadmap}
                                     handleCompletedChange={handleCompletedChange}
                                     handleDelete={handleDelete}
-                                    project_comitee={props.project_comitee}
+                                    project_personInCharge={props.project_personInCharge}
+                                    user_access={user_access}
                                     decodedToken={props.decodedToken}
                                   />
                                   <div style={{ backgroundColor: "#d8dce3", height: 4 }} />
@@ -464,24 +385,25 @@ export default function TaskList(props) {
         </Scrollbars>
       </div>
 
-      {tasksLoading || tasks.length === 0 ?
-        <div></div>
-        :
-        <div className={classes.taskHeaderFooter}>
-          {tasksByRoadmap.length === 0 ?
-            <LinearProgress color="secondary" variant="determinate" value={0} />
-            :
-            <LinearProgress color="secondary" variant="determinate" value={(countCompleted / tasksByRoadmap.length) * 100} />
-          }
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography style={{ fontSize: 10, fontWeight: 300, color: 'white', alignItems: 'right' }}>
-              {countUncompleted} active task
+      {
+        tasksLoading || tasks.length === 0 ?
+          <div></div>
+          :
+          <div className={classes.taskHeaderFooter}>
+            {tasks.length === 0 ?
+              <LinearProgress color="secondary" variant="determinate" value={0} />
+              :
+              <LinearProgress color="secondary" variant="determinate" value={(countCompleted / tasks.length) * 100} />
+            }
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography style={{ fontSize: 10, fontWeight: 300, color: 'white', alignItems: 'right' }}>
+                {countUncompleted} active task
         </Typography>
-            <Typography style={{ fontSize: 10, fontWeight: 300, color: 'white', alignItems: 'right' }}>
-              {countCompleted}/{tasksByRoadmap.length} task completed
+              <Typography style={{ fontSize: 10, fontWeight: 300, color: 'white', alignItems: 'right' }}>
+                {countCompleted}/{tasks.length} task completed
         </Typography>
+            </div>
           </div>
-        </div>
       }
     </Card >
   );

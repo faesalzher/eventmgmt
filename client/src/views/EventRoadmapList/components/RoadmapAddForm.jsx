@@ -6,6 +6,7 @@ import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog'
 import TextField from '@material-ui/core/TextField';
 import {
   Dialog,
+  MenuItem,
 } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import { DateRange } from 'react-date-range';
@@ -15,37 +16,10 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import randomColor from 'randomcolor';
 
-import { useMutation } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import uuid from 'uuid/v1';
 
-const ADD_ROADMAP = gql`
-  mutation addRoadmap(
-    $_id: String!,
-    $roadmap_name: String!,
-    $start_date: String!,
-    $end_date: String!,
-    $color:String!,
-    $event_id:String!
-    ) {
-    addRoadmap(
-      _id: $_id,
-      roadmap_name: $roadmap_name,
-      start_date:$start_date,
-      end_date:$end_date,
-      color:$color,
-      event_id:$event_id
-      ) {
-      _id
-      roadmap_name
-      start_date
-      end_date
-      color
-      event_id
-    }
-  }
-`;
-
+import { ADD_ROADMAP, COMMITTEE_QUERY, PERSON_IN_CHARGES_BY_PROJECT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -78,10 +52,12 @@ export default function RoadmapAddForm(props) {
   const intitialFormState = {
     _id: uuid(),
     roadmap_name: "",
-    color: randomColor({ luminosity: 'dark' }) ,
-    event_id: props.event_id,
+    color: randomColor({ luminosity: 'dark' }),
     start_date: "",
     end_date: "",
+    committee_id: "",
+    event_id: props.event_id,
+    project_id: props.project_id,
   }
 
   const initialDateRange = [{
@@ -92,6 +68,7 @@ export default function RoadmapAddForm(props) {
   const [roadmapForm, setRoadmapForm] = useState(intitialFormState);
   const [daysSelected, setDaysSelected] = useState(false);
   const [date, setDate] = useState(initialDateRange);
+  // const [committee_id, setCommittee_id] = useState("");
 
   const handleDeleteDate = () => {
     setDate(initialDateRange);
@@ -110,6 +87,44 @@ export default function RoadmapAddForm(props) {
 
   const [addRoadmap] = useMutation(ADD_ROADMAP);
 
+
+  const { data: personInChargesData } =
+    useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
+      variables: { project_id: props.project_id },
+    }
+    );
+  if (!personInChargesData) {
+    return (<></>)
+  }
+
+
+  //group cmmittee from person_in_charges
+  const groupCommitteesObject = personInChargesData.person_in_charges.reduce((committees, personInCharge) => {
+    const committee_id = personInCharge.committee_id;
+    if (!committees[committee_id]) {
+      committees[committee_id] = [];
+    }
+    committees[committee_id].push(personInCharge);
+    return committees;
+  }, {});
+
+  //add it into array
+  const groupCommittees = Object.keys(groupCommitteesObject).map((committee_id) => {
+    return {
+      committee_id,
+      personInCharges: groupCommitteesObject[committee_id]
+    };
+  });
+  console.log(groupCommittees)
+
+
+  const handleChangeCommittee = (e) => {
+    const { value } = e.target;
+    // roadmapForm.committee_id = event.target.value;
+    // setCommittee_id(e.target.value)
+    setRoadmapForm({ ...roadmapForm, committee_id: value });
+  };
+
   const handleSaveButton = () => {
     // roadmapForm.color = roadmapForm.color
     roadmapForm.start_date = date[0].startDate.toString().slice(0, 16);
@@ -124,7 +139,9 @@ export default function RoadmapAddForm(props) {
           color: roadmapForm.color,
           start_date: roadmapForm.start_date,
           end_date: roadmapForm.end_date,
+          committee_id: roadmapForm.committee_id,
           event_id: roadmapForm.event_id,
+          project_id: roadmapForm.project_id,
         }
       });
     setRoadmapForm(intitialFormState);
@@ -132,8 +149,9 @@ export default function RoadmapAddForm(props) {
     props.close();
     setDaysSelected(false);
   }
+  console.log(roadmapForm)
 
-  
+
   const handleCloseModal = () => {
     props.close();
     setRoadmapForm(intitialFormState);
@@ -143,12 +161,12 @@ export default function RoadmapAddForm(props) {
   return (
     <Dialog
       fullScreen={fullScreen}
-      onClose={()=>handleCloseModal()}
+      onClose={() => handleCloseModal()}
       aria-labelledby="customized-dialog-title"
       open={props.open}
       maxWidth={false}
     >
-      <DialogTitle title="Add New roadmap" onClose={()=>handleCloseModal()}/>
+      <DialogTitle title="Add New roadmap" onClose={() => handleCloseModal()} />
       <DialogContent style={fullScreen ? {} : { width: 700 }}>
         <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: 'row' }}>
           <div className={classes.form} style={fullScreen ? {} : { width: '50%' }}>
@@ -165,6 +183,38 @@ export default function RoadmapAddForm(props) {
                 value={roadmapForm.roadmap_name}
                 onChange={handleInputChange}
               />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              {
+                <TextField
+                  id="committee_id"
+                  select
+                  size="small"
+                  margin="dense"
+                  style={{ backgroundColor: 'white' }}
+                  label="Committee"
+                  value={roadmapForm.committee_id}
+                  onChange={handleChangeCommittee}
+                  variant="outlined"
+                >
+                  {groupCommittees.map((groupCommittee) => {
+                    if (groupCommittee.committee_id === props.project_personInCharge.committee_id
+                      || props.decodedToken.user_type === "organization"
+                      || props.project_personInCharge.position_id === '1'
+                      || props.project_personInCharge.position_id === '2'
+                      || props.project_personInCharge.position_id === '3'
+                    )
+                      return (
+                        <MenuItem key={groupCommittee.committee_id}
+                          value={groupCommittee.committee_id}
+                        >
+                          <MenuItemSelect groupCommittee={groupCommittee} />
+                        </MenuItem>
+                      )
+                    return null
+                  })}
+                </TextField>
+              }
             </FormControl>
           </div>
           <div style={fullScreen ? {} : { marginTop: 14 }}>
@@ -190,10 +240,26 @@ export default function RoadmapAddForm(props) {
             ("invalid") : ("valid")
         }
         submit={() => handleSaveButton()}
-        close={()=>handleCloseModal()}
-        />
-        
+        close={() => handleCloseModal()}
+      />
+
     </Dialog>
   );
 };
 
+const MenuItemSelect = (props) => {
+  const { data: committeeData } = useQuery(COMMITTEE_QUERY, {
+    variables: { _id: props.groupCommittee.committee_id },
+  }
+  );
+
+  if (!committeeData) {
+    return (<></>)
+  }
+
+  return (
+    <div>
+      {committeeData.committee.committee_name}
+    </div>
+  );
+}
