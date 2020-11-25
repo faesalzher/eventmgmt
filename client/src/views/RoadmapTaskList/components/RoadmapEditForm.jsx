@@ -113,6 +113,7 @@ export default function RoadmapEditForm(props) {
           color: roadmapForm.color,
           start_date: roadmapForm.start_date,
           end_date: roadmapForm.end_date,
+          committee_id: roadmapForm.committee_id,
           event_id: roadmapForm.event_id,
           project_id: roadmapForm.project_id,
         }
