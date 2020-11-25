@@ -128,10 +128,10 @@ const AssignedToMe = (props) => {
     setTasksAssignedTo(temp);
   }
 
-  React.useEffect(() => {
-    props.handleTasksAssignedToLength(tasksAssignedTo.length)
-  })
-  console.log(tasksAssignedTo.length)
+  // React.useEffect(() => {
+  //   props.handleTasksAssignedToLength(tasksAssignedTo.length)
+  // })
+  // console.log(tasksAssignedTo.length)
 
   return (
     (tasksAssignedTo).map((taskAssignedTo, index) => {
@@ -190,15 +190,15 @@ export default function MyTasks(props) {
     setValue(newValue);
   };
 
-  const [tasksAssignedToLength, setTasksAssignedToLength] = useState(0)
-  const handleTasksAssignedToLength = (e) => {
-    setTasksAssignedToLength(e)
-  }
+  // const [tasksAssignedToLength, setTasksAssignedToLength] = useState(0)
+  // const handleTasksAssignedToLength = (e) => {
+  //   setTasksAssignedToLength(e)
+  // }
 
-  const [tasksLength, setTasksLength] = useState(0)
-  const handleTasksLength = (e) => {
-    setTasksLength(e)
-  }
+  // const [tasksLength, setTasksLength] = useState(0)
+  // const handleTasksLength = (e) => {
+  //   setTasksLength(e)
+  // }
 
   return (
     <div>
@@ -256,7 +256,7 @@ export default function MyTasks(props) {
                         key={index}
                         personInCharge={personInCharge}
                         decodedToken={decodedToken}
-                        handleTasksAssignedToLength={handleTasksAssignedToLength}
+                        // handleTasksAssignedToLength={handleTasksAssignedToLength}
                       />
                     )
                   })
@@ -274,7 +274,7 @@ export default function MyTasks(props) {
             //     </Typography>
             //   </Paper>
             //   :
-            <TasksCreatedByMe decodedToken={decodedToken} handleTasksLength={handleTasksLength} />
+            <TasksCreatedByMe decodedToken={decodedToken} />
           }
         </TabPanel>
       </div>

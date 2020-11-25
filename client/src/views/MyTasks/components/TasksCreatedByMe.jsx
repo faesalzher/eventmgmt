@@ -229,9 +229,9 @@ export default function TasksCreatedByMe(props) {
   }
 
   const sortedTasks = (tasks.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
-  React.useEffect(() => {
-    props.handleTasksLength(tasks.length)
-  })
+  // React.useEffect(() => {
+  //   props.handleTasksLength(tasks.length)
+  // })
   return (
       props.slice ?
         sortedTasks.slice(0, props.slice).map((task, index) => {
