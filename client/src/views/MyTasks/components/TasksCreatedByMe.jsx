@@ -7,7 +7,10 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import MyTaskBreadCrumbs from 'components/BreadCrumbs/MyTaskBreadCrumbs';
 
 import { Task } from 'views/RoadmapTaskList/components';
-// import { Grid } from '@material-ui/core';
+// import { 
+//   Paper,
+//   Typography
+//  } from '@material-ui/core';
 
 // const useStyles = makeStyles(theme => ({
 //   root: {
@@ -226,36 +229,38 @@ export default function TasksCreatedByMe(props) {
   }
 
   const sortedTasks = (tasks.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
-
+  React.useEffect(() => {
+    props.handleTasksLength(tasks.length)
+  })
   return (
-    props.slice ?
-      sortedTasks.slice(0, props.slice).map((task, index) => {
-        return (
-          <CreatedByMe
-            key={index}
-            task={task}
-            project_personInCharge={props.personInCharge}
-            decodedToken={props.decodedToken}
-            handleCompletedChange={handleCompletedChange}
-            handleDelete={handleDelete}
-            handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
-          />
-        )
-      })
-      :
-      sortedTasks.map((task, index) => {
-        return (
-          <CreatedByMe
-            key={index}
-            task={task}
-            project_personInCharge={props.personInCharge}
-            decodedToken={props.decodedToken}
-            handleCompletedChange={handleCompletedChange}
-            handleDelete={handleDelete}
-            handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
-          />
-        )
-      })
+      props.slice ?
+        sortedTasks.slice(0, props.slice).map((task, index) => {
+          return (
+            <CreatedByMe
+              key={index}
+              task={task}
+              project_personInCharge={props.personInCharge}
+              decodedToken={props.decodedToken}
+              handleCompletedChange={handleCompletedChange}
+              handleDelete={handleDelete}
+              handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+            />
+          )
+        })
+        :
+        sortedTasks.map((task, index) => {
+          return (
+            <CreatedByMe
+              key={index}
+              task={task}
+              project_personInCharge={props.personInCharge}
+              decodedToken={props.decodedToken}
+              handleCompletedChange={handleCompletedChange}
+              handleDelete={handleDelete}
+              handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
+            />
+          )
+        })
   );
 };
 

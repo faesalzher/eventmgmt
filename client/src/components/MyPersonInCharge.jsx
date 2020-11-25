@@ -29,7 +29,6 @@ export default function MyPersonInCharge(props) {
   } else {
     if (!organizationData) return <></>
   }
-
   return (
     <div style={{ display: 'flex' }} >
       {/* <Typography variant="subtitle2">
@@ -47,13 +46,13 @@ export default function MyPersonInCharge(props) {
             // color="primary"
             variant="outlined"
             avatar={<Avatar src={organizationData.organization.picture} />}
-            label={"Admin" + " Of " + organizationData.organization.organization_name}
+            label={"Admin Of " + organizationData.organization.organization_name}
           />
           :
-          positionData.position === '1' ||
-            positionData.position === '2' ||
-            positionData.position === '3' ||
-            positionData.position === '4' ?
+          positionData.position._id === '1' ||
+            positionData.position._id === '2' ||
+            positionData.position._id === '3' ||
+            positionData.position._id === '4' ?
             < Chip
               size="small"
               // color="primary"

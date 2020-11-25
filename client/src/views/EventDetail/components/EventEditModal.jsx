@@ -5,7 +5,7 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
 import {
-  Button,
+  // Button,
   Dialog,
 } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
@@ -21,7 +21,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { Redirect } from 'react-router';
 
 import {
-  ConfirmationDialog,
+  // ConfirmationDialog,
   StatusBox,
   EditImageForm,
 } from 'components';

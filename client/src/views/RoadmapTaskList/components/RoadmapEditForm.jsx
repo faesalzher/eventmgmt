@@ -149,7 +149,7 @@ if (!personInChargesData) {
   });
 
   const handleChangeCommittee = (e) => {
-    const { id, value } = e.target;
+    const { value } = e.target;
     // roadmapForm.committee_id = event.target.value;
     // setCommittee_id(e.target.value)
     setRoadmapForm({ ...roadmapForm, committee_id: value });
@@ -219,7 +219,6 @@ if (!personInChargesData) {
                           <MenuItemSelect groupCommittee={groupCommittee} />
                         </MenuItem>
                       )
-                    return null
                   })}
                 </TextField>
               }

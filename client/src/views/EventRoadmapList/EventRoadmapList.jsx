@@ -187,7 +187,7 @@ export default function EventRoadmapList(props) {
                     <Paper style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                       <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
                         there is no roadmap yet
-            </Typography>
+                         </Typography>
                     </Paper>
                   ) : (
                     roadmaps.map((roadmap, index) => (

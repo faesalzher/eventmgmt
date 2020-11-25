@@ -20,7 +20,7 @@ import {
 } from './components';
 // import gql from 'graphql-tag';
 
-import { STAFFS_QUERY, POSITIONS_QUERY,COMMITTEES__QUERY,COMMITTEE_QUERY } from 'gql';
+import { STAFFS_QUERY, POSITIONS_QUERY,COMMITTEES__QUERY } from 'gql';
 // export const COMMITTEE_QUERY = gql`
 //   query committee($_id: String!){
 //     committee(_id:$_id) {
@@ -75,7 +75,7 @@ export default function ProjectPersonInCharge(props) {
   }
   );
 
-  const { data: committeesData, refetch: committeesRefetch, loading: committeesLoading } = useQuery(COMMITTEES__QUERY, {
+  const { data: committeesData, refetch: committeesRefetch } = useQuery(COMMITTEES__QUERY, {
     variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setCommittees(

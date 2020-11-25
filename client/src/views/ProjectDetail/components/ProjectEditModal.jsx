@@ -3,7 +3,7 @@ import { makeStyles, useTheme } from "@material-ui/styles";
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from "@material-ui/core/TextField";
 import {
-  Button,
+  // Button,
   Dialog,
 } from "@material-ui/core";
 import { useMutation, useQuery } from "@apollo/react-hooks";
@@ -33,7 +33,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { StatusBox } from 'components';
 import { Redirect } from "react-router";
 
-import { ConfirmationDialog, EditImageForm } from "components";
+import { EditImageForm } from "components";
 
 const useStyles = makeStyles((theme) => ({
   form: {

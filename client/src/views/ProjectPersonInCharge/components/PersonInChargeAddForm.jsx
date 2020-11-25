@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
 import { AvatarName } from 'components';
@@ -17,7 +17,7 @@ import {
   useMutation,
 } from '@apollo/react-hooks';
 
-import { ADD_PERSON_IN_CHARGE, COMMITTEES__QUERY } from 'gql';
+import { ADD_PERSON_IN_CHARGE } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {

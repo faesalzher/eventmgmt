@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { Typography, List, ListItem, Divider, Paper, CircularProgress } from '@material-ui/core';
+import { Typography, List, ListItem, Divider, Paper } from '@material-ui/core';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import { useQuery } from '@apollo/react-hooks';

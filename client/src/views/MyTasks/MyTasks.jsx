@@ -128,6 +128,11 @@ const AssignedToMe = (props) => {
     setTasksAssignedTo(temp);
   }
 
+  React.useEffect(() => {
+    props.handleTasksAssignedToLength(tasksAssignedTo.length)
+  })
+  console.log(tasksAssignedTo.length)
+
   return (
     (tasksAssignedTo).map((taskAssignedTo, index) => {
       return (
@@ -184,6 +189,17 @@ export default function MyTasks(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const [tasksAssignedToLength, setTasksAssignedToLength] = useState(0)
+  const handleTasksAssignedToLength = (e) => {
+    setTasksAssignedToLength(e)
+  }
+
+  const [tasksLength, setTasksLength] = useState(0)
+  const handleTasksLength = (e) => {
+    setTasksLength(e)
+  }
+
   return (
     <div>
       <Paper color="default" position="static" style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
@@ -227,22 +243,39 @@ export default function MyTasks(props) {
                   <CircularProgress size={100} />
                 </div>
                 :
-                (personInCharges).map((personInCharge, index) => {
-                  return (
-                    <AssignedToMe
-                      key={index}
-                      personInCharge={personInCharge}
-                      decodedToken={decodedToken}
-                    />
-                  )
-                })
+                // tasksAssignedToLength === 0 ?
+                //   <Paper style={{ height: 180, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                //     <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                //       there is no task yet
+                //     </Typography>
+                //   </Paper>
+                //   :
+                  (personInCharges).map((personInCharge, index) => {
+                    return (
+                      <AssignedToMe
+                        key={index}
+                        personInCharge={personInCharge}
+                        decodedToken={decodedToken}
+                        handleTasksAssignedToLength={handleTasksAssignedToLength}
+                      />
+                    )
+                  })
               }
             </TabPanel>
             :
             <></>
         }
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={decodedToken.user_type === "organization" ? 0 : 1}>
-          <TasksCreatedByMe decodedToken={decodedToken} />
+          {
+            // tasksLength === 0 ?
+            //   <Paper style={{ height: 180, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            //     <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+            //       there is no task yet
+            //     </Typography>
+            //   </Paper>
+            //   :
+            <TasksCreatedByMe decodedToken={decodedToken} handleTasksLength={handleTasksLength} />
+          }
         </TabPanel>
       </div>
     </div>

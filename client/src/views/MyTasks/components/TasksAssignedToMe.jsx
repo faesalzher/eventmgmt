@@ -49,8 +49,6 @@ export default function TasksAssignedToMe(props) {
         setTask(
           taskData.task
         )
-      } else {
-        setTask(initialFormState)
       }
     };
     const onError = (error) => { /* magic */ };

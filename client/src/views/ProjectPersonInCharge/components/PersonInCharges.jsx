@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Paper,
   Toolbar,
@@ -53,9 +53,8 @@ const StyledTableRow = withStyles(theme => ({
 
 const PersonInCharges = (props) => {
   const classes = useStyles();
-  const [personInCharges, setPersonInCharges] = useState(props.personInCharges);
 
-  const sortedPersonInCharges = personInCharges.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
+  const sortedPersonInCharges = props.personInCharges.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
 
   const personInChargesByCommittee = sortedPersonInCharges.filter(function (personInCharge) {
     if (props.committee_id === "all") {
@@ -81,6 +80,7 @@ const PersonInCharges = (props) => {
       personInCharges: groupCommitteesObject[committee_id]
     };
   });
+  const emptyRows = 5 - Math.min(5, props.personInCharges.length);
 
 
   return (
@@ -130,38 +130,51 @@ const PersonInCharges = (props) => {
               </StyledTableCell>
             </StyledTableRow>
           </TableHead>
-            {
-              groupCommittees.map((groupCommittee, index) => {
-                return <TableBody key={index}>
-                  <StyledTableRow className={classes.committee}>
-                    <StyledTableCell component="th" scope="row" colSpan={7}>
-                      <Typography variant="body2" style={{ fontWeight: 500 }}>
-                        <CommitteeName committee_id={groupCommittee.committee_id} />
-                      </Typography>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  {
-                    (groupCommittee.personInCharges).map((personInCharge) => {
-                      return (
-                        <PersonInCharge
-                          key={personInCharge._id}
-                          handleDeletePersonInCharge={props.handleDeletePersonInCharge}
-                          positions={props.positions}
-                          committees={props.committees}
-                          project_id={props.project_id}
-                          project_personInCharge={props.project_personInCharge}
-                          personInCharge={personInCharge}
-                          staffs={props.staffs}
-                          decodedToken={props.decodedToken}
-                          personInCharges={props.personInCharges}
-                          handleSaveEditButton={props.handleSaveEditButton}
-                        />
-                      )
-                    })
-                  }
-                </TableBody>
-              })
-            }
+          {
+            groupCommittees.map((groupCommittee, index) => {
+              return <TableBody key={index}>
+                <StyledTableRow className={classes.committee}>
+                  <StyledTableCell component="th" scope="row" colSpan={7}>
+                    <Typography variant="body2" style={{ fontWeight: 500 }}>
+                      <CommitteeName committee_id={groupCommittee.committee_id} />
+                    </Typography>
+                  </StyledTableCell>
+                </StyledTableRow>
+                {
+                  (groupCommittee.personInCharges).map((personInCharge) => {
+                    return (
+                      <PersonInCharge
+                        key={personInCharge._id}
+                        handleDeletePersonInCharge={props.handleDeletePersonInCharge}
+                        positions={props.positions}
+                        committees={props.committees}
+                        project_id={props.project_id}
+                        project_personInCharge={props.project_personInCharge}
+                        personInCharge={personInCharge}
+                        staffs={props.staffs}
+                        decodedToken={props.decodedToken}
+                        personInCharges={props.personInCharges}
+                        handleSaveEditButton={props.handleSaveEditButton}
+                      />
+                    )
+                  })
+                }
+              </TableBody>
+            })
+          }
+          <TableBody>
+            <StyledTableRow style={{ height: 53 * emptyRows }}>
+              <StyledTableCell colSpan={7} style={{ textAlign: 'center' }}>
+                {props.personInCharges.length === 0 ?
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no person in charges yet
+                     </Typography>
+                  :
+                  ""
+                }
+              </StyledTableCell>
+            </StyledTableRow>
+          </TableBody>
         </Table>
       </TableContainer>
     </div>

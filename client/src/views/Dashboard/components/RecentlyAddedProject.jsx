@@ -8,7 +8,7 @@ import {
   Divider,
   Grid,
   Button,
-  IconButton,
+  // IconButton,
 } from '@material-ui/core';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";

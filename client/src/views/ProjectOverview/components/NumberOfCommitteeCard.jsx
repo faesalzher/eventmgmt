@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function NumberOfCommitteeCard(props) {
-  const { className, ...rest } = props;
+  // const { className, ...rest } = props;
 
   const classes = useStyles();
 

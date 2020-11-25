@@ -24,7 +24,7 @@ import {
   AddAgendaModal,
 } from './components';
 
-import { AGENDAS_QUERY,EVENT_QUERY } from 'gql';
+import { AGENDAS_QUERY, EVENT_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -168,6 +168,7 @@ export default function EventAgenda(props) {
     };
   });
   const sortedGroupAgendas = (groupAgendas.slice().sort((a, b) => new Date(a.date) - new Date(b.date)));
+  const emptyRows = 5 - Math.min(5, agendas.length);
 
   return (
     <div>
@@ -210,47 +211,48 @@ export default function EventAgenda(props) {
             </TableRow>
           </TableHead>
           {
-            agendas.length === 0 ?
-              <TableBody>
+            sortedGroupAgendas.map((rundownDate, index) => (
+              <TableBody key={index} >
                 <StyledTableRow >
-                  <StyledTableCell style={{ backgroundColor: "white", padding: 20 }} align="center" colSpan={5}>
-                    <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
-                      There is no rundown yet
+                  <StyledTableCell align="center" colSpan={5}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <CalendarTodayIcon style={{ fontSize: 10, margin: 5, color: 'white' }} />
+                      <Typography variant="subtitle2" style={{ color: 'white' }}>
+                        {rundownDate.date}
                       </Typography>
+                    </div>
                   </StyledTableCell>
                 </StyledTableRow>
+                {
+                  rundownDate.sortedAgendas.map((agenda, index) => {
+                    return <AgendaByDate
+                      key={index}
+                      project_id={props.project_id}
+                      rundownDate={rundownDate}
+                      agenda={agenda}
+                      index={index}
+                      handleDelete={handleDelete}
+                      handleSaveEditButton={handleSaveEditButton}
+                    />
+                  })
+                }
               </TableBody>
-              :
-              sortedGroupAgendas.map((rundownDate, index) => (
-                <TableBody key={index} >
-                  <StyledTableRow >
-                    <StyledTableCell align="center" colSpan={5}>
-                      <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <CalendarTodayIcon style={{ fontSize: 10, margin: 5, color: 'white' }} />
-                        <Typography variant="subtitle2" style={{ color: 'white' }}>
-                          {rundownDate.date}
-                        </Typography>
-                      </div>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                  {
-                    rundownDate.sortedAgendas.map((agenda, index) => {
-                      return <AgendaByDate
-                        key={index}
-                        project_id={props.project_id}
-                        rundownDate={rundownDate}
-                        agenda={agenda}
-                        index={index}
-                        handleDelete={handleDelete}
-                        handleSaveEditButton={handleSaveEditButton}
-                      />
-                    })
-                  }
-                </TableBody>
-              )
-              )
+            )
+            )
           }
-
+          <TableBody>
+            <StyledTableRow style={{ height: 53 * emptyRows }}>
+              <StyledTableCell colSpan={6} style={{ textAlign: 'center', backgroundColor:'white' }}>
+                {agendas.length === 0 ?
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no agenda yet
+                     </Typography>
+                  :
+                  ""
+                }
+              </StyledTableCell>
+            </StyledTableRow>
+          </TableBody>
         </Table>
       </TableContainer>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
