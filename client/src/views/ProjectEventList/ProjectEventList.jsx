@@ -36,9 +36,9 @@ export default function ProjectEventList(props) {
           >
 
             {
-              props.project_personInCharge.position_id === "1" ||
-                props.project_personInCharge.position_id === "2" ||
-                props.project_personInCharge.position_id === "3" ||
+              props.project_personInCharge.order === "1" ||
+                props.project_personInCharge.order === "2" ||
+                props.project_personInCharge.order === "3" ||
                 props.decodedToken.user_type === "organization" ?
                 <AddEventCard
                   handleSaveEventButton={props.handleSaveEventButton}

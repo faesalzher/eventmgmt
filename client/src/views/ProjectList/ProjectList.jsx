@@ -121,7 +121,7 @@ const ProjectList = () => {
   if (loading) return (
     <div className={classes.loading}><CircularProgress /></div>
   )
-  // console.log(decodedToken.organization_id)
+  console.log(decodedToken.organization_id)
 
   return (
     <div className={classes.tabs_root}>

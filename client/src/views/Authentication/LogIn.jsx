@@ -21,7 +21,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { useAuth } from "context/auth.jsx";
 
 import { SECRET_KEY } from '../../secret_key.js'
-import { CHECK_ORGANIZATION, CHECK_STAFF } from 'gql';
+import { CHECK_STAFF } from 'gql';
 
 // const { SECRET_KEY } = require('../../secret_key');
 const jwt = require('jsonwebtoken');
@@ -159,6 +159,7 @@ const LogIn = props => {
     touched: {},
     errors: {}
   });
+  
   useEffect(() => {
     const errors = validate(formState.values, schema);
 
@@ -196,18 +197,18 @@ const LogIn = props => {
   React.useEffect(() => {
     refresh();
   });
-  const [organization, setOrganization] = useState({});
+  // const [organization, setOrganization] = useState({});
   const [staff, setStaff] = useState({});
 
-  const {
-    data: dataOrganization,
-    loading: loadingOrganization,
-    error: errorOrganization,
-    refetch: refetchOrganization
-  } = useQuery(CHECK_ORGANIZATION,
-    {
-      variables: { email: formState.values.email, },
-    });
+  // const {
+  //   data: dataOrganization,
+  //   loading: loadingOrganization,
+  //   error: errorOrganization,
+  //   refetch: refetchOrganization
+  // } = useQuery(CHECK_ORGANIZATION,
+  //   {
+  //     variables: { email: formState.values.email, },
+  //   });
 
   const {
     data: dataStaff,
@@ -219,17 +220,17 @@ const LogIn = props => {
       variables: { email: formState.values.email, },
     });
 
-  useEffect(() => {
-    const onCompleted = (data) => { setOrganization(data.check_organization) };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !loadingOrganization && !errorOrganization) {
-        onCompleted(dataOrganization);
-      } else if (onError && !loadingOrganization && errorOrganization) {
-        onError(errorOrganization);
-      }
-    }
-  }, [loadingOrganization, dataOrganization, errorOrganization]);
+  // useEffect(() => {
+  //   const onCompleted = (data) => { setOrganization(data.check_organization) };
+  //   const onError = (error) => { /* magic */ };
+  //   if (onCompleted || onError) {
+  //     if (onCompleted && !loadingOrganization && !errorOrganization) {
+  //       onCompleted(dataOrganization);
+  //     } else if (onError && !loadingOrganization && errorOrganization) {
+  //       onError(errorOrganization);
+  //     }
+  //   }
+  // }, [loadingOrganization, dataOrganization, errorOrganization]);
 
   useEffect(() => {
     const onCompleted = (dataStaff) => { setStaff(dataStaff.check_staff) };
@@ -245,7 +246,7 @@ const LogIn = props => {
 
 
   const refresh = () => {
-    refetchOrganization();
+    // refetchOrganization();
     refetchStaff();
   }
 
@@ -269,23 +270,32 @@ const LogIn = props => {
     setLoading(true);
 
     setTimeout(() => {
-      if (organization.length === 0) {
-        if (staff.length === 0) {
-          setFormState(formState => ({
-            ...formState,
-            errors: {
-              ...formState.errors, email: ["User Not Found"], password: [""]
-            } || {}
-          }));
-          handleError();
-        } else if (staff[0].password !== formState.values.password) {
-          setFormState(formState => ({
-            ...formState,
-            errors: {
-              ...formState.errors, password: ["The password you entered is incorrect"]
-            } || {}
-          }));
-          handleError();
+      // if (organization.length === 0) {
+      if (staff.length === 0) {
+        setFormState(formState => ({
+          ...formState,
+          errors: {
+            ...formState.errors, email: ["User Not Found"], password: [""]
+          } || {}
+        }));
+        handleError();
+      } else if (staff[0].password !== formState.values.password) {
+        setFormState(formState => ({
+          ...formState,
+          errors: {
+            ...formState.errors, password: ["The password you entered is incorrect"]
+          } || {}
+        }));
+        handleError();
+      } else {
+        if (staff[0].is_admin) {
+          const token = generateTokenOrganization(staff[0])
+          setAuthTokens(token);
+          setLoadingSucces(true);
+          setTimeout(() => {
+            history.push('/');
+            setLoadingSucces(false);
+          }, 500);
         } else {
           const token = generateTokenStaff(staff[0])
           setAuthTokens(token);
@@ -295,23 +305,24 @@ const LogIn = props => {
             setLoadingSucces(false);
           }, 500);
         }
-      } else if (organization[0].password !== formState.values.password) {
-        setFormState(formState => ({
-          ...formState,
-          errors: {
-            ...formState.errors, password: ["The password you entered is incorrect"]
-          } || {}
-        }));
-        handleError();
-      } else {
-        const token = generateTokenOrganization(organization[0])
-        setAuthTokens(token);
-        setLoadingSucces(true);
-        setTimeout(() => {
-          history.push('/');
-          setLoadingSucces(false);
-        }, 500);
       }
+      // } else if (organization[0].password !== formState.values.password) {
+      //   setFormState(formState => ({
+      //     ...formState,
+      //     errors: {
+      //       ...formState.errors, password: ["The password you entered is incorrect"]
+      //     } || {}
+      //   }));
+      //   handleError();
+      // } else {
+      //   const token = generateTokenOrganization(organization[0])
+      //   setAuthTokens(token);
+      //   setLoadingSucces(true);
+      //   setTimeout(() => {
+      //     history.push('/');
+      //     setLoadingSucces(false);
+      //   }, 500);
+      // }
       setLoading(false)
     }, 1000);
   };
@@ -320,8 +331,8 @@ const LogIn = props => {
     return jwt.sign(
       {
         // _id: user._id,
-        staff_id: "",
-        organization_id: user._id,
+        staff_id: user._id,
+        organization_id: user.organization_id,
         user_type: "organization"
       },
       SECRET_KEY,

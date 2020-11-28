@@ -54,13 +54,13 @@ const StyledTableRow = withStyles(theme => ({
 const PersonInCharges = (props) => {
   const classes = useStyles();
 
-  const sortedPersonInCharges = props.personInCharges.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
+  const sortedPersonInCharges = props.personInCharges.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
   const personInChargesByCommittee = sortedPersonInCharges.filter(function (personInCharge) {
     if (props.committee_id === "all") {
-      return personInCharge.project_id === props.project_id;
+      return personInCharge;
     } else {
-      return personInCharge.committee_id === props.committee_id && personInCharge.project_id === props.project_id;
+      return personInCharge.committee_id === props.committee_id;
     }
   });
 
@@ -80,6 +80,7 @@ const PersonInCharges = (props) => {
       personInCharges: groupCommitteesObject[committee_id]
     };
   });
+
   const emptyRows = 5 - Math.min(5, props.personInCharges.length);
 
 
@@ -124,7 +125,7 @@ const PersonInCharges = (props) => {
               <StyledTableCell align="left">Position</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
-                  props.project_personInCharge.position_id !== "7" ?
+                  1 < parseInt(props.project_personInCharge.order) < 7 ?
                     "Action" : ""
                 }
               </StyledTableCell>

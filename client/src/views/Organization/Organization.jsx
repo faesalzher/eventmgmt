@@ -17,22 +17,20 @@ import {
 import MuiAlert from '@material-ui/lab/Alert';
 
 import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+
 
 import {
   Staffs,
   Departements,
+  DepartementPositions,
 } from './components';
 import jwtDecode from "jwt-decode";
-import { STAFFS_QUERY } from 'gql';
-const DEPARTEMENS_QUERY = gql`
-query departements($organization_id:String!){
-  departements(organization_id: $organization_id){
-    _id
-    departement_name
-  }
-}
-`;
+import { 
+  STAFFS_QUERY,
+  DEPARTEMENTS_QUERY,
+  DEPARTEMENT_POSITIONS_QUERY,
+ } from 'gql';
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -86,6 +84,7 @@ export default function Organization() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
   const [departements, setDepartements] = useState([]);
+  const [departementPositions, setDepartementPositions] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
@@ -105,7 +104,18 @@ export default function Organization() {
     setValue(newValue);
   };
 
-  const { data: departementsData, refetch: departementsRefetch } = useQuery(DEPARTEMENS_QUERY, {
+  const { data: departementPositionsData, refetch: departementPositionsRefetch } = useQuery(DEPARTEMENT_POSITIONS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
+    onCompleted: () => {
+      setDepartementPositions(
+        departementPositionsData.departement_positions
+      )
+    }
+  }
+  );
+
+  
+  const { data: departementsData, refetch: departementsRefetch } = useQuery(DEPARTEMENTS_QUERY, {
     variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setDepartements(
@@ -114,6 +124,8 @@ export default function Organization() {
     }
   }
   );
+  
+  
 
   const { loading: staffsLoading, data: staffsData, refetch: staffsRefetch } = useQuery(STAFFS_QUERY, {
     variables: { organization_id: decodedToken.organization_id },
@@ -125,25 +137,15 @@ export default function Organization() {
   }
   );
 
-  console.log(staffs)
   useEffect(() => {
     refresh();
   });
-  // useEffect(() => {
-  //   const onCompleted = (staffsData) => { setDepartements(staffsData.staffs) };
-  //   const onError = (staffsError) => { /* magic */ };
-  //   if (onCompleted || onError) {
-  //     if (onCompleted && !staffsLoading && !staffsError) {
-  //       onCompleted(staffsData);
-  //     } else if (onError && !staffsLoading && staffsError) {
-  //       onError(staffsError);
-  //     }
-  //   }
-  // }, [staffsLoading, staffsData, staffsError]);
+
 
   const refresh = () => {
     staffsRefetch();
     departementsRefetch();
+    departementPositionsRefetch();
   };
 
   const handleSaveDepartementButton = (e) => {
@@ -196,6 +198,34 @@ export default function Organization() {
     setStaffs([...staffs, e])
   };
 
+  
+  const handleSaveDepartementPositionButton = (e) => {
+    setDepartementPositions([...departementPositions, e])
+  };
+
+  const handleSaveEditDepartementPositionButton = (e) => {
+    const temp = [...departementPositions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setDepartementPositions(temp)
+  };
+
+
+  const handleDeleteDepartementPosition = (e) => {
+    const temp = [...departementPositions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setDepartementPositions(temp);
+    setTimeout(() => {
+      handleOpenSnackbar();
+    }, 700);
+  };
+
+
   return (
     <div>
       <Paper color="default" position="static" style={{ display: "flex", height: 48, flexDirection: "row", justifyContent: "center" }}>
@@ -228,7 +258,7 @@ export default function Organization() {
             >
               <Tab label="Staff" {...a11yProps(0)} />
               <Tab label="Departement" {...a11yProps(1)} />
-              {/* <Tab label="Organization" {...a11yProps(2)} /> */}
+              <Tab label="Position" {...a11yProps(2)} />
             </Tabs>
           </Paper>
           <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
@@ -241,6 +271,7 @@ export default function Organization() {
                 decodedToken={decodedToken}
                 organization_id={decodedToken.organization_id}
                 departements={departements}
+                departementPositions={departementPositions}
                 staffs={staffs}
                 handleSaveButton={handleSaveStaffButton}
                 handleSaveEditButton={handleSaveEditStaffButton}
@@ -258,9 +289,16 @@ export default function Organization() {
               handleDeleteDepartement={handleDeleteDepartement}
             />
           </TabPanel>
-          {/* <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
-
-        </TabPanel> */}
+          <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>
+          <DepartementPositions
+              decodedToken={decodedToken}
+              departementPositions={departementPositions}
+              organization_id={decodedToken.organization_id}
+              handleSaveEditButton={handleSaveEditDepartementPositionButton}
+              handleSaveButton={handleSaveDepartementPositionButton}
+              handleDeleteDepartementPosition={handleDeleteDepartementPosition}
+            />
+        </TabPanel>
         </Paper>
       </div>
     </div>

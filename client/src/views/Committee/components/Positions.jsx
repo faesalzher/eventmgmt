@@ -4,12 +4,12 @@ import {
   IconButton,
   TablePagination,
   Toolbar,
-  // Tooltip,
+  Tooltip,
   Typography,
   // TextField,
 } from '@material-ui/core';
 
-// import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@material-ui/icons/Add';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 // import {, makeStyles } from '@material-ui/core/styles';
@@ -28,10 +28,12 @@ import LastPageIcon from '@material-ui/icons/LastPage'
 
 import {
   Position,
-  // PositionAddForm
+  PositionAddForm
 } from '.';
 
-
+// import {
+//   COMMITTEE_QUERY,
+// }
 
 // import mockData from '../dataPosition';
 
@@ -123,22 +125,32 @@ export default function Positions(props) {
   // const [positions, setPositions] = useState(mockData);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  // const [openAddModal, setOpenAddModal] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
   const [positions, setPositions] = useState(props.positions)
   // console.log(positions)
   useEffect(() => {
     setPositions(props.positions)
   }, [setPositions, props.positions])
 
+  // const { data: committeesData, refetch: committeesRefetch, loading: committeesLoading } = useQuery(COMMITTEES_QUERY, {
+  //   variables: { organization_id: decodedToken.organization_id },
+  //   onCompleted: () => {
+  //     setCommittees(
+  //       committeesData.committees
+  //     )
+  //   }
+  // }
+  // );
+
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, positions.length - page * rowsPerPage);
 
-  // const handleOpenAddModal = () => {
-  //   setOpenAddModal(true);
-  // };
+  const handleOpenAddModal = () => {
+    setOpenAddModal(true);
+  };
 
-  // const handleCloseAddModal = () => {
-  //   setOpenAddModal(false);
-  // };
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -156,36 +168,37 @@ export default function Positions(props) {
           List of Position
         </Typography>
         {
-            props.decodedToken.user_type === "organization"
+          props.decodedToken.user_type === "organization"
             ?
-            // <Tooltip arrow title="Add New Positions" aria-label="confirm">
-            //   <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-            //     <AddIcon />
-            //   </IconButton>
-            // </Tooltip>
-            <></>
+            <Tooltip arrow title="Add New Positions" aria-label="confirm">
+              <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
             : <></>
         }
-        {/* <PositionAddForm
+        <PositionAddForm
           // guests={guests}
+          positions={positions}
+          coreCommittee={props.coreCommittee}
           decodedToken={props.decodedToken}
           open={openAddModal}
           handleSaveButton={props.handleSaveButton}
           close={handleCloseAddModal}
-        /> */}
+        />
       </Toolbar>
       <TableContainer component={Paper}>
         <Table size="small" className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
               <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
+              <StyledTableCell style={{ width: 150 }}>Committee Type</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
-                    props.decodedToken.user_type === "organization"
+                  props.decodedToken.user_type === "organization"
                     ?
                     "Action" : ""
                 }
-
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -197,11 +210,12 @@ export default function Positions(props) {
               ).map((position, index) => {
                 return <Position
                   key={index}
+                  position={position}
+                  coreCommittee={props.coreCommittee}
                   project_personInCharge={props.project_personInCharge}
                   decodedToken={props.decodedToken}
-                  // handleDeletePosition={props.handleDeletePosition}
-                  position={position}
-                  // handleSaveEditButton={props.handleSaveEditButton}
+                  handleDeletePosition={props.handleDeletePosition}
+                  handleSaveEditButton={props.handleSaveEditButton}
                 />
               })
             }

@@ -16,7 +16,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import {
-  CommitteeEditForm
+  DepartementPositionEditForm
 } from '.';
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -37,9 +37,9 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
-export default function Volunteer(props) {
+export default function DepartementPosition(props) {
   // const classes = useStyles();
-  // console.log(props.committee.imageUrl)
+  // console.log(props.departement_position.imageUrl)
 
   const [openEditModal, setOpenEditModal] = useState(false);
 
@@ -52,43 +52,32 @@ export default function Volunteer(props) {
   };
 
   // const handleSaveButton = (e) => {
-  //   // setVolunteers([...committees, e])
+  //   // setVolunteers([...departement_positions, e])
   // }
   return (
     <StyledTableRow>
       <StyledTableCell style={{ paddingLeft: 16 }} scope="row">
-        {props.committee.committee_name}
+        {props.departementPosition.departement_position_name}
       </StyledTableCell>
-      <StyledTableCell style={{ width: 100 }}>{props.committee.core ? "Core" : "Non Core"}</StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
-        {props.committee.committee_name === 'Core Committee' ?
-          <div></div>
-          :
-          <div>
-            {
-              props.decodedToken.user_type === "organization" ?
-                <>
-                  <Tooltip arrow title="Edit" aria-label="confirm">
-                    <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
-                      <EditIcon style={{ fontSize: 14 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <CommitteeEditForm
-                    committee={props.committee}
-                    event_id={props.event_id}
-                    open={openEditModal}
-                    index={props.index}
-                    handleDeleteCommittee={props.handleDeleteCommittee}
-                    handleSaveEditButton={props.handleSaveEditButton}
-                    close={handleCloseEditModal}
-                  />
-                </>
-                :
-                <></>
-            }
-          </div>
+        {props.decodedToken.user_type === "organization" ?
+          <Tooltip arrow title="Edit" aria-label="confirm">
+            <IconButton onClick={handleOpenEditModal} style={{ padding: 3 }}>
+              <EditIcon style={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+          : <div></div>
         }
+        <DepartementPositionEditForm
+          departementPosition={props.departementPosition}
+          event_id={props.event_id}
+          open={openEditModal}
+          index={props.index}
+          handleDeleteDepartementPosition={props.handleDeleteDepartementPosition}
+          handleSaveEditButton={props.handleSaveEditButton}
+          close={handleCloseEditModal}
+        />
       </StyledTableCell>
-    </StyledTableRow >
+    </StyledTableRow>
   );
 }

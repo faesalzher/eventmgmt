@@ -44,6 +44,7 @@ export default function CommitteeAddForm(props) {
   const intitialFormState = {
     _id: uuid(),
     committee_name: "",
+    core: false,
     organization_id: props.decodedToken.organization_id,
   }
 
@@ -59,6 +60,7 @@ export default function CommitteeAddForm(props) {
         {
           _id: committeeForm._id,
           committee_name: committeeForm.committee_name,
+          core: committeeForm.core,
           organization_id: committeeForm.organization_id,
         }
       });

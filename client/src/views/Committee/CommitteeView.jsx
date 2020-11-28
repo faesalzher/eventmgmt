@@ -21,7 +21,7 @@ import {
   Positions,
 } from './components';
 
-import {POSITIONS_QUERY, COMMITTEES__QUERY } from 'gql';
+import { POSITIONS_QUERY, COMMITTEES_QUERY, CORE_COMMITTEE_QUERY } from 'gql';
 
 
 function TabPanel(props) {
@@ -76,6 +76,7 @@ export default function ComiteeView(props) {
   const [value, setValue] = React.useState(0);
   const [positions, setPositions] = useState([]);
   const [committees, setCommittees] = useState([]);
+  const [coreCommittee, setCoreCommittee] = useState([]);
 
 
   const handleChange = (event, newValue) => {
@@ -84,6 +85,7 @@ export default function ComiteeView(props) {
 
 
   const { loading: positionsLoading, data: positionsData, refetch: positionsRefetch } = useQuery(POSITIONS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setPositions(
         positionsData.positions
@@ -92,12 +94,23 @@ export default function ComiteeView(props) {
   }
   );
 
-  const { data: committeesData, refetch: committeesRefetch, loading: committeesLoading } = useQuery(COMMITTEES__QUERY, {
+  const { data: committeesData, refetch: committeesRefetch, loading: committeesLoading } = useQuery(COMMITTEES_QUERY, {
     variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setCommittees(
         committeesData.committees
       )
+    }
+  }
+  );
+
+  const { data: coreCommitteeData, refetch: coreCommitteeRefetch } = useQuery(CORE_COMMITTEE_QUERY, {
+    variables: { organization_id: decodedToken.organization_id, core: true },
+    onCompleted: () => {
+      if (coreCommitteeData && coreCommitteeData.core_committee !== null)
+        setCoreCommittee(
+          coreCommitteeData.core_committee
+        )
     }
   }
   );
@@ -109,6 +122,7 @@ export default function ComiteeView(props) {
   const refresh = () => {
     positionsRefetch();
     committeesRefetch();
+    coreCommitteeRefetch();
   };
 
   const handleSaveCommitteeButton = (e) => {
@@ -132,6 +146,32 @@ export default function ComiteeView(props) {
     }).indexOf(e);
     temp.splice(index, 1);
     setCommittees(temp);
+    // setTimeout(() => {
+    //   handleOpenSnackbar();
+    // }, 700);
+  };
+
+  const handleSavePositionButton = (e) => {
+    setPositions([...positions, e])
+  };
+
+  const handleSaveEditPositionButton = (e) => {
+    const temp = [...positions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e._id);
+    temp[index] = e;
+    setPositions(temp)
+  };
+
+
+  const handleDeletePosition = (e) => {
+    const temp = [...positions];
+    const index = temp.map(function (item) {
+      return item._id
+    }).indexOf(e);
+    temp.splice(index, 1);
+    setPositions(temp);
     // setTimeout(() => {
     //   handleOpenSnackbar();
     // }, 700);
@@ -183,11 +223,12 @@ export default function ComiteeView(props) {
               :
               <Positions
                 positions={positions}
+                coreCommittee={coreCommittee}
                 decodedToken={decodedToken}
                 project_personInCharge={props.project_personInCharge}
-              // handleSaveEditButton={handleSaveEditCommitteeButton}
-              // handleSaveButton={handleSaveCommitteeButton}
-              // handleDeleteCommittee={handleDeleteCommittee}
+                handleSaveEditButton={handleSaveEditPositionButton}
+                handleSaveButton={handleSavePositionButton}
+                handleDeletePosition={handleDeletePosition}
               />
             }
           </TabPanel>

@@ -8,11 +8,14 @@ import {
   Dialog,
   FormControl,
   MenuItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-import { useMutation } from '@apollo/react-hooks';
-import { DELETE_PERSON_IN_CHARGE, EDIT_PERSON_IN_CHARGE } from 'gql';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { DELETE_PERSON_IN_CHARGE, EDIT_PERSON_IN_CHARGE, DEPARTEMENT_POSITION_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -48,6 +51,11 @@ export default function PersonInChargeEditForm(props) {
   const [position_id, setPosition_id] = useState(props.personInCharge.position_id);
   const [staff_id, setStaff_id] = useState(props.personInCharge.staff_id);
 
+  const [committees, setCommittees] = useState(props.committees);
+  React.useEffect(() => {
+    setCommittees(props.committees)
+  }, [setCommittees, props.committees])
+  
   const intitialFormState = {
     _id: props.personInCharge._id,
     staff_id: props.personInCharge.staff_id,
@@ -91,7 +99,8 @@ export default function PersonInChargeEditForm(props) {
   };
 
   const handleChangePosition = (event) => {
-    personInChargeForm.position_id = event.target.value;
+    const position_value = event.target.value
+    setPersonInChargeForm({ ...personInChargeForm, order: position_value.order, position_id: position_value._id })
     setPosition_id(event.target.value);
   };
 
@@ -104,24 +113,26 @@ export default function PersonInChargeEditForm(props) {
   }
 
   let checkPersonInChargePositionId = [];
-  props.personInCharges.map((personInCharge) =>
-    props.positions.map((position) => {
+  props.personInCharges.forEach((personInCharge) => {
+    props.positions.forEach((position) => {
       if (position._id === personInCharge.position_id
         && props.project_id === personInCharge.project_id
         && committee_id === personInCharge.committee_id
-        && position._id !== "7"
+        && parseInt(position.order) > 7
       ) {
         checkPersonInChargePositionId.push(position._id)
       } else {
         return null
       }
-      return null
+      return null;
     })
+    return null;
+  }
   );
 
   let checkCommitteeCore = [];
   props.committees.map((committee) => {
-    if (committee.committee_name === "Core Committee") {
+    if (committee.core) {
       checkCommitteeCore.push(committee._id)
     }
     return null;
@@ -156,7 +167,7 @@ export default function PersonInChargeEditForm(props) {
                 {
                   props.staffs.map((staff) => {
                     return < MenuItem key={staff.staff_name} value={staff._id} >
-                      {staff.staff_name}
+                      <StaffName staff={staff} />
                     </MenuItem>
                   })
                 }
@@ -175,11 +186,21 @@ export default function PersonInChargeEditForm(props) {
                   onChange={handleChangeCommittee}
                   variant="outlined"
                 >
-                  {props.committees.map((committee) => (
-                    <MenuItem key={committee.committee_name} value={committee._id}>
-                      {committee.committee_name}
-                    </MenuItem>
-                  ))}
+                  {committees.map((committee) => {
+                    if (committee._id === props.project_personInCharge.committee_id
+                      || props.decodedToken.user_type === "organization"
+                      || props.project_personInCharge.order === '1'
+                      || props.project_personInCharge.order === '2'
+                      || props.project_personInCharge.order === '3'
+                    )
+                      return (
+                        <MenuItem key={committee.committee_name}
+                          value={committee._id}
+                        >
+                          {committee.committee_name}
+                        </MenuItem>)
+                    return null
+                  })}
                 </TextField>
               }
             </FormControl>
@@ -260,3 +281,37 @@ export default function PersonInChargeEditForm(props) {
   );
 };
 
+const StaffName = (props) => {
+  return (
+    <div style={{ padding: "0px 10px", display: 'flex' }}>
+      <ListItemAvatar>
+        <Avatar src={props.staff.picture} />
+      </ListItemAvatar>
+      <ListItemText
+        style={{ margin: 0 }}
+        primary={props.staff.staff_name}
+        secondary={<DepartementPositionName departement_position_id={props.staff.departement_position_id} />}
+      />
+    </div>
+  );
+}
+
+const DepartementPositionName = (props) => {
+  const { data: departementPositionData } = useQuery(DEPARTEMENT_POSITION_QUERY, {
+    variables: { _id: props.departement_position_id },
+  }
+  );
+  if (!departementPositionData) {
+    return (<></>)
+  }
+
+  return (
+    <>
+      {departementPositionData.departement_position === null ?
+        "No Positions on Departement"
+        :
+        departementPositionData.departement_position.departement_position_name
+      }
+    </>
+  );
+}

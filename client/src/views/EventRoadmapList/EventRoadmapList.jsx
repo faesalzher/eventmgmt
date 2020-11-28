@@ -121,11 +121,11 @@ export default function EventRoadmapList(props) {
             Roadmap List
           </Typography>
           <div style={
-            (props.project_personInCharge.position_id === '1' ||
-              props.project_personInCharge.position_id === '2' ||
-              props.project_personInCharge.position_id === '3' ||
-              props.project_personInCharge.position_id === '5' ||
-              props.project_personInCharge.position_id === '6' ||
+            (props.project_personInCharge.order === '1' ||
+              props.project_personInCharge.order === '2' ||
+              props.project_personInCharge.order === '3' ||
+              props.project_personInCharge.order === '6' ||
+              props.project_personInCharge.order === '7' ||
               props.decodedToken.user_type === "organization") ?
               { display: 'flex', width: 50, justifyContent: 'space-between' }
               :
@@ -142,11 +142,11 @@ export default function EventRoadmapList(props) {
               close={handleCloseCalendar}
             />
             {
-              (props.project_personInCharge.position_id === '1' ||
-                props.project_personInCharge.position_id === '2' ||
-                props.project_personInCharge.position_id === '3' ||
-                props.project_personInCharge.position_id === '5' ||
-                props.project_personInCharge.position_id === '6' ||
+              (props.project_personInCharge.order === '1' ||
+                props.project_personInCharge.order === '2' ||
+                props.project_personInCharge.order === '3' ||
+                props.project_personInCharge.order === '6' ||
+                props.project_personInCharge.order === '7' ||
                 props.decodedToken.user_type === "organization") ?
                 <>
                   <Tooltip title="Add New Roadmap" arrow>

@@ -33,7 +33,6 @@ import {
 import {
   ProjectEditModal
 } from './components';
-import { MyPersonInCharge } from 'components';
 
 import {
   PROJECT_QUERY,
@@ -157,8 +156,8 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     const onCompleted = (personInChargeData) => {
-      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
-        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
+      if (personInChargeData  && personInChargeData.person_in_charges_by_staff_and_project !== null) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -192,6 +191,7 @@ export default function ProjectDetail() {
     personInChargesRefetch();
     eventsRefetch();
   };
+  console.log(project_personInCharge)
 
   const { data: organizationData } =
     useQuery(ORGANIZATION_QUERY, {
@@ -300,7 +300,7 @@ export default function ProjectDetail() {
         {/* </div> */}
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_personInCharge.position_id === '1' || decodedToken.user_type === "organization") ?
+            (project_personInCharge.order === '1' || decodedToken.user_type === "organization") ?
               <>
                 <IconButton onClick={handleOpenEditModal} >
                   <SettingsIcon />
@@ -329,9 +329,6 @@ export default function ProjectDetail() {
           <div>
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           </div>
-          <MyPersonInCharge
-            project_personInCharge={project_personInCharge}
-          />
         </div>
         <TabPanel value={value} index={0} dir={theme.direction} style={{ padding: '0px 30px' }}>
           <ProjectEventList

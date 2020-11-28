@@ -4,7 +4,6 @@ const Schema = mongo.Schema;
 const Organization = new Schema({
   _id: String,
   organization_name: String,
-  email: String,
   password: String,
   description: String,
   picture: String,

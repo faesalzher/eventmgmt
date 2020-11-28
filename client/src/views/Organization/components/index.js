@@ -6,7 +6,10 @@ export { default as Departements } from './Departements.jsx';
 export { default as Departement } from './Departement.jsx';
 export { default as DepartementAddForm } from './DepartementAddForm.jsx';
 export { default as DepartementEditForm } from './DepartementEditForm.jsx';
-export { default as DepartementDeleteForm } from './DepartementDeleteForm.jsx';
+export { default as DepartementPositions } from './DepartementPositions.jsx';
+export { default as DepartementPosition } from './DepartementPosition.jsx';
+export { default as DepartementPositionAddForm } from './DepartementPositionAddForm.jsx';
+export { default as DepartementPositionEditForm } from './DepartementPositionEditForm.jsx';
 
 
 

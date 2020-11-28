@@ -314,7 +314,7 @@ export default function ProjectEditModal(props) {
             ("invalid") : ("valid")
         }
         deleteButton={
-          props.project_personInCharge.position_id === '1'
+          props.project_personInCharge.order === '1'
             || props.decodedToken.user_type === 'organization' ?
             true : false
         }

@@ -8,14 +8,15 @@ import TextField from '@material-ui/core/TextField';
 import {
   Button,
   Dialog,
-  FormControl
+  FormControl,
+  MenuItem,
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 
 import validate from 'validate.js';
-import { DELETE_STAFF,EDIT_STAFF } from 'gql';
+import { DELETE_STAFF, EDIT_STAFF, CHECK_STAFF } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -57,11 +58,12 @@ export default function StaffEditForm(props) {
   const initialFormState = {
     _id: props.staff._id,
     staff_name: props.staff.staff_name,
-    position_name: props.staff.position_name,
     email: props.staff.email,
     phone_number: props.staff.phone_number,
     password: props.staff.password,
     picture: props.staff.picture,
+    is_admin: props.staff.is_admin,
+    departement_position_id: props.staff.departement_position_id,
     departement_id: props.staff.departement_id,
     organization_id: props.organization_id
   }
@@ -74,10 +76,34 @@ export default function StaffEditForm(props) {
   };
 
   const [staffForm, setStaffForm] = useState(defaultState);
-  const [departement_id, setDepartement_id] = useState(props.staff.departement_id)
 
   const [deleteStaff] = useMutation(DELETE_STAFF);
   const [editStaff] = useMutation(EDIT_STAFF);
+
+  const [staff, setStaff] = useState([])
+  const { data: dataStaff, loading: loadingStaff, error: errorStaff, refetch: refetchStaff } = useQuery(CHECK_STAFF,
+    {
+      variables: { email: staffForm.values.email, },
+    });
+
+  useEffect(() => {
+    const onCompleted = (dataStaff) => { setStaff(dataStaff.check_staff) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingStaff && !errorStaff) {
+        onCompleted(dataStaff);
+      } else if (onError && !loadingStaff && errorStaff) {
+        onError(errorStaff);
+      }
+    }
+  }, [loadingStaff, dataStaff, errorStaff]);
+
+  React.useEffect(() => {
+    refresh();
+  });
+  const refresh = () => {
+    refetchStaff();
+  };
 
   const handleSaveEditButton = () => {
     props.handleSaveEditButton(staffForm.values)
@@ -88,11 +114,12 @@ export default function StaffEditForm(props) {
       {
         _id: staffForm.values._id,
         staff_name: staffForm.values.staff_name,
-        position_name: staffForm.values.position_name,
+        departement_position_id: staffForm.values.departement_position_id,
         email: staffForm.values.email,
         phone_number: staffForm.values.phone_number,
         password: staffForm.values.password,
         picture: staffForm.values.picture,
+        is_admin: staffForm.values.is_admin,
         departement_id: staffForm.values.departement_id,
         organization_id: staffForm.values.organization_id,
       }
@@ -101,10 +128,17 @@ export default function StaffEditForm(props) {
 
   useEffect(() => {
     const errors = validate(staffForm.values, schema);
-    setStaffForm(staffForm => ({
-      ...staffForm, isValid: errors ? false : true, errors: errors || {}
-    }));
-  }, [staffForm.values]);
+    if (staff.length !== 0 && staffForm.values.email !== props.staff.email) {
+      setStaffForm(staffForm => ({
+        ...staffForm, isValid: false, errors: { ...staffForm.errors, email: ["Email already registered"] } || {}
+      }));
+      // handleError();
+    } else {
+      setStaffForm(staffForm => ({
+        ...staffForm, isValid: errors ? false : true, errors: errors || {}
+      }));
+    }
+  }, [staffForm.values, staff.length, props.staff.email]);
 
   const handleInputChange = e => {
     const { id, value } = e.target;
@@ -126,15 +160,14 @@ export default function StaffEditForm(props) {
   }
 
   const handleChange = (event) => {
-    const { id, value } = event.target;
+    const { name, value } = event.target;
 
-    setDepartement_id(event.target.value);
     setStaffForm(staffForm => ({
       ...staffForm, values: {
-        ...staffForm.values, [id]: value
+        ...staffForm.values, [name]: value
       },
       touched: {
-        ...staffForm.touched, [id]: true
+        ...staffForm.touched, [name]: true
       }
     }));
   };
@@ -175,39 +208,41 @@ export default function StaffEditForm(props) {
             <FormControl className={classes.formControl}>
               {
                 <TextField
-                  id="departement_id"
+                  name="departement_id"
                   select
                   size="small"
                   margin="dense"
                   style={{ backgroundColor: 'white' }}
                   label="Departement"
-                  value={departement_id}
+                  value={staffForm.values.departement_id}
                   onChange={handleChange}
-                  SelectProps={{
-                    native: true,
-                  }}
-                  // helperText="Please select your currency"
                   variant="outlined"
                 >
+
                   {props.departements.map((departement) => (
-                    <option key={departement.departement_name} value={departement._id}>
+                    <MenuItem key={departement.departement_name} value={departement._id}>
                       {departement.departement_name}
-                    </option>
+                    </MenuItem>
                   ))}
                 </TextField>
               }
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
-                style={{ backgroundColor: 'white' }}
                 margin="dense"
-                id="position_name"
+                name="departement_position_id"
                 label="Position Name"
-                type="text"
+                select
                 variant="outlined"
-                value={staffForm.values.position_name}
-                onChange={handleInputChange}
-              />
+                value={staffForm.values.departement_position_id}
+                onChange={handleChange}
+              >
+                {props.departementPositions.map((departementPosition) => (
+                  <MenuItem key={departementPosition.departement_position_name} value={departementPosition._id}>
+                    {departementPosition.departement_position_name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
@@ -263,7 +298,7 @@ export default function StaffEditForm(props) {
           (
             (staffForm.values.staff_name === "" ||
               staffForm.values.departement_id === "" ||
-              staffForm.values.position_name === "" ||
+              staffForm.values.departement_position_id === "" ||
               staffForm.values.email === "" ||
               staffForm.values.phone_number === "" ||
               !staffForm.isValid

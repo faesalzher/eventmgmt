@@ -110,6 +110,7 @@ const Sidebar = (props) => {
       <Divider className={classes.divider} />
       <SidebarNav
         className={classes.nav}
+        collapsed={props.collapsed}
         pages={
           decodedToken.user_type === "organization"
             ? OrganizationPages

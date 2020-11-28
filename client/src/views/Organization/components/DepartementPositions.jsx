@@ -7,7 +7,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-  TextField,
+  // TextField,
 } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -26,12 +26,15 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage'
 
-// import mockData from '../dataStaff';
 
 import {
-  Staff,
-  StaffAddForm
+  DepartementPosition,
+  DepartementPositionAddForm
 } from '.';
+
+
+
+// import mockData from '../dataDepartementPosition';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -60,6 +63,7 @@ const StyledTableCell = withStyles(theme => ({
 function TablePaginationActions(props) {
   const classes = useStyles1();
   const theme = useTheme();
+
   const { count, page, rowsPerPage, onChangePage } = props;
 
   const handleFirstPageButtonClick = (event) => {
@@ -115,38 +119,19 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-export default function Staffs(props) {
+export default function DepartementPositions(props) {
   const classes = useStyles();
-  const [staffs, setStaffs] = useState(props.staffs);
+  // const [departementPositions, setDepartementPositions] = useState(mockData);
   const [page, setPage] = React.useState(0);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [departements, setDepartements] = React.useState(props.departements);
-  const [departement_id, setDepartement_id] = React.useState('all');
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [departementPositions, setDepartementPositions] = useState(props.departementPositions)
+  // console.log(departementPositions)
   useEffect(() => {
-    setStaffs(props.staffs)
-  }, [setStaffs, props.staffs])
+    setDepartementPositions(props.departementPositions)
+  }, [setDepartementPositions, props.departementPositions])
 
-  useEffect(() => {
-    setDepartements(props.departements)
-  }, [setDepartements, props.departements])
-
-  const departement_name = (departements.filter(function (departement) {
-    if (departement_id === "all") {
-      return departement
-    } else {
-      return departement._id === departement_id;
-    }
-  }));
-  const staffsByDepartement = staffs.filter(function (staff) {
-    if (departement_id === "all") {
-      return staff
-    } else {
-      return staff.departement_id === departement_id;
-    }
-  });
-
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, staffsByDepartement.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, departementPositions.length - page * rowsPerPage);
 
   const handleOpenAddModal = () => {
     setOpenAddModal(true);
@@ -165,98 +150,54 @@ export default function Staffs(props) {
     setPage(0);
   };
 
-  const handleChange = (event) => {
-    setDepartement_id(event.target.value);
-    setPage(0)
-  };
-
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
         <Typography style={{ color: 'black' }} variant='subtitle2'>
-          List of Staff
+          List of Position
         </Typography>
-        <div style={{ display: 'flex' }}>
-          <TextField
-            id="select-departement-native"
-            select
-            size="small"
-            margin="dense"
-            style={{ margin: '4px 10px' }}
-            label="Departement"
-            value={departement_id}
-            onChange={handleChange}
-            SelectProps={{
-              native: true,
-            }}
-            // helperText="Please select your currency"
-            variant="outlined"
-          >
-            <option key={'All'} value={'all'}>
-              All
-              </option>
-            {departements.map((departement) => (
-              <option key={departement.departement_name} value={departement._id}>
-                {departement.departement_name}
-              </option>
-            ))}
-          </TextField>
-          {props.decodedToken.user_type === "organization" ?
-            <Tooltip arrow title="Add New Staffs" aria-label="confirm">
-              <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-            :
-            <div></div>
-          }
-          <StaffAddForm
-            // guests={guests}
-            // event_id={props.event_id}
-            organization_id={props.organization_id}
-            departement_id={departement_id}
-            departements={departements}
-            departementPositions={props.departementPositions}
-            departement_name={departement_name}
-            open={openAddModal}
-            handleSaveButton={props.handleSaveButton}
-            close={handleCloseAddModal}
-          />
-        </div>
+        {props.decodedToken.user_type === "organization" ?
+          <Tooltip arrow title="Add New DepartementPositions" aria-label="confirm">
+            <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          : <div></div>
+        }
+        <DepartementPositionAddForm
+          // guests={guests}
+          decodedToken={props.decodedToken}
+          event_id={props.event_id}
+          open={openAddModal}
+          handleSaveButton={props.handleSaveButton}
+          close={handleCloseAddModal}
+        />
       </Toolbar>
       <TableContainer component={Paper}>
         <Table size="small" className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell style={{ width: 70 }} ></StyledTableCell>
-              <StyledTableCell >Name</StyledTableCell>
-              <StyledTableCell align="left">Email</StyledTableCell>
-              <StyledTableCell align="left">Phone Number</StyledTableCell>
-              <StyledTableCell >Departement</StyledTableCell>
-              <StyledTableCell >Position</StyledTableCell>
-              <StyledTableCell>
+              <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
+              <StyledTableCell style={{ width: 10 }} align="center">
                 {props.decodedToken.user_type === "organization" ?
                   "Action"
                   : <div></div>
                 }
               </StyledTableCell>
-
             </TableRow>
           </TableHead>
           <TableBody>
             {
               (rowsPerPage > 0
-                ? staffsByDepartement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : staffsByDepartement
-              ).map((staff) => {
-                return <Staff
+                ? departementPositions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : departementPositions
+              ).map((departementPosition, index) => {
+                return <DepartementPosition
+                  key={index}
                   decodedToken={props.decodedToken}
-                  departementPositions={props.departementPositions}
-                  key={staff._id}
-                  handleDeleteStaff={props.handleDeleteStaff}
-                  staff={staff}
-                  organization_id={props.organization_id}
-                  departements={departements}
+                  handleDeleteDepartementPosition={props.handleDeleteDepartementPosition}
+                  departementPosition={departementPosition}
+                  index={index}
                   handleSaveEditButton={props.handleSaveEditButton}
                 />
               })
@@ -272,7 +213,7 @@ export default function Staffs(props) {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={6}
-                count={staffsByDepartement.length}
+                count={departementPositions.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

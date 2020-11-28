@@ -68,6 +68,8 @@ export default function CommitteeEditForm(props) {
         {
           _id: committeeForm._id,
           committee_name: committeeForm.committee_name,
+          core: committeeForm.core,
+          organization_id: committeeForm.organization_id,
         }
       });
   }
@@ -125,6 +127,7 @@ export default function CommitteeEditForm(props) {
               ("invalid") : ("valid")
           }
           content="Committee"
+          deleteButton={committeeForm.core ? false : true}
           name={committeeForm.committee_name}
           submit={() => handleSaveEditButton()}
           delete={() => handleDelete()}

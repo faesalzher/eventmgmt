@@ -79,8 +79,8 @@ const CreatedByMe = (props) => {
 
   useEffect(() => {
     const onCompleted = (personInChargeData) => {
-      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
-        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
+      if (personInChargeData && personInChargeData.person_in_charges_by_staff_and_project !== null) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -114,11 +114,11 @@ const CreatedByMe = (props) => {
   }
 
   const user_access = (roadmap.committee_id === project_personInCharge.committee_id) ?
-    (project_personInCharge.position_id === '1' ||
-      project_personInCharge.position_id === '2' ||
-      project_personInCharge.position_id === '3' ||
-      project_personInCharge.position_id === '5' ||
-      project_personInCharge.position_id === '6') ?
+    (project_personInCharge.order === '1' ||
+      project_personInCharge.order === '2' ||
+      project_personInCharge.order === '3' ||
+      project_personInCharge.order === '6' ||
+      project_personInCharge.order === '7') ?
       true
       :
       false

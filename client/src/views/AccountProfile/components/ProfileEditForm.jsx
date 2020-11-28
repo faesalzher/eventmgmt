@@ -1,4 +1,4 @@
-import React, { useState, } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -8,34 +8,197 @@ import {
   Grid,
   Button,
   TextField,
-  Typography
+  Typography,
+  MenuItem,
+  // Avatar,
+  CardHeader,
+
 } from '@material-ui/core';
 
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 
+import { EditAvatarForm } from 'components';
 import {
   PasswordChangeForm
 } from '.';
+import validate from 'validate.js';
 
 import {
-  EDIT_STAFF
+  EDIT_STAFF,
+  EDIT_ORGANIZATION,
+  DEPARTEMENTS_QUERY,
+  DEPARTEMENT_POSITIONS_QUERY,
+  DEPARTEMENT_QUERY,
+  DEPARTEMENT_POSITION_QUERY,
+  CHECK_STAFF,
 } from 'gql';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {},
   center: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+  },
+  centerHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    [theme.breakpoints.down('xs')]: {
+      textAlign: 'center'
+    }
+  },
+  avatar: {
+    // margin: 10,
+    // marginBottom: 0,
+    height: 100,
+    width: 100,
+    // flexShrink: 0,
+    // flexGrow: 0,
+  },
+  organization: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  header: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  title: {
+    color: theme.palette.white
+  },
+  subheader: {
+    color: theme.palette.divider
+  },
+  [theme.breakpoints.down('xs')]: {
+    header: {
+      display: 'block'
+    },
+    avatarHeader: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginLeft: 16
+    },
+    title: {
+      textAlign: 'center'
+    }
   }
 }));
+
+const schema = {
+  email: {
+    // presence: { allowEmpty: false, message: 'is required' },
+    email: true,
+    length: {
+      maximum: 64
+    }
+  },
+};
 
 const ProfileEditForm = props => {
 
   const classes = useStyles();
   const [openEditModal, setOpenEditModal] = useState(false);
-  // const [profileForm, setProfileForm] = useState(props.profileForm);
+  // const [profileForm, setProfileForm] = useState(profileForm);
   const [editStaff] = useMutation(EDIT_STAFF);
+  const [editOrganization] = useMutation(EDIT_ORGANIZATION);
+
+  const [departement, setDepartement] = useState([]);
+  const [departementPosition, setDepartementPosition] = useState([]);
+  const [profile, setProfile] = useState(props.profile);
+  useEffect(() => {
+    setProfile(props.profile)
+  }, [setProfile, props.profile]);
+  const defaultState = {
+    isValid: false,
+    values: profile,
+    touched: {},
+    errors: {}
+  };
+
+  const [profileForm, setProfileForm] = useState(defaultState);
+
+  const [organizationForm, setOrganizationForm] = useState(props.organization);
+  useEffect(() => {
+    setOrganizationForm(props.organization)
+  }, [setOrganizationForm, props.organization]);
+
+  const { data: departementData, refetch: departementRefetch } = useQuery(DEPARTEMENT_QUERY, {
+    variables: { departement_id: profileForm.values.departement_id },
+    onCompleted: () => {
+      if (departementData !== undefined && departementData.departement !== null) {
+        setDepartement(departementData.departement)
+      }
+
+    }
+  }
+  );
+
+  const { data: departementPositionData, refetch: departementPositionRefetch } = useQuery(DEPARTEMENT_POSITION_QUERY, {
+    variables: { _id: profileForm.values.departement_position_id },
+    onCompleted: () => {
+      if (departementPositionData && departementPositionData.departement_position !== null) {
+        setDepartementPosition(departementPositionData.departement_position)
+      }
+
+    }
+  }
+  );
+
+  const [departements, setDepartements] = useState([]);
+  const { data: departementsData, refetch: departementsRefetch } = useQuery(DEPARTEMENTS_QUERY, {
+    variables: { organization_id: props.decodedToken.organization_id },
+    onCompleted: () => {
+      setDepartements(
+        departementsData.departements
+      )
+    }
+  }
+  );
+
+  const [departementPositions, setDepartementPositions] = useState([]);
+  const { data: departementPositionsData, refetch: departementPositionsRefetch } = useQuery(DEPARTEMENT_POSITIONS_QUERY, {
+    variables: { organization_id: props.decodedToken.organization_id },
+    onCompleted: () => {
+      setDepartementPositions(
+        departementPositionsData.departement_positions
+      )
+    }
+  }
+  );
+
+
+  const [staff, setStaff] = useState([])
+  const { data: dataStaff, loading: loadingStaff, error: errorStaff, refetch: refetchStaff } = useQuery(CHECK_STAFF,
+    {
+      variables: { email: profileForm.values.email, },
+    });
+
+  useEffect(() => {
+    const onCompleted = (dataStaff) => { setStaff(dataStaff.check_staff) };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !loadingStaff && !errorStaff) {
+        onCompleted(dataStaff);
+      } else if (onError && !loadingStaff && errorStaff) {
+        onError(errorStaff);
+      }
+    }
+  }, [loadingStaff, dataStaff, errorStaff]);
+
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    departementsRefetch();
+    departementPositionsRefetch();
+    departementRefetch();
+    departementPositionRefetch();
+    refetchStaff();
+  };
+
 
   const handleOpenEditModal = () => {
     setOpenEditModal(true);
@@ -45,195 +208,333 @@ const ProfileEditForm = props => {
     setOpenEditModal(false);
   };
 
+  useEffect(() => {
+    const errors = validate(profileForm.values, schema);
+    if (staff.length !== 0 && profileForm.values.email !== props.profile.email) {
+      setProfileForm(profileForm => ({
+        ...profileForm, isValid: false, errors: { ...profileForm.errors, email: ["Email already registered"] } || {}
+      }));
+      // handleError();
+    } else {
+      setProfileForm(profileForm => ({
+        ...profileForm, isValid: errors ? false : true, errors: errors || {}
+      }));
+    }
+  }, [profileForm.values, staff.length, props.profile.email]);
 
+  const handleChangeProfile = event => {
+    // setProfileForm({
+    //   ...profileForm.values,
+    //   [event.target.name]: event.target.value
+    // });
+    const { name, value } = event.target;
+    setProfileForm(profileForm => ({
+      ...profileForm, values: {
+        ...profileForm.values, [name]: value
+      },
+      touched: {
+        ...profileForm.touched, [name]: true
+      }
+    }));
+  };
+
+  const handleChangeOrganization = event => {
+    setOrganizationForm({
+      ...organizationForm,
+      [event.target.name]: event.target.value
+    });
+  }
+
+
+  const handleCancel = () => {
+    props.handleCloseEditPage();
+    setProfileForm(props.profile)
+    setOrganizationForm(props.organization)
+  }
+
+
+
+  const uploadImage = (e) => {
+    setProfileForm(profileForm => ({
+      ...profileForm, values: {
+        ...profileForm.values,  picture: e
+      },
+    }));
+ 
+    if (props.decodedToken.user_type === "organization") {
+      setOrganizationForm({
+        ...organizationForm,
+        picture: e,
+      });
+    }
+  };
+
+  const removeImage = (e) => {
+    setProfileForm(profileForm => ({
+      ...profileForm, values: {
+        ...profileForm.values,  picture: ' '
+      },
+    }));
+ 
+    if (props.decodedToken.user_type === "organization") {
+      setOrganizationForm({
+        ...organizationForm,
+        picture: ' ',
+      });
+    }
+  };
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(props.profileForm)
+    props.handleSaveEditButton(profileForm.values, organizationForm);
     // setOrganizationForm(intitialFormState);
     props.handleCloseEditPage();
     editStaff({
       variables:
       {
-        _id: props.profileForm._id,
-        staff_name: props.profileForm.staff_name,
-        position_name: props.profileForm.position_name,
-        email: props.profileForm.email,
-        phone_number: props.profileForm.phone_number,
-        password: props.profileForm.password,
-        picture: props.profileForm.picture,
-        departement_id: props.profileForm.departement_id,
-        organization_id: props.profileForm.organization_id,
+        _id: profileForm.values._id,
+        staff_name: profileForm.values.staff_name,
+        position_name: profileForm.values.position_name,
+        email: profileForm.values.email,
+        phone_number: profileForm.values.phone_number,
+        password: profileForm.values.password,
+        picture: profileForm.values.picture,
+        is_admin: profileForm.values.is_admin,
+        departement_position_id: profileForm.values.departement_position_id,
+        departement_id: profileForm.values.departement_id,
+        organization_id: profileForm.values.organization_id,
       }
     });
+    if (props.decodedToken.user_type === "organization") {
+      editOrganization({
+        variables:
+        {
+          _id: organizationForm._id,
+          organization_name: organizationForm.organization_name,
+          description: organizationForm.description,
+          picture: organizationForm.picture,
+        }
+      });
+    }
   }
 
-  const handleCancel = () => {
-    props.handleCancel()
-  }
+  console.log(profileForm)
+  const hasError = field =>
+    profileForm.touched[field] && profileForm.errors[field] ? true : false;
 
   return (
+
     <form
       autoComplete="off"
       noValidate
     >
-      <CardContent>
+      <CardHeader
+        className={classes.header}
+        subheader={
+          <div>
+            <Typography variant="body2" className={[classes.subheader, classes.centerHeader].join(" ")} color="textSecondary" component="p">
+              {profileForm.values.departement_position_id !== "" || profileForm.values.departement_id !== "" ?
+                departementPosition.departement_position_name + " " + departement.departement_name
+                :
+                ""
+              }
+            </Typography>
+            <Typography
+              className={[classes.organization, classes.subheader, classes.centerHeader].join(" ")}
+              color="textSecondary"
+              variant="body1"
+            >
+              {organizationForm.organization_name}
+            </Typography>
+          </div>
+        }
+        title={
+          <div>
+            <Typography gutterBottom variant="h5" component="h2" className={[classes.title, classes.centerHeader].join(" ")}>
+              {profileForm.values.staff_name}
+            </Typography>
+            <Typography gutterBottom variant="body2" className={[classes.centerHeader].join(" ")} style={{ color: "cornflowerblue" }} component="p">
+              {profileForm.values.email}
+            </Typography>
+          </div>
+        }
+        avatar={
+          <div style={{ padding: 10 }}>
+            <div className={classes.avatarHeader}>
+              <EditAvatarForm
+                uploadImage={uploadImage}
+                picture={profileForm.values.picture}
+                removeImage={removeImage}
+                size={100}
+              />
+            </div>
+          </div>
+        }
+      >
+      </CardHeader>
+      <CardContent style={{ backgroundColor: 'white' }}>
         <Grid
           container
           spacing={0}
         >
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
+            <Typography variant="subtitle2">Organization Name</Typography>
+          </Grid>
+          <Grid item md={9} sm={9} xs={12}          >
+            {
+              props.decodedToken.user_type === "organization" ?
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="organization_name"
+                  onChange={handleChangeOrganization}
+                  value={organizationForm.organization_name}
+                  variant="outlined"
+                />
+                :
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="organization_id"
+                  onChange={handleChangeOrganization}
+                  disabled
+                  value={organizationForm.organization_name}
+                  variant="outlined"
+                />
+            }
+          </Grid>
 
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
+            <Typography variant="subtitle2">Organization Description</Typography>
+          </Grid>
+          <Grid item md={9} sm={9} xs={12}          >
+            {
+              props.decodedToken.user_type === "organization" ?
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="description"
+                  onChange={handleChangeOrganization}
+                  value={organizationForm.description}
+                  variant="outlined"
+                />
+                :
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  name="description"
+                  disabled
+                  onChange={handleChangeOrganization}
+                  value={organizationForm.description}
+                  variant="outlined"
+                />
+            }
+          </Grid>
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
             <Typography variant="subtitle2">Name</Typography>
           </Grid>
-          <Grid
-            item
-            sm={9}
-            md={9}
-            xs={12}
-          >
+          <Grid item sm={9} md={9} xs={12}          >
             <TextField
               fullWidth
               margin="dense"
               name="staff_name"
-              onChange={props.handleChange}
-              value={props.profileForm.staff_name}
+              onChange={handleChangeProfile}
+              value={profileForm.values.staff_name}
               variant="outlined"
             />
           </Grid>
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
             <Typography variant="subtitle2">Email</Typography>
           </Grid>
-          <Grid
-            item
-            md={9}
-            sm={9}
-            xs={12}
-          >
+          <Grid item md={9} sm={9} xs={12}          >
             <TextField
               fullWidth
               margin="dense"
               name="email"
-              onChange={props.handleChange}
-              value={props.profileForm.email}
+              error={hasError('email')}
+              helperText={
+                hasError('email') ? profileForm.errors.email[0] : null
+              }
+              label="Email"
+              type="text"
+              value={profileForm.values.email || ''}
+              onChange={handleChangeProfile}
               variant="outlined"
             />
           </Grid>
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
             <Typography variant="subtitle2">Phone Number</Typography>
           </Grid>
-          <Grid
-            item
-            md={9}
-            sm={9}
-            xs={12}
-          >
+          <Grid item md={9} sm={9} xs={12}          >
             <TextField
               fullWidth
               margin="dense"
               name="phone_number"
-              onChange={props.handleChange}
+              onChange={handleChangeProfile}
               type="number"
-              value={props.profileForm.phone_number}
+              value={profileForm.values.phone_number}
               variant="outlined"
             />
           </Grid>
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
-            <Typography variant="subtitle2">Position Name</Typography>
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
+            <Typography variant="subtitle2">Position</Typography>
           </Grid>
-          <Grid
-            item
-            sm={9}
-            md={9}
-            xs={12}
-          >
-            <TextField
+          <Grid item sm={9} md={9} xs={12}          >
+            {/* <TextField
               fullWidth
               margin="dense"
               name="position_name"
-              onChange={props.handleChange}
+              onChange={handleChangeProfile}
               disabled
-              value={props.profileForm.position_name}
+              value={profileForm.values.position_name}
               variant="outlined"
-            />
+            /> */}
+            <TextField
+              margin="dense"
+              fullWidth
+              name="departement_position_id"
+              label="Position Name"
+              select
+              disabled={props.decodedToken.user_type === "organization" ? false : true}
+              variant="outlined"
+              value={profileForm.values.departement_position_id}
+              onChange={handleChangeProfile}
+            >
+              {departementPositions.map((departementPosition) => (
+                <MenuItem key={departementPosition.departement_position_name} value={departementPosition._id}>
+                  {departementPosition.departement_position_name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
+          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
             <Typography variant="subtitle2">Departement</Typography>
           </Grid>
-          <Grid
-            item
-            md={9}
-            sm={9}
-            xs={12}
-          >
+          <Grid item md={9} sm={9} xs={12}          >
             <TextField
               fullWidth
-              margin="dense"
               name="departement_id"
-              onChange={props.handleChange}
-              disabled
-              value={props.departement_name}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid
-            item
-            md={3}
-            sm={3}
-            xs={12}
-            className={classes.center}
-          >
-            <Typography variant="subtitle2">Organization</Typography>
-          </Grid>
-          <Grid
-            item
-            md={9}
-            sm={9}
-            xs={12}
-          >
-            <TextField
-              fullWidth
+              select
+              size="small"
               margin="dense"
-              name="organization_id"
-              onChange={props.handleChange}
-              disabled
-              value={props.organization_name}
+              style={{ backgroundColor: 'white' }}
+              label="Departement"
+              disabled={props.decodedToken.user_type === "organization" ? false : true}
+              value={profileForm.values.departement_id}
+              onChange={handleChangeProfile}
+              // helperText="Please select your currency"
               variant="outlined"
-            />
+            >
+              {departements.map((departement) => (
+                <MenuItem key={departement.departement_name} value={departement._id}>
+                  {departement.departement_name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
       </CardContent>
       <Divider />
-      <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <CardActions style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'white' }}>
         <Button
           color="primary"
           onClick={handleOpenEditModal}
@@ -252,6 +553,19 @@ const ProfileEditForm = props => {
               <Button
                 color="secondary"
                 variant="contained"
+                disabled={
+                  ((
+                    organizationForm.organization_name === ""||
+                    // organizationForm.organization_name === ""||
+                    profileForm.values.staff_name === "" ||
+                    profileForm.values.departement_id === "" ||
+                    profileForm.values.departement_position_id === "" ||
+                    profileForm.values.email === "" ||
+                    profileForm.values.phone_number === "" ) ||
+                    !profileForm.isValid ?
+                    true : false
+                  )
+                }
                 onClick={() => handleSaveEditButton()}
               >
                 Save
@@ -259,12 +573,12 @@ const ProfileEditForm = props => {
             </div>
           }
           <PasswordChangeForm
-            open={openEditModal}
-            close={handleCloseEditModal}
-          />
+          open={openEditModal}
+          close={handleCloseEditModal}
+        />
         </div>
       </CardActions>
-    </form>
+    </form >
   );
 };
 

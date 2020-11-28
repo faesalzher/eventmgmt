@@ -84,9 +84,11 @@ export default function CustomizedMenus(props) {
           className={classes.text}
           style={{ color: "white" }}
         >
-          {props.decodedToken.user_type === "organization"
-            ? props.profileOrganization.email
-            : props.profileStaff.email}
+          {
+          // props.decodedToken.user_type === "organization"
+          //   ? props.profileOrganization.email
+            // :
+             props.profileStaff.email}
         </Typography>
         <ArrowDropDownIcon style={{ color: "white" }} />
       </Button>

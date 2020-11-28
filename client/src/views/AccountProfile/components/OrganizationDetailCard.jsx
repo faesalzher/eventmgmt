@@ -169,9 +169,9 @@ const OrganizationDetailCard = props => {
             <Typography gutterBottom variant="h5" component="h2" className={classes.title} style={{ color: 'white' }}>
               {organizationForm.organization_name}
             </Typography>
-            <Typography gutterBottom variant="body2" className={classes.title} style={{ color: "cornflowerblue" }} component="p">
+            {/* <Typography gutterBottom variant="body2" className={classes.title} style={{ color: "cornflowerblue" }} component="p">
               {organizationForm.email}
-            </Typography>
+            </Typography> */}
           </div>
         }
         action={

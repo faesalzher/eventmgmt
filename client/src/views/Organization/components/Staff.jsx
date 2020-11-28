@@ -18,6 +18,12 @@ import EditIcon from '@material-ui/icons/Edit';
 import {
   StaffEditForm
 } from '.';
+
+import { useQuery } from '@apollo/react-hooks';
+import { 
+  DEPARTEMENT_QUERY,
+  DEPARTEMENT_POSITION_QUERY,
+ } from 'gql';
 const StyledTableCell = withStyles(theme => ({
   head: {
     backgroundColor: theme.palette.common.black,
@@ -37,6 +43,45 @@ const StyledTableRow = withStyles(theme => ({
   },
 }))(TableRow);
 
+function DepartementName(props) {
+  const { data: departementData, refetch: departementRefetch } = useQuery(DEPARTEMENT_QUERY, {
+    variables: { departement_id: props.departement_id },
+  }
+  );
+  React.useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    departementRefetch();
+  };
+
+  if (!departementData || departementData.departement === null) return <></>
+  return (
+    <>      {departementData.departement.departement_name}    </>
+  );
+}
+
+function DepartementPositionName(props) {
+  const { data: departementPositionData, refetch: departementPositionRefetch } = useQuery(DEPARTEMENT_POSITION_QUERY, {
+    variables: { _id: props.departement_position_id },
+  }
+  );
+  React.useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    departementPositionRefetch();
+  };
+
+
+  if (!departementPositionData || departementPositionData.departement_position === null) return <></>
+
+  return (
+    <>      {departementPositionData.departement_position.departement_position_name}    </>
+  );
+}
 export default function Staffs(props) {
   // const classes = useStyles();
   // console.log(props.staffs.imageUrl)
@@ -62,13 +107,16 @@ export default function Staffs(props) {
       <StyledTableCell scope="row">
         {props.staff.staff_name}
       </StyledTableCell>
-      <StyledTableCell scope="row">
-        {props.staff.position_name}
-      </StyledTableCell>
       <StyledTableCell align="left">
         {props.staff.email}
       </StyledTableCell>
       <StyledTableCell align="left">{props.staff.phone_number}</StyledTableCell>
+      <StyledTableCell scope="row">
+        <DepartementName departement_id={props.staff.departement_id} />
+      </StyledTableCell>
+      <StyledTableCell scope="row">
+        <DepartementPositionName departement_position_id={props.staff.departement_position_id} />
+      </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         {props.decodedToken.user_type === "organization" ?
           <Tooltip arrow title="Edit" aria-label="confirm">
@@ -82,6 +130,7 @@ export default function Staffs(props) {
         <StaffEditForm
           staff={props.staff}
           departements={props.departements}
+          departementPositions={props.departementPositions}
           open={openEditModal}
           organization_id={props.organization_id}
           handleDeleteStaff={props.handleDeleteStaff}

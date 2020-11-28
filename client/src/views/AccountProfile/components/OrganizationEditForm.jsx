@@ -110,7 +110,7 @@ const OrganizationEditForm = props => {
           >
             <Typography variant="subtitle2">Email</Typography>
           </Grid>
-          <Grid
+          {/* <Grid
             item
             md={9}
             xs={12}
@@ -123,7 +123,7 @@ const OrganizationEditForm = props => {
               value={props.organizationForm.email}
               variant="outlined"
             />
-          </Grid>
+          </Grid> */}
           <Grid
             item
             md={3}

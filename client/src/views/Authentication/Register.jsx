@@ -22,18 +22,29 @@ import { useQuery } from '@apollo/react-hooks';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import uuid from 'uuid/v1';
-import { CHECK_ORGANIZATION, REGISTER, ADD_COMMITTEE } from 'gql';
+import { CHECK_STAFF, ADD_ORGANIZATION, ADD_COMMITTEE, ADD_STAFF, ADD_POSITION } from 'gql';
 
 
 const committeeName = [
-  'Core Committee',
-  'Program Subcommittee',
-  'Secretariat Subcommittee',
-  'Funding Subcommittee',
-  'Food Subcommittee',
-  'Security Subcommittee',
-  'Publication and Documentation Subcommittee',
-  'Equipment and Transportation Subcommittee',
+  { committee_name: 'Panitia Inti', core: true },
+  { committee_name: 'Program Subcommittee', core: false },
+  { committee_name: 'Secretariat Subcommittee', core: false },
+  { committee_name: 'Funding Subcommittee', core: false },
+  { committee_name: 'Food Subcommittee', core: false },
+  { committee_name: 'Security Subcommittee', core: false },
+  { committee_name: 'Publication and Documentation Subcommittee', core: false },
+  { committee_name: 'Equipment and Transportation Subcommittee', core: false },
+]
+
+const positionName = [
+  { position_name: 'Head Of Project', core: true, order: '1' },
+  { position_name: 'Vice Head of Project', core: true, order: '2' },
+  { position_name: 'Secretary', core: true, order: '3' },
+  { position_name: 'Treasurer', core: true, order: '4' },
+  { position_name: 'Vice Treasurer', core: true, order: '5' },
+  { position_name: 'Coordinator', core: false, order: '6' },
+  { position_name: 'Vice Coordinator', core: false, order: '7' },
+  { position_name: 'Member', core: false, order: '8' },
 ]
 
 const schema = {
@@ -156,11 +167,14 @@ function Alert(props) {
 const Register = props => {
   const { history } = props;
 
+  const initialFormState = {
+    _id: uuid(), email: "", description: "", picture: ""
+  }
   const classes = useStyles();
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     isValid: false,
-    values: { _id: uuid(), email: "" },
+    values: initialFormState,
     touched: {},
     errors: {}
   });
@@ -199,35 +213,24 @@ const Register = props => {
     history.goBack();
   };
 
-  const [register] = useMutation(REGISTER, {
-    // update(proxy, result) {
-    //   // console.log(result)
-    // },
-    variables: {
-      _id: form.values._id,
-      organization_name: form.values.organization_name,
-      email: form.values.email,
-      password: form.values.password,
-      description: "",
-      picture: "",
-    },
-  });
+  const [register] = useMutation(ADD_ORGANIZATION);
   const [addCommittee] = useMutation(ADD_COMMITTEE);
+  const [addStaff] = useMutation(ADD_STAFF);
+  const [addPosition] = useMutation(ADD_POSITION);
 
-  const [organization, setOrganization] = useState({});
-
-  const { loading: loadingCheck, error, data, refetch } = useQuery(CHECK_ORGANIZATION,
+  const [staff, setStaff] = useState({});
+  const { loading: loadingCheck, error, data, refetch } = useQuery(CHECK_STAFF,
     {
       variables: { email: form.values.email },
       // onCompleted: () => { setCheck_organization(data.check_organization) }
-      // onCompleted: () => { setOrganization(data.check_organization) }
+      // onCompleted: () => { setStaff(data.check_organization) }
     });
   React.useEffect(() => {
     refresh();
   });
 
   useEffect(() => {
-    const onCompleted = (data) => { setOrganization(data.check_organization) };
+    const onCompleted = (data) => { setStaff(data.check_staff) };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !loadingCheck && !error) {
@@ -245,33 +248,68 @@ const Register = props => {
   const handleRegister = event => {
     refetch();
     // checkOrganization();
-    committeeName.forEach((committee) => {
-      addCommittee({
-        variables: {
-          _id: uuid(),
-          committee_name: committee,
-          organization_id: form.values._id
-        }
-      })
-    })
-
     event.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      if (organization.length !== 0) {
+      if (staff.length !== 0) {
         setLoading(false)
         handleError();
       } else {
-        register();
+        register({
+          // update(proxy, result) {
+          //   // console.log(result)
+          // },
+          variables: {
+            _id: form.values._id,
+            organization_name: form.values.organization_name,
+            description: "",
+            picture: "",
+          },
+        });
+        addStaff({
+          variables: {
+            _id: uuid(),
+            staff_name: "Super Admin",
+            email: form.values.email,
+            phone_number: "",
+            is_admin: true,
+            password: form.values.password,
+            picture: "",
+            position_name: "",
+            departement_id: "",
+            organization_id: form.values._id,
+          },
+        });
+        committeeName.forEach((committee) => {
+          addCommittee({
+            variables: {
+              _id: uuid(),
+              committee_name: committee.committee_name,
+              core: committee.core,
+              organization_id: form.values._id
+            }
+          })
+        })
+        positionName.forEach((position) => {
+          addPosition({
+            variables: {
+              _id: uuid(),
+              position_name: position.position_name,
+              core: position.core,
+              order: position.order,
+              organization_id: form.values._id
+            }
+          })
+        })
         setLoading(false)
         setForm(form => ({
-          values: { email: "" }, touched: {}, errors: {}, isValid: false
+          values: initialFormState, touched: {}, errors: {}, isValid: false
         }));
         handleSucces();
         // history.push('/');
       }
-    }, 1000);
 
+    }, 1000);
   };
 
   const [openErrorMsg, setOpenErrorMsg] = React.useState(false);

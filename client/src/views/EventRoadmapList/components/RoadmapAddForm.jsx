@@ -200,9 +200,9 @@ export default function RoadmapAddForm(props) {
                   {groupCommittees.map((groupCommittee) => {
                     if (groupCommittee.committee_id === props.project_personInCharge.committee_id
                       || props.decodedToken.user_type === "organization"
-                      || props.project_personInCharge.position_id === '1'
-                      || props.project_personInCharge.position_id === '2'
-                      || props.project_personInCharge.position_id === '3'
+                      || props.project_personInCharge.order === '1'
+                      || props.project_personInCharge.order === '2'
+                      || props.project_personInCharge.order === '3'
                     )
                       return (
                         <MenuItem key={groupCommittee.committee_id}

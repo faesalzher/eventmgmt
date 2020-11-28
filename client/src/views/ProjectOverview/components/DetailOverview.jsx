@@ -15,7 +15,7 @@ import { useQuery } from '@apollo/react-hooks';
 import AdjustIcon from '@material-ui/icons/Adjust';
 import EventIcon from '@material-ui/icons/Event';
 import { StatusBox, AvatarName } from 'components';
-import { ORGANIZATION_QUERY, STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION } from 'gql';
+import { ORGANIZATION_QUERY, STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_ORDER } from 'gql';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -44,24 +44,22 @@ const useStyles = makeStyles(() => ({
 export default function DetailOverview(props) {
   const classes = useStyles();
 
-  const [headOfProjectId, setHeadOfProjectId] = useState("");
+  const [headOfProjectId, setHeadOfProjectId] = useState({ staff_id: "" });
   const [headOfProject, setHeadOfProject] = useState([]);
   const [organization, setOrganization] = useState("");
 
 
-  const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION,
+  const { loading: headOfProjectIdLoading, error: headOfProjectIdError, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_ORDER,
     {
-      variables: { project_id: props.project_id, position_id: '1' },
+      variables: { project_id: props.project_id, order: '1' },
     });
 
 
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectIdData !== undefined && headOfProjectIdData.person_in_charges_by_project_and_position.length !== 0) {
-        setHeadOfProjectId(data.person_in_charges_by_project_and_position[0].staff_id);
-      } else {
-        return setHeadOfProjectId('')
+      if (headOfProjectIdData && headOfProjectIdData.person_in_charges_by_project_and_order !== null) {
+        setHeadOfProjectId(data.person_in_charges_by_project_and_order);
       }
     };
     const onError = (error) => { /* magic */ };
@@ -76,17 +74,14 @@ export default function DetailOverview(props) {
 
   const { loading: headOfProjectLoading, error: headOfProjectError, data: headOfProjectData, refetch: headOfProjectRefetch } = useQuery(STAFF_QUERY,
     {
-      variables: { staff_id: headOfProjectId },
+      variables: { staff_id: headOfProjectId.staff_id },
     });
 
-
-
+    console.log(headOfProjectId)
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectData !== undefined && headOfProjectData.staff !== null) {
+      if (headOfProjectData && headOfProjectData.staff !== null) {
         setHeadOfProject(data.staff)
-      } else {
-        setHeadOfProject([])
       }
     };
     const onError = (error) => { /* magic */ };

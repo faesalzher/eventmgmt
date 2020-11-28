@@ -3,21 +3,26 @@
 import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsAdd } from 'components/Dialog';
-import { AvatarName } from 'components';
 
 import TextField from '@material-ui/core/TextField';
 import {
   Dialog,
   FormControl,
   MenuItem,
+  Divider,
+  ListSubheader,
+  ListItemAvatar,
+  Avatar,
+  ListItemText
 } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import uuid from 'uuid/v1';
 import {
   useMutation,
+  useQuery,
 } from '@apollo/react-hooks';
 
-import { ADD_PERSON_IN_CHARGE } from 'gql';
+import { ADD_PERSON_IN_CHARGE, DEPARTEMENT_QUERY, DEPARTEMENT_POSITION_QUERY } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -30,6 +35,9 @@ const useStyles = makeStyles(theme => ({
     // minWidth: 50
     width: "100%"
   },
+  formControlSelect: {
+    width: "100%",
+  },
   formDate: {
     // margin: theme.spacing(2),
     // marginLeft: theme.spacing(0),
@@ -41,16 +49,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-// const ITEM_HEIGHT = 48;
-// const ITEM_PADDING_TOP = 8;
-// const MenuProps = {
-//   PaperProps: {
-//     style: {
-//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-//       width: 250,
-//     },
-//   },
-// };
+const ITEM_HEIGHT = 100;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 export default function PersonInChargeAddForm(props) {
   const theme = useTheme();
@@ -68,6 +76,7 @@ export default function PersonInChargeAddForm(props) {
   const [staff_id, setStaff_id] = useState("");
   const intitialFormState = {
     _id: uuid(),
+    order: "",
     staff_id: "",
     position_id: "",
     committee_id: "",
@@ -76,20 +85,16 @@ export default function PersonInChargeAddForm(props) {
 
   const [personInChargeForm, setPersonInChargeForm] = useState(intitialFormState);
   const [addPersonInCharge] = useMutation(ADD_PERSON_IN_CHARGE);
-  // React.useEffect(() => {
-  //   if (props.committee_id !== "all") {
-  //     personInChargeForm.committee_id = props.committee_id;
-  //   }
-  // }, [props.committee_id, personInChargeForm.committee_id]);
+
 
   const handleSaveButton = () => {
     props.handleSaveButton(personInChargeForm)
-    props.close();
     addPersonInCharge({
       variables:
       {
         _id: personInChargeForm._id,
         staff_id: personInChargeForm.staff_id,
+        order: personInChargeForm.order,
         committee_id: personInChargeForm.committee_id,
         position_id: personInChargeForm.position_id,
         project_id: personInChargeForm.project_id,
@@ -99,25 +104,23 @@ export default function PersonInChargeAddForm(props) {
     setCommittee_id("");
     setPosition_id("");
     setStaff_id("");
+    props.close();
   }
 
   const handleChangeCommittee = (event) => {
     personInChargeForm.committee_id = event.target.value;
-    // setAgendaForm({ ...agendaForm, date: day.toString().slice(0, 16) })
-    // setPersonInChargeForm({...personInChargeForm, committee_id: '1'})
     setCommittee_id(event.target.value);
     setPosition_id("");
     setPersonInChargeForm({ ...personInChargeForm, position_id: "" })
-    // personInChargeForm.position_id = "";
   };
 
   const handleChangePosition = (event) => {
-    personInChargeForm.position_id = event.target.value;
+    const position_value = event.target.value
+    setPersonInChargeForm({ ...personInChargeForm, order: position_value.order, position_id: position_value._id })
     setPosition_id(event.target.value);
   };
 
   const handleChangeStaff = (event) => {
-    // personInChargeForm.staff_id = event.target.value;
     setPersonInChargeForm({ ...personInChargeForm, staff_id: event.target.value })
     setStaff_id(event.target.value);
   };
@@ -130,23 +133,25 @@ export default function PersonInChargeAddForm(props) {
     setStaff_id("");
   }
 
-  let checkPersonInChargeStaffId = [];
+  //checking whether staff is assigned to person in charge and available
+  const checkPersonInChargeStaffId = [];
   props.personInCharges.forEach((personInCharge) => {
     props.staffs.forEach((staff) => {
-      if (staff._id === personInCharge.staff_id && props.project_id === personInCharge.project_id) {
+      if (staff._id === personInCharge.staff_id) {
         checkPersonInChargeStaffId.push(staff._id)
       }
     })
   }
   );
 
+  //checking wheter position is taken
   let checkPersonInChargePositionId = [];
   props.personInCharges.forEach((personInCharge) => {
     props.positions.forEach((position) => {
       if (position._id === personInCharge.position_id
         && props.project_id === personInCharge.project_id
         && committee_id === personInCharge.committee_id
-        && position._id !== "7"
+        && parseInt(position.order) > 7
       ) {
         checkPersonInChargePositionId.push(position._id)
       } else {
@@ -158,11 +163,38 @@ export default function PersonInChargeAddForm(props) {
   }
   );
 
+  //checking wheter committee choosen is core
   let checkCoreCommitteeId = [];
   committees.forEach((committee) => {
-    if (committee_id === committee._id && committee.committee_name === "Core Committee")
+    if (committee_id === committee._id && committee.core)
       checkCoreCommitteeId.push(committee._id)
   });
+
+
+  //menuitem for staffs
+  const menuItems = [];
+  props.groupDepartements.forEach((groupDepartement,index) => {
+    menuItems.push(
+      <ListSubheader key={index} disableSticky color="primary" style={{ padding: "0px 25px" }}> <DepartementName departement_id={groupDepartement.departement_id} /></ListSubheader>
+    )
+    menuItems.push(
+      <Divider key={index} />
+    )
+    groupDepartement.staffs.sort((a, b) => a.staff_name.localeCompare(b.staff_name)).forEach((staff,index) => {
+      if (checkPersonInChargeStaffId.indexOf(staff._id) > -1) {
+        menuItems.push(
+          <MenuItem key={index} disabled={true} style={{ padding: "5px 15px" }} >
+            <StaffName staff={staff} />
+          </MenuItem>)
+      } else {
+        menuItems.push(
+          < MenuItem key={index} value={staff._id || ''} style={{ padding: "5px 15px" }} >
+            <StaffName staff={staff} />
+          </MenuItem>
+        )
+      }
+    })
+  })
 
   return (
     <Dialog
@@ -178,7 +210,9 @@ export default function PersonInChargeAddForm(props) {
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
+              {/* <InputLabel id="person-in-charge-name-label">Person In Charge Name</InputLabel> */}
               <TextField
+                variant="outlined"
                 id="staff_id"
                 size="small"
                 select
@@ -187,28 +221,9 @@ export default function PersonInChargeAddForm(props) {
                 label="Person In Charge Name"
                 value={staff_id}
                 onChange={handleChangeStaff}
-                variant="outlined"
-              // MenuProps={MenuProps}
+                SelectProps={{ MenuProps: MenuProps }}
               >
-                {
-                  props.staffs.map((staff) => {
-                    if (checkPersonInChargeStaffId.indexOf(staff._id) > -1) {
-                      return <MenuItem key={staff.staff_name} disabled={true}>
-                        <AvatarName
-                          name={staff.staff_name}
-                          picture={staff.picture}
-                        />
-                      </MenuItem>
-                    } else {
-                      return < MenuItem key={staff.staff_name} value={staff._id} >
-                        <AvatarName
-                          name={staff.staff_name}
-                          picture={staff.picture}
-                        />
-                      </MenuItem>
-                    }
-                  })
-                }
+                {menuItems}
               </TextField>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -223,13 +238,14 @@ export default function PersonInChargeAddForm(props) {
                   value={committee_id}
                   onChange={handleChangeCommittee}
                   variant="outlined"
+                  SelectProps={{ MenuProps: MenuProps }}
                 >
                   {committees.map((committee) => {
                     if (committee._id === props.project_personInCharge.committee_id
                       || props.decodedToken.user_type === "organization"
-                      || props.project_personInCharge.position_id === '1'
-                      || props.project_personInCharge.position_id === '2'
-                      || props.project_personInCharge.position_id === '3'
+                      || props.project_personInCharge.order === '1'
+                      || props.project_personInCharge.order === '2'
+                      || props.project_personInCharge.order === '3'
                     )
                       return (
                         <MenuItem key={committee.committee_name}
@@ -265,24 +281,25 @@ export default function PersonInChargeAddForm(props) {
                     value={position_id}
                     onChange={handleChangePosition}
                     variant="outlined"
+                    SelectProps={{ MenuProps: MenuProps }}
                   >
                     {
                       committee_id === checkCoreCommitteeId[0] ?
                         props.positions.map((position) => {
                           if (position.core === true)
                             if (checkPersonInChargePositionId.indexOf(position._id) > -1)
-                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                              if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                              if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else
-                                return <MenuItem key={position.position_name} value={position._id}>
+                                return <MenuItem key={position.position_name} value={position}>
                                   {position.position_name}
                                 </MenuItem>
                           else return null;
@@ -291,18 +308,18 @@ export default function PersonInChargeAddForm(props) {
                         props.positions.map((position) => {
                           if (position.core === false)
                             if (checkPersonInChargePositionId.indexOf(position._id) > -1)
-                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                              if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else return <MenuItem key={position.position_name} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
-                              if (parseInt(props.project_personInCharge.position_id) >= parseInt(position._id)
+                              if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else
-                                return <MenuItem key={position.position_name} value={position._id}>
+                                return <MenuItem key={position.position_name} value={position}>
                                   {position.position_name}
                                 </MenuItem>
                           else return null;
@@ -333,3 +350,59 @@ export default function PersonInChargeAddForm(props) {
   );
 };
 
+
+const DepartementName = (props) => {
+
+  const { data: departementData } = useQuery(DEPARTEMENT_QUERY, {
+    variables: { departement_id: props.departement_id },
+  }
+  );
+  if (!departementData) {
+    return (<></>)
+  }
+
+  return (
+    <div>
+      {departementData.departement === null ?
+        "No Departements"
+        :
+        departementData.departement.departement_name
+      }
+    </div>
+  );
+}
+
+const StaffName = (props) => {
+  return (
+    <div style={{ padding: "0px 10px", display: 'flex' }}>
+      <ListItemAvatar>
+        <Avatar src={props.staff.picture} />
+      </ListItemAvatar>
+      <ListItemText
+        style={{ margin: 0 }}
+        primary={props.staff.staff_name}
+        secondary={<DepartementPositionName departement_position_id={props.staff.departement_position_id} />}
+      />
+    </div>
+  );
+}
+
+const DepartementPositionName = (props) => {
+  const { data: departementPositionData } = useQuery(DEPARTEMENT_POSITION_QUERY, {
+    variables: { _id: props.departement_position_id },
+  }
+  );
+  if (!departementPositionData) {
+    return (<></>)
+  }
+
+  return (
+    <>
+      {departementPositionData.departement_position === null ?
+        "No Positions on Departement"
+        :
+        departementPositionData.departement_position.departement_position_name
+      }
+    </>
+  );
+}

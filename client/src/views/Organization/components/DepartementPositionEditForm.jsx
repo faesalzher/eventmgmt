@@ -12,8 +12,8 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation } from '@apollo/react-hooks';
 import {
-  DELETE_DEPARTEMENT,
-  EDIT_DEPARTEMENT,
+  DELETE_DEPARTEMENT_POSITION,
+  EDIT_DEPARTEMENT_POSITION,
 } from 'gql';
 
 const useStyles = makeStyles(theme => ({
@@ -30,52 +30,51 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function DepartementEditForm(props) {
+export default function DepartementPositionEditForm(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
   const classes = useStyles();
   // const [anchorEl, setAnchorEl] = React.useState(null);
   const intitialFormState = {
-    _id: props.departement._id,
-    departement_name: props.departement.departement_name,
-    organization_id: props.organization_id
+    _id: props.departementPosition._id,
+    departement_position_name: props.departementPosition.departement_position_name,
+    organization_id:  props.departementPosition.organization_id
   }
-  
-  const [departementForm, setDepartementForm] = useState(intitialFormState);
-  const [deleteDepartement] = useMutation(DELETE_DEPARTEMENT);
-  const [editDepartement] = useMutation(EDIT_DEPARTEMENT);
+  const [departementPositionForm, setDepartementPositionForm] = useState(intitialFormState);
+  const [deleteDepartementPosition] = useMutation(DELETE_DEPARTEMENT_POSITION);
+  const [editDepartementPosition] = useMutation(EDIT_DEPARTEMENT_POSITION);
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(departementForm)
-    // setDepartementForm(intitialFormState);
+    props.handleSaveEditButton(departementPositionForm)
+    // setDepartementPositionForm(intitialFormState);
     props.close();
-    editDepartement(
+    editDepartementPosition(
       {
         variables:
         {
-          _id: departementForm._id,
-          departement_name: departementForm.departement_name,
-          organization_id: departementForm.organization_id
+          _id: departementPositionForm._id,
+          departement_position_name: departementPositionForm.departement_position_name,
+          organization_id: departementPositionForm.organization_id
         }
       });
   }
   const handleInputChange = e => {
     const { id, value } = e.target;
-    setDepartementForm({ ...departementForm, [id]: value })
+    setDepartementPositionForm({ ...departementPositionForm, [id]: value })
   }
-  console.log(departementForm)
+
 
   const handleDelete = () => {
-    props.handleDeleteDepartement(props.departement._id, props.index);
-    // setDepartementForm(intitialFormState);
+    props.handleDeleteDepartementPosition(departementPositionForm._id, props.index);
+    // setDepartementPositionForm(intitialFormState);
     props.close();
-    deleteDepartement({ variables: { _id: props.departement._id, } });
+    deleteDepartementPosition({ variables: { _id: departementPositionForm._id, } });
   }
 
   const handleCloseModal = e => {
     props.close();
-    setDepartementForm(intitialFormState)
+    setDepartementPositionForm(intitialFormState)
   }
 
   return (
@@ -88,7 +87,7 @@ export default function DepartementEditForm(props) {
         fullWidth={true}
         maxWidth={'xs'}
       >
-        <DialogTitle title="Edit Departement" onClose={props.close} />
+        <DialogTitle title="Edit DepartementPosition" onClose={props.close} />
         <DialogContent dividers>
           <form noValidate >
             <div >
@@ -96,11 +95,11 @@ export default function DepartementEditForm(props) {
                 <TextField
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
-                  id="departement_name"
-                  label="Departement Name"
+                  id="departement_position_name"
+                  label="DepartementPosition Name"
                   type="text"
                   variant="outlined"
-                  value={departementForm.departement_name}
+                  value={departementPositionForm.departement_position_name}
                   onChange={handleInputChange}
                 />
               </FormControl>
@@ -110,12 +109,12 @@ export default function DepartementEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              departementForm.departement_name === ""
+              departementPositionForm.departementPosition_name === ""
             ) ?
               ("invalid") : ("valid")
           }
-          content="Departement"
-          name={departementForm.departement_name}
+          content="DepartementPosition"
+          name={departementPositionForm.departement_position_name}
           submit={() => handleSaveEditButton()}
           delete={() => handleDelete()}
           close={() => handleCloseModal()}

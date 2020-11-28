@@ -67,8 +67,8 @@ export default function PersonInCharge(props) {
 
   return (
     <StyledTableRow style={
-      (props.decodedToken.user_type === "organization") ? {} : props.project_personInCharge._id === props.personInCharge._id ? { backgroundColor: "#ececec" } : {}}>
-      <StyledTableCell style={{ display: 'flex', justifyContent: 'center',padding:'2px 10px'}}>
+      props.project_personInCharge._id === props.personInCharge._id ? { backgroundColor: "#ececec" } : {}}>
+      <StyledTableCell style={{ display: 'flex', justifyContent: 'center', padding: '2px 10px' }}>
         <Avatar style={{ width: 30, height: 30 }} src={staff.picture} />
       </StyledTableCell>
       <StyledTableCell scope="row">
@@ -99,11 +99,11 @@ export default function PersonInCharge(props) {
               </IconButton>
             </Tooltip>
             :
-            (props.project_personInCharge.position_id === "1"
-              || props.project_personInCharge.position_id === "2"
-              || props.project_personInCharge.position_id === "3"
+            (props.project_personInCharge.order === "1"
+              || props.project_personInCharge.order === "2"
+              || props.project_personInCharge.order === "3"
             ) ?
-              ((parseInt(props.project_personInCharge.position_id) >= parseInt(props.personInCharge.position_id)))
+              ((parseInt(props.project_personInCharge.order) >= parseInt(props.personInCharge.order)))
                 ?
                 <></>
                 :
@@ -116,7 +116,7 @@ export default function PersonInCharge(props) {
 
                 </>
               :
-              (parseInt(props.project_personInCharge.position_id) >= parseInt(props.personInCharge.position_id))
+              (parseInt(props.project_personInCharge.order) >= parseInt(props.personInCharge.order))
                 || (props.project_personInCharge.committee_id !== props.personInCharge.committee_id)
                 ?
                 <></>
@@ -135,6 +135,8 @@ export default function PersonInCharge(props) {
           positions={props.positions}
           staffs={props.staffs}
           departements={props.departements}
+          project_personInCharge={props.project_personInCharge}
+          decodedToken={props.decodedToken}
           open={openEditModal}
           handleDeletePersonInCharge={props.handleDeletePersonInCharge}
           handleSaveEditButton={props.handleSaveEditButton}

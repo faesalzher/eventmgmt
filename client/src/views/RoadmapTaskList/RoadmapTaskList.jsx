@@ -16,7 +16,6 @@ import { useParams } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import jwtDecode from "jwt-decode";
-import { MyPersonInCharge } from 'components';
 
 import {
   IconButton,
@@ -107,8 +106,8 @@ export default function RoadamapTaskList() {
 
   useEffect(() => {
     const onCompleted = (personInChargeData) => {
-      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
-        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
+      if (personInChargeData && personInChargeData.person_in_charges_by_staff_and_project !== null) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -170,11 +169,11 @@ export default function RoadamapTaskList() {
         </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_personInCharge.position_id === '1' ||
-              project_personInCharge.position_id === '2' ||
-              project_personInCharge.position_id === '3' ||
-              project_personInCharge.position_id === '5' ||
-              project_personInCharge.position_id === '6' ||
+            (project_personInCharge.order === '1' ||
+              project_personInCharge.order === '2' ||
+              project_personInCharge.order === '3' ||
+              project_personInCharge.order === '6' ||
+              project_personInCharge.order === '7' ||
               decodedToken.user_type === "organization") ?
               <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
                 <SettingsIcon />
@@ -196,9 +195,6 @@ export default function RoadamapTaskList() {
           {fullScreen ? <></> :
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           }
-          <MyPersonInCharge
-            project_personInCharge={project_personInCharge}
-          />
         </div>
         <Grid container spacing={1} style={{ justifyContent: 'center' }}>
           <Grid

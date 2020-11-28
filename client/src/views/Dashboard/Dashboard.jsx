@@ -14,6 +14,7 @@ const useStyles = makeStyles(theme => ({
 const Dashboard = () => {
   const decodedToken = jwtDecode(localStorage.getItem("jwtToken"));
   const classes = useStyles();
+  console.log(decodedToken)
   return (
     <div className={classes.root}>
       {

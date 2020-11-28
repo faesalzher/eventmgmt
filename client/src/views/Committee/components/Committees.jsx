@@ -178,6 +178,7 @@ export default function Committees(props) {
           <TableHead>
             <TableRow>
               <StyledTableCell style={{ paddingLeft: 16 }}>Name</StyledTableCell>
+              <StyledTableCell style={{ width: 100 }}>Type</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
                     props.decodedToken.user_type === "organization"

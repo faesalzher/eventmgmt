@@ -76,7 +76,7 @@ const Organization = props => {
           </div>
         </div>
         <Divider />
-        <div className={classes.row}>
+        {/* <div className={classes.row}>
           <div
             className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
@@ -91,7 +91,7 @@ const Organization = props => {
             <Typography variant="body1" style={{ color: 'blue' }}>{organization.email}</Typography>
           </div>
         </div>
-        <Divider />
+        <Divider /> */}
 
         <div className={classes.row}>
           <div

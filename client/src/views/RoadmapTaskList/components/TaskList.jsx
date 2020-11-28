@@ -214,16 +214,16 @@ export default function TaskList(props) {
 
   const user_access = (props.roadmap.committee_id === props.project_personInCharge.committee_id) ?
     (
-      props.project_personInCharge.position_id === '5' ||
-      props.project_personInCharge.position_id === '6') ?
+      props.project_personInCharge.order === '6' ||
+      props.project_personInCharge.order === '7') ?
       true
       :
       false
     :
     decodedToken.user_type === "organization" ||
-      props.project_personInCharge.position_id === '1' ||
-      props.project_personInCharge.position_id === '2' ||
-      props.project_personInCharge.position_id === '3' ? true : false
+      props.project_personInCharge.order === '1' ||
+      props.project_personInCharge.order === '2' ||
+      props.project_personInCharge.order === '3' ? true : false
 
   return (
     <Card className={classes.root} elevation={0} >

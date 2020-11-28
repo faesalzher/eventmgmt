@@ -25,7 +25,7 @@ import {
 // import { findByLabelText } from '@testing-library/react';
 // import LoadingOverlay from 'react-loading-overlay';
 import { NavLink as RouterLink } from 'react-router-dom';
-import { STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION } from 'gql';
+import { STAFF_QUERY, PERSON_IN_CHARGE_BY_PROJECT_AND_ORDER } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -78,16 +78,16 @@ const CustomRouterLink = forwardRef((props, ref) => (
 
 const ProjectCard = (props) => {
   // const [elevate, setElevate] = useState(1);
-  const { className,handleDelete, ...rest } = props;
+  const { className, handleDelete, ...rest } = props;
   const classes = useStyles();
   const shadowStyles = useBouncyShadowStyles();
 
-  const [headOfProjectId, setHeadOfProjectId] = useState([{ staff_id: '0' }]);
+  const [headOfProjectId, setHeadOfProjectId] = useState({ staff_id: "" });
   const [headOfProjectName, setHeadOfProjectName] = useState([]);
 
-  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_POSITION,
+  const { loading, error, data: headOfProjectIdData, refetch: headOfProjectIdRefetch } = useQuery(PERSON_IN_CHARGE_BY_PROJECT_AND_ORDER,
     {
-      variables: { project_id: props.project._id, position_id: '1' },
+      variables: { project_id: props.project._id, order: '1' },
     });
 
   useEffect(() => {
@@ -96,10 +96,8 @@ const ProjectCard = (props) => {
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (headOfProjectIdData.person_in_charges_by_project_and_position.length === 0) {
-        return setHeadOfProjectId([{ staff_id: '0' }])
-      } else {
-        return setHeadOfProjectId(data.person_in_charges_by_project_and_position)
+      if (headOfProjectIdData && headOfProjectIdData.person_in_charges_by_project_and_order !== null) {
+        return setHeadOfProjectId(data.person_in_charges_by_project_and_order)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -112,18 +110,17 @@ const ProjectCard = (props) => {
     }
   }, [loading, headOfProjectIdData, error]);
 
+
   const { data: headOfProjectNameData, refetch: headOfProjectNameRefetch } = useQuery(STAFF_QUERY,
     {
-      variables: { staff_id: headOfProjectId[0].staff_id },
+      variables: { staff_id: headOfProjectId.staff_id },
       // onCompleted: () => { setHeadOfProjectName(headOfProjectNameData.staff) }
     });
 
   useEffect(() => {
     const onCompleted = (data) => {
-      if (data === undefined) {
-        return
-      } else {
-        return setHeadOfProjectName(data.staff)
+      if (data && data.staff !== null) {
+        setHeadOfProjectName(data.staff)
       }
     };
     const onError = (error) => { /* magic */ };

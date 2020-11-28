@@ -10,7 +10,7 @@ import { useTheme } from "@material-ui/core/styles";
 
 import { useQuery } from "@apollo/react-hooks";
 
-import { ORGANIZATION_QUERY } from "gql";
+// import { ORGANIZATION_QUERY } from "gql";
 
 import { STAFF_QUERY } from "gql";
 
@@ -40,20 +40,20 @@ const Topbar = (props) => {
 
   const classes = useStyles();
 
-  const [profileOrganization, setProfileOrganization] = useState({});
+  // const [profileOrganization, setProfileOrganization] = useState({});
   const [profileStaff, setProfileStaff] = useState({});
 
-  const {
-    data: dataOrganization,
-    loading: loadingOrganization,
-    error: organizationError,
-    refetch: refetchOrganization,
-  } = useQuery(ORGANIZATION_QUERY, {
-    variables: { _id: decodedToken.organization_id },
-    // onCompleted: () => {
-    //   setProfileOrganization(dataOrganization.organization);
-    // },
-  });
+  // const {
+  //   data: dataOrganization,
+  //   loading: loadingOrganization,
+  //   error: organizationError,
+  //   refetch: refetchOrganization,
+  // } = useQuery(ORGANIZATION_QUERY, {
+  //   variables: { _id: decodedToken.organization_id },
+  //   // onCompleted: () => {
+  //   //   setProfileOrganization(dataOrganization.organization);
+  //   // },
+  // });
 
   const {
     data: dataStaff,
@@ -71,21 +71,21 @@ const Topbar = (props) => {
     refresh();
   });
 
-  useEffect(() => {
-    const onCompleted = (dataOrganization) => {
-      setProfileOrganization(dataOrganization.organization);
-    };
-    const onError = (error) => {
-      /* magic */
-    };
-    if (onCompleted || onError) {
-      if (onCompleted && !loadingOrganization && !organizationError) {
-        onCompleted(dataOrganization);
-      } else if (onError && !loadingOrganization && organizationError) {
-        onError(organizationError);
-      }
-    }
-  }, [loadingOrganization, dataOrganization, organizationError]);
+  // useEffect(() => {
+  //   const onCompleted = (dataOrganization) => {
+  //     setProfileOrganization(dataOrganization.organization);
+  //   };
+  //   const onError = (error) => {
+  //     /* magic */
+  //   };
+  //   if (onCompleted || onError) {
+  //     if (onCompleted && !loadingOrganization && !organizationError) {
+  //       onCompleted(dataOrganization);
+  //     } else if (onError && !loadingOrganization && organizationError) {
+  //       onError(organizationError);
+  //     }
+  //   }
+  // }, [loadingOrganization, dataOrganization, organizationError]);
 
   useEffect(() => {
     const onCompleted = (dataStaff) => {
@@ -104,7 +104,7 @@ const Topbar = (props) => {
   }, [loadingStaff, dataStaff, staffError]);
 
   const refresh = () => {
-    refetchOrganization();
+    // refetchOrganization();
     refetchStaff();
   };
 
@@ -114,12 +114,12 @@ const Topbar = (props) => {
       <div className={classes.root}>
         <Typography variant="h6" style={xs ? { fontSize: 14 } : {}}>
           Event Management
-          {decodedToken.user_type === "organization" ? " (Admin)" : ""}
+          {/* {decodedToken.user_type === "organization" ? " (Admin)" : ""} */}
         </Typography>
       </div>
       <CustomizedMenus
         logOut={logOut}
-        profileOrganization={profileOrganization}
+        // profileOrganization={profileOrganization}
         profileStaff={profileStaff}
         decodedToken={decodedToken}
       />

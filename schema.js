@@ -14,7 +14,6 @@ const OrganizationType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     organization_name: { type: GraphQLString },
-    email: { type: GraphQLID },
     password: { type: GraphQLString },
     description: { type: GraphQLString },
     picture: { type: GraphQLString },
@@ -42,11 +41,12 @@ const StaffType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     staff_name: { type: GraphQLString },
-    position_name: { type: GraphQLString },
+    departement_position_id: { type: GraphQLString },
     email: { type: GraphQLString },
     phone_number: { type: GraphQLString },
     password: { type: GraphQLString },
     picture: { type: GraphQLString },
+    is_admin: { type: GraphQLBoolean },
     departement_id: { type: GraphQLString },
     organization_id: { type: GraphQLString },
   }),
@@ -58,6 +58,16 @@ const DepartementType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     departement_name: { type: GraphQLString },
+    organization_id: { type: GraphQLString },
+  }),
+});
+
+const Departement_position = require("./model/Departement_position");
+const Departement_positionType = new GraphQLObjectType({
+  name: "Departement_position",
+  fields: () => ({
+    _id: { type: GraphQLID },
+    departement_position_name: { type: GraphQLString },
     organization_id: { type: GraphQLString },
   }),
 });
@@ -85,6 +95,8 @@ const PositionType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     position_name: { type: GraphQLString },
     core: { type: GraphQLBoolean },
+    order: { type: GraphQLString },
+    organization_id: { type: GraphQLString },
   }),
 });
 
@@ -94,6 +106,7 @@ const CommitteeType = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLID },
     committee_name: { type: GraphQLString },
+    core: { type: GraphQLBoolean },
     organization_id: { type: GraphQLString },
   }),
 });
@@ -103,6 +116,7 @@ const Person_in_chargeType = new GraphQLObjectType({
   name: "Person_in_charge",
   fields: () => ({
     _id: { type: GraphQLID },
+    order: { type: GraphQLString },
     staff_id: { type: GraphQLString },
     committee_id: { type: GraphQLString },
     position_id: { type: GraphQLString },
@@ -193,13 +207,13 @@ const Task_assigned_toType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
-    check_organization: {
-      type: new GraphQLList(OrganizationType),
-      args: { email: { type: GraphQLString } },
-      resolve(parent, args) {
-        return Organization.find({ email: args.email });
-      },
-    },
+    // check_organization: {
+    //   type: new GraphQLList(OrganizationType),
+    //   args: { email: { type: GraphQLString } },
+    //   resolve(parent, args) {
+    //     return Organization.find({ email: args.email });
+    //   },
+    // },
     organization: {
       type: OrganizationType,
       args: { _id: { type: GraphQLString } },
@@ -278,10 +292,27 @@ const RootQuery = new GraphQLObjectType({
         return Event.findById(args._id);
       },
     },
+    departement_positions: {
+      type: new GraphQLList(Departement_positionType),
+      args: { organization_id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Departement_position.find({
+          organization_id: args.organization_id,
+        });
+      },
+    },
+    departement_position: {
+      type: Departement_positionType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        return Departement_position.findById(args._id);
+      },
+    },
     positions: {
       type: new GraphQLList(PositionType),
+      args: { organization_id: { type: GraphQLString } },
       resolve(parent, args) {
-        return Position.find({});
+        return Position.find({ organization_id: args.organization_id });
       },
     },
     position: {
@@ -291,6 +322,7 @@ const RootQuery = new GraphQLObjectType({
         return Position.findById(args._id);
       },
     },
+
     committees: {
       type: new GraphQLList(CommitteeType),
       args: { organization_id: { type: GraphQLString } },
@@ -303,6 +335,19 @@ const RootQuery = new GraphQLObjectType({
       args: { _id: { type: GraphQLString } },
       resolve(parent, args) {
         return Committee.findById(args._id);
+      },
+    },
+    core_committee: {
+      type: CommitteeType,
+      args: {
+        organization_id: { type: GraphQLString },
+        core: { type: GraphQLBoolean },
+      },
+      resolve(parent, args) {
+        return Committee.findOne({
+          organization_id: args.organization_id,
+          core: args.core,
+        });
       },
     },
     person_in_charges: {
@@ -325,27 +370,27 @@ const RootQuery = new GraphQLObjectType({
         }
       },
     },
-    person_in_charges_by_project_and_position: {
-      type: new GraphQLList(Person_in_chargeType),
+    person_in_charges_by_project_and_order: {
+      type: Person_in_chargeType,
       args: {
         project_id: { type: GraphQLString },
-        position_id: { type: GraphQLString },
+        order: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return Person_in_charge.find({
+        return Person_in_charge.findOne({
           project_id: args.project_id,
-          position_id: args.position_id,
+          order: args.order,
         });
       },
     },
     person_in_charges_by_staff_and_project: {
-      type: new GraphQLList(Person_in_chargeType),
+      type: Person_in_chargeType,
       args: {
         staff_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return Person_in_charge.find({
+        return Person_in_charge.findOne({
           staff_id: args.staff_id,
           project_id: args.project_id,
         });
@@ -477,13 +522,11 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    register: {
+    addOrganization: {
       type: OrganizationType,
       args: {
         _id: { type: GraphQLID },
         organization_name: { type: GraphQLString },
-        email: { type: GraphQLID },
-        password: { type: GraphQLString },
         description: { type: GraphQLString },
         picture: { type: GraphQLString },
       },
@@ -505,7 +548,8 @@ const Mutation = new GraphQLObjectType({
         let organization = new Organization({
           _id: args._id,
           organization_name: args.organization_name,
-          email: args.email,
+          description: args.description,
+          picture: args.picture,
           password: args.password,
         });
         return organization.save();
@@ -516,7 +560,6 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         organization_name: { type: GraphQLString },
-        email: { type: GraphQLString },
         password: { type: GraphQLString },
         description: { type: GraphQLString },
         picture: { type: GraphQLString },
@@ -524,7 +567,6 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let edit = {
           organization_name: args.organization_name,
-          email: args.email,
           password: args.password,
           description: args.description,
           picture: args.picture,
@@ -601,11 +643,12 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         staff_name: { type: GraphQLString },
-        position_name: { type: GraphQLString },
+        departement_position_id: { type: GraphQLString },
         email: { type: GraphQLString },
         phone_number: { type: GraphQLString },
         password: { type: GraphQLString },
         picture: { type: GraphQLString },
+        is_admin: { type: GraphQLBoolean },
         departement_id: { type: GraphQLString },
         organization_id: { type: GraphQLString },
       },
@@ -613,11 +656,12 @@ const Mutation = new GraphQLObjectType({
         let staff = new Staff({
           _id: args._id,
           staff_name: args.staff_name,
-          position_name: args.position_name,
+          departement_position_id: args.departement_position_id,
           email: args.email,
           phone_number: args.phone_number,
           password: args.password,
           picture: args.picture,
+          is_admin: args.is_admin,
           departement_id: args.departement_id,
           organization_id: args.organization_id,
         });
@@ -629,40 +673,28 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         staff_name: { type: GraphQLString },
-        position_name: { type: GraphQLString },
+        departement_position_id: { type: GraphQLString },
         email: { type: GraphQLString },
         phone_number: { type: GraphQLString },
         password: { type: GraphQLString },
         picture: { type: GraphQLString },
+        is_admin: { type: GraphQLBoolean },
         departement_id: { type: GraphQLString },
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.staff_name) {
-          edit.staff_name = args.staff_name;
-        }
-        if (args.position_name) {
-          edit.position_name = args.position_name;
-        }
-        if (args.email) {
-          edit.email = args.email;
-        }
-        if (args.phone_number) {
-          edit.phone_number = args.phone_number;
-        }
-        if (args.password) {
-          edit.password = args.password;
-        }
-        if (args.picture) {
-          edit.picture = args.picture;
-        }
-        if (args.departement_id) {
-          edit.departement_id = args.departement_id;
-        }
-        if (args.organization_id) {
-          edit.organization_id = args.organization_id;
-        }
+        let edit = {
+          _id: args._id,
+          staff_name: args.staff_name,
+          departement_position_id: args.departement_position_id,
+          email: args.email,
+          phone_number: args.phone_number,
+          password: args.password,
+          picture: args.picture,
+          is_admin: args.is_admin,
+          departement_id: args.departement_id,
+          organization_id: args.organization_id,
+        };
         let staff = Staff.findByIdAndUpdate(args._id, edit, { new: true });
         return staff;
       },
@@ -708,12 +740,14 @@ const Mutation = new GraphQLObjectType({
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let departement = Departement.findByIdAndUpdate(
-          args._id,
-          { departement_name: args.departement_name },
-          { organization_id: args.organization_id },
-          { new: true }
-        );
+        let edit = {
+          _id: args._id,
+          departement_name: args.departement_name,
+          organization_id: args.organization_id,
+        };
+        let departement = Departement.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
         return departement;
       },
     },
@@ -723,6 +757,108 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let departement = Departement.findByIdAndDelete(args._id);
         return departement;
+      },
+    },
+
+    addPosition: {
+      type: PositionType,
+      args: {
+        _id: { type: GraphQLString },
+        position_name: { type: GraphQLString },
+        core: { type: GraphQLBoolean },
+        order: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let position = new Position({
+          _id: args._id,
+          position_name: args.position_name,
+          core: args.core,
+          order: args.order,
+          organization_id: args.organization_id,
+        });
+        return position.save();
+      },
+    },
+    editPosition: {
+      type: PositionType,
+      args: {
+        _id: { type: GraphQLString },
+        position_name: { type: GraphQLString },
+        core: { type: GraphQLBoolean },
+        order: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {
+          _id: args._id,
+          position_name: args.position_name,
+          core: args.core,
+          order: args.order,
+          organization_id: args.organization_id,
+        };
+        let position = Position.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
+        return position;
+      },
+    },
+    deletePosition: {
+      type: PositionType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let position = Position.findByIdAndDelete(args._id);
+        return position;
+      },
+    },
+
+    addDepartement_position: {
+      type: Departement_positionType,
+      args: {
+        _id: { type: GraphQLString },
+        departement_position_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let departement_position = new Departement_position({
+          _id: args._id,
+          departement_position_name: args.departement_position_name,
+          organization_id: args.organization_id,
+        });
+        return departement_position.save();
+      },
+    },
+    editDepartement_position: {
+      type: Departement_positionType,
+      args: {
+        _id: { type: GraphQLString },
+        departement_position_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let edit = {
+          _id: args._id,
+          departement_position_name: args.departement_position_name,
+          organization_id: args.organization_id,
+        };
+        let departement_position = Departement_position.findByIdAndUpdate(
+          args._id,
+          edit,
+          {
+            new: true,
+          }
+        );
+        return departement_position;
+      },
+    },
+    deleteDepartement_position: {
+      type: Departement_positionType,
+      args: { _id: { type: GraphQLString } },
+      resolve(parent, args) {
+        let departement_position = Departement_position.findByIdAndDelete(
+          args._id
+        );
+        return departement_position;
       },
     },
 
@@ -796,12 +932,14 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         committee_name: { type: GraphQLString },
+        core: { type: GraphQLBoolean },
         organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let committee = new Committee({
           _id: args._id,
           committee_name: args.committee_name,
+          core: args.core,
           organization_id: args.organization_id,
         });
         return committee.save();
@@ -811,14 +949,20 @@ const Mutation = new GraphQLObjectType({
       type: CommitteeType,
       args: {
         _id: { type: GraphQLString },
+        core: { type: GraphQLBoolean },
         committee_name: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let committee = Committee.findByIdAndUpdate(
-          args._id,
-          { committee_name: args.committee_name },
-          { new: true }
-        );
+        let edit = {
+          _id: args._id,
+          committee_name: args.committee_name,
+          core: args.core,
+          organization_id: args.organization_id,
+        };
+        let committee = Committee.findByIdAndUpdate(args._id, edit, {
+          new: true,
+        });
         return committee;
       },
     },
@@ -835,6 +979,7 @@ const Mutation = new GraphQLObjectType({
       type: Person_in_chargeType,
       args: {
         _id: { type: GraphQLString },
+        order: { type: GraphQLString },
         staff_id: { type: GraphQLString },
         committee_id: { type: GraphQLString },
         position_id: { type: GraphQLString },
@@ -843,6 +988,7 @@ const Mutation = new GraphQLObjectType({
       resolve(parent, args) {
         let person_in_charge = new Person_in_charge({
           _id: args._id,
+          order: args.order,
           staff_id: args.staff_id,
           committee_id: args.committee_id,
           position_id: args.position_id,
@@ -855,25 +1001,20 @@ const Mutation = new GraphQLObjectType({
       type: Person_in_chargeType,
       args: {
         _id: { type: GraphQLString },
+        order: { type: GraphQLString },
         staff_id: { type: GraphQLString },
         position_id: { type: GraphQLString },
         committee_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
       },
       resolve(parent, args) {
-        let edit = {};
-        if (args.staff_id) {
-          edit.staff_id = args.staff_id;
-        }
-        if (args.committee_id) {
-          edit.committee_id = args.committee_id;
-        }
-        if (args.position_id) {
-          edit.position_id = args.position_id;
-        }
-        if (args.project_id) {
-          edit.project_id = args.project_id;
-        }
+        let edit = {
+          order: args.order,
+          staff_id: args.staff_id,
+          committee_id: args.committee_id,
+          position_id: args.position_id,
+          project_id: args.project_id,
+        };
         let person_in_charge = Person_in_charge.findByIdAndUpdate(
           args._id,
           edit,

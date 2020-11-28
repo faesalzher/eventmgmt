@@ -16,7 +16,6 @@ import { createBrowserHistory } from 'history';
 // import ScrollContainer from 'react-indiana-drag-scroll'
 import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs';
 import jwtDecode from "jwt-decode";
-import { MyPersonInCharge } from 'components';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
@@ -115,8 +114,8 @@ export default function EventDetail() {
 
   useEffect(() => {
     const onCompleted = (personInChargeData) => {
-      if (personInChargeData !== undefined && personInChargeData.person_in_charges_by_staff_and_project.length !== 0) {
-        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project[0])
+      if (personInChargeData && personInChargeData.person_in_charges_by_staff_and_project !== null) {
+        setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -202,9 +201,9 @@ if (!organizationData) return (<></>)
         </Tabs>
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_personInCharge.position_id === '1' ||
-              project_personInCharge.position_id === '2' ||
-              project_personInCharge.position_id === '3' ||
+            (project_personInCharge.order === '1' ||
+              project_personInCharge.order === '2' ||
+              project_personInCharge.order === '3' ||
               decodedToken.user_type === "organization") ?
               <>
                 <IconButton onClick={handleOpenEditModal} className={classes.iconbutton}>
@@ -229,9 +228,6 @@ if (!organizationData) return (<></>)
           {fullScreen ? <></> :
             <BreadCrumbs breadcrumb_item={breadcrumb_item} />
           }
-          <MyPersonInCharge
-            project_personInCharge={project_personInCharge}
-          />
         </div>
         <TabPanel value={value} index={0} style={{ padding: '0px 30px' }}>
           <EventRoadmapList

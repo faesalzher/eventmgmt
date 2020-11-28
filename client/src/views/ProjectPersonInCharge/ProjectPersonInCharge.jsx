@@ -20,7 +20,7 @@ import {
 } from './components';
 // import gql from 'graphql-tag';
 
-import { STAFFS_QUERY, POSITIONS_QUERY,COMMITTEES__QUERY } from 'gql';
+import { STAFFS_QUERY, POSITIONS_QUERY, COMMITTEES_QUERY } from 'gql';
 // export const COMMITTEE_QUERY = gql`
 //   query committee($_id: String!){
 //     committee(_id:$_id) {
@@ -67,6 +67,7 @@ export default function ProjectPersonInCharge(props) {
 
 
   const { loading: positionsLoading, data: positionsData, refetch: positionsRefetch } = useQuery(POSITIONS_QUERY, {
+    variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setPositions(
         positionsData.positions
@@ -75,7 +76,7 @@ export default function ProjectPersonInCharge(props) {
   }
   );
 
-  const { data: committeesData, refetch: committeesRefetch } = useQuery(COMMITTEES__QUERY, {
+  const { data: committeesData, refetch: committeesRefetch } = useQuery(COMMITTEES_QUERY, {
     variables: { organization_id: decodedToken.organization_id },
     onCompleted: () => {
       setCommittees(
@@ -84,6 +85,7 @@ export default function ProjectPersonInCharge(props) {
     }
   }
   );
+
 
   // useEffect(() => {
   //   refresh();
@@ -141,6 +143,23 @@ export default function ProjectPersonInCharge(props) {
     }
   }));
 
+
+  const groupDepartementsObject = staffs.reduce((departements, staff) => {
+    const departement_id = staff.departement_id;
+    if (!departements[departement_id]) {
+      departements[departement_id] = [];
+    }
+    departements[departement_id].push(staff);
+    return departements;
+  }, {});
+
+
+  const groupDepartements = Object.keys(groupDepartementsObject).map((departement_id) => {
+    return {
+      departement_id,
+      staffs: groupDepartementsObject[departement_id]
+    };
+  });
   return (
     <div>
       <Paper>
@@ -151,7 +170,7 @@ export default function ProjectPersonInCharge(props) {
             PERSON IN CHARGE
           </Typography>
           {
-            props.project_personInCharge.position_id !== "7" || decodedToken.user_type === "organization" ?
+            1 < parseInt(props.project_personInCharge.order) < 8 || decodedToken.user_type === "organization" ?
               <Tooltip title="Add New Person In Charge" arrow>
                 <IconButton style={{ padding: 0 }} onClick={handleOpenAddModal} >
                   <AddIcon />
@@ -170,6 +189,7 @@ export default function ProjectPersonInCharge(props) {
             decodedToken={decodedToken}
             committee_name={committee_name}
             personInCharges={personInCharges}
+            groupDepartements={groupDepartements}
             open={openAddModal}
             handleSaveButton={props.handleSaveEditPersonInChargeButton}
             close={handleCloseAddModal}
