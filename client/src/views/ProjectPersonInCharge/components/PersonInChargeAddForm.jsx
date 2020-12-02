@@ -149,9 +149,10 @@ export default function PersonInChargeAddForm(props) {
   props.personInCharges.forEach((personInCharge) => {
     props.positions.forEach((position) => {
       if (position._id === personInCharge.position_id
-        && props.project_id === personInCharge.project_id
+        // && props.project_id === personInCharge.project_id
         && committee_id === personInCharge.committee_id
-        && parseInt(position.order) > 7
+        && parseInt(position.order) !== 8
+        && parseInt(position.order) !== 9
       ) {
         checkPersonInChargePositionId.push(position._id)
       } else {
@@ -173,22 +174,22 @@ export default function PersonInChargeAddForm(props) {
 
   //menuitem for staffs
   const menuItems = [];
-  props.groupDepartements.forEach((groupDepartement,index) => {
+  props.groupDepartements.forEach((groupDepartement) => {
     menuItems.push(
-      <ListSubheader key={index} disableSticky color="primary" style={{ padding: "0px 25px" }}> <DepartementName departement_id={groupDepartement.departement_id} /></ListSubheader>
+      <ListSubheader key={groupDepartement.departement_id} disableSticky color="primary" style={{ padding: "0px 25px" }}> <DepartementName departement_id={groupDepartement.departement_id} /></ListSubheader>
     )
     menuItems.push(
-      <Divider key={index} />
+      <Divider key={groupDepartement.departement_id} />
     )
-    groupDepartement.staffs.sort((a, b) => a.staff_name.localeCompare(b.staff_name)).forEach((staff,index) => {
+    groupDepartement.staffs.sort((a, b) => a.staff_name.localeCompare(b.staff_name)).forEach((staff) => {
       if (checkPersonInChargeStaffId.indexOf(staff._id) > -1) {
         menuItems.push(
-          <MenuItem key={index} disabled={true} style={{ padding: "5px 15px" }} >
+          <MenuItem key={staff._id} disabled={true} style={{ padding: "5px 15px" }} >
             <StaffName staff={staff} />
           </MenuItem>)
       } else {
         menuItems.push(
-          < MenuItem key={index} value={staff._id || ''} style={{ padding: "5px 15px" }} >
+          < MenuItem key={staff._id} value={staff._id || ''} style={{ padding: "5px 15px" }} >
             <StaffName staff={staff} />
           </MenuItem>
         )
@@ -248,7 +249,7 @@ export default function PersonInChargeAddForm(props) {
                       || props.project_personInCharge.order === '3'
                     )
                       return (
-                        <MenuItem key={committee.committee_name}
+                        <MenuItem key={committee._id}
                           value={committee._id}
                         >
                           {committee.committee_name}
@@ -291,7 +292,7 @@ export default function PersonInChargeAddForm(props) {
                               if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
-                              else return <MenuItem key={position.position_name} disabled={true}>
+                              else return <MenuItem key={position._id} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
@@ -299,7 +300,7 @@ export default function PersonInChargeAddForm(props) {
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else
-                                return <MenuItem key={position.position_name} value={position}>
+                                return <MenuItem key={position._id} value={position}>
                                   {position.position_name}
                                 </MenuItem>
                           else return null;
@@ -311,7 +312,7 @@ export default function PersonInChargeAddForm(props) {
                               if (parseInt(props.project_personInCharge.order) >= parseInt(position.order)
                                 && props.decodedToken.user_type !== "organization")
                                 return null
-                              else return <MenuItem key={position.position_name} disabled={true}>
+                              else return <MenuItem key={position._id} disabled={true}>
                                 {position.position_name}
                               </MenuItem>
                             else
@@ -319,7 +320,7 @@ export default function PersonInChargeAddForm(props) {
                                 && props.decodedToken.user_type !== "organization")
                                 return null
                               else
-                                return <MenuItem key={position.position_name} value={position}>
+                                return <MenuItem key={position._id} value={position}>
                                   {position.position_name}
                                 </MenuItem>
                           else return null;

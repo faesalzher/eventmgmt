@@ -22,6 +22,7 @@ import { useAuth } from "context/auth.jsx";
 
 import { SECRET_KEY } from '../../secret_key.js'
 import { CHECK_STAFF } from 'gql';
+const bcrypt = require('bcryptjs');
 
 // const { SECRET_KEY } = require('../../secret_key');
 const jwt = require('jsonwebtoken');
@@ -159,7 +160,7 @@ const LogIn = props => {
     touched: {},
     errors: {}
   });
-  
+
   useEffect(() => {
     const errors = validate(formState.values, schema);
 
@@ -264,8 +265,12 @@ const LogIn = props => {
     setOpenErrorMsg(false);
   };
 
+
   const handleLogIn = (event) => {
-    // refetch();
+    let isPasswordCorrect = false;
+    bcrypt.compare(formState.values.password, staff[0].password, function (err, result) {
+      isPasswordCorrect = result;
+    });
     event.preventDefault();
     setLoading(true);
 
@@ -279,7 +284,8 @@ const LogIn = props => {
           } || {}
         }));
         handleError();
-      } else if (staff[0].password !== formState.values.password) {
+      }
+      else if (!isPasswordCorrect) {
         setFormState(formState => ({
           ...formState,
           errors: {

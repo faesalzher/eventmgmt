@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { ListItemSecondaryAction, Avatar, ListItemAvatar, CircularProgress } from '@material-ui/core';
+import { ListItemSecondaryAction, Avatar, ListItemAvatar } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import CheckIcon from '@material-ui/icons/Check';
 
-import { ConfirmationDialog } from 'components';
+import { ConfirmationDialog, AdminChip } from 'components';
 
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import uuid from 'uuid/v1';
@@ -45,8 +45,12 @@ export default function Assignee(props) {
     created_at: new Date().toString(),
   };
 
-  const [staff, setStaff] = useState([]);
-  const [position, setPosition] = useState([]);
+  const initialStaffState = {
+    staff_name: "",
+    picture: "",
+  }
+  const [staff, setStaff] = useState(initialStaffState);
+  const [position, setPosition] = useState({ position_name: "" });
   const [addTaskAssignedToForm] = React.useState(initialFormState)
   const [selected, setSelected] = useState(false);
   const [addTaskAssignedTo] = useMutation(ADD_TASK_ASSIGNED_TO);
@@ -62,23 +66,27 @@ export default function Assignee(props) {
   }
   );
 
-  const { data: staffData, loading: staffLoading } = useQuery(STAFF_QUERY,
+  const { data: staffData, refetch: staffRefetch } = useQuery(STAFF_QUERY,
     {
       variables: { staff_id: props.personInCharge.staff_id },
-      onCompleted: () => { setStaff(staffData.staff) }
+      onCompleted: () => {
+        if (staffData && staffData.staff !== null) {
+          setStaff(staffData.staff);
+        } else {
+          setStaff({ staff_name: "[ Staff Data Not Found ]", picture: "" })
+        }
+      }
     });
 
 
 
-  const { data: positionData, loading: positionLoading } = useQuery(POSITION_QUERY, {
+  const { data: positionData, refetch: positionRefetch } = useQuery(POSITION_QUERY, {
     variables: { _id: props.personInCharge.position_id },
     onCompleted: () => {
-      if (positionData !== undefined && positionData.position !== null) {
-        setPosition(
-          positionData.position
-        )
+      if (positionData && positionData.position !== null) {
+        setPosition(positionData.position);
       } else {
-        setPosition({ position_name: "" })
+        setPosition({ position_name: "[ Position Name Not Found ]" })
       }
     }
   }
@@ -121,11 +129,21 @@ export default function Assignee(props) {
   }
 
 
-  if (staffLoading || positionLoading || props.personInChargesLoading) {
-    return <div style={{ textAlign: 'center' }}>
-      <CircularProgress />
-    </div>
-  }
+  // if (staffLoading || positionLoading || props.personInChargesLoading) {
+  //   return <div style={{ textAlign: 'center' }}>
+  //     <CircularProgress />
+  //   </div>
+  // }
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    staffRefetch();
+    positionRefetch();
+  };
+
+  if (!positionData || !staffData) return <></>
 
   return (
     <div>
@@ -148,13 +166,14 @@ export default function Assignee(props) {
           primary={staff.staff_name}
           secondary={position.position_name}
         />
-        {
-          assignedPersonInChargeId || selected ?
-            <ListItemSecondaryAction>
+        <ListItemSecondaryAction style={{display:'flex'}}>
+          {staff.is_admin ? <AdminChip /> : ''}
+          {
+            assignedPersonInChargeId || selected ?
               <CheckIcon />
-            </ListItemSecondaryAction>
-            : <div></div>
-        }
+              : <div></div>
+          }
+        </ListItemSecondaryAction>
       </ListItem>
     </div>
   );

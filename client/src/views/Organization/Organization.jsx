@@ -287,6 +287,7 @@ export default function Organization() {
               handleSaveEditButton={handleSaveEditDepartementButton}
               handleSaveButton={handleSaveDepartementButton}
               handleDeleteDepartement={handleDeleteDepartement}
+              staffs={staffs}
             />
           </TabPanel>
           <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={2}>

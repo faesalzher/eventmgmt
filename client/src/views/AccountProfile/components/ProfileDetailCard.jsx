@@ -63,6 +63,7 @@ const ProfileDetailCard = props => {
           :
           <Profile
             profile={props.profile}
+            decodedToken={decodedToken}
             organization={props.organization}
             handleOpenEditPage={handleOpenEditPage}
             // departement={departement}

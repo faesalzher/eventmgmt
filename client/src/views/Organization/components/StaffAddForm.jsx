@@ -20,7 +20,9 @@ import {
   ADD_STAFF,
   CHECK_STAFF
 } from 'gql';
-
+import { EditAvatarForm } from "components";
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -62,8 +64,8 @@ export default function StaffAddForm(props) {
     email: "",
     phone_number: "",
     password: "1234",
-    picture: "",
-    is_admin: true,
+    picture: " ",
+    is_admin: false,
     departement_position_id: "",
     departement_id: "",
     organization_id: props.organization_id,
@@ -103,24 +105,34 @@ export default function StaffAddForm(props) {
     refetchStaff();
   };
 
+  const uploadImage = (e) => {
+    setStaffForm({
+      ...staffForm.values,
+      picture: e,
+    });
+  };
+
   const handleSaveButton = () => {
     props.handleSaveButton(staffForm.values)
     props.close();
-    addStaff({
-      variables:
-      {
-        _id: staffForm.values._id,
-        staff_name: staffForm.values.staff_name,
-        departement_position_id: staffForm.values.departement_position_id,
-        email: staffForm.values.email,
-        phone_number: staffForm.values.phone_number,
-        password: staffForm.values.password,
-        picture: staffForm.values.picture,
-        is_admin: staffForm.values.is_admin,
-        departement_id: staffForm.values.departement_id,
-        organization_id: staffForm.values.organization_id,
-      }
+    bcrypt.hash(staffForm.values.password, saltRounds, function (err, hash) {
+      addStaff({
+        variables:
+        {
+          _id: staffForm.values._id,
+          staff_name: staffForm.values.staff_name,
+          departement_position_id: staffForm.values.departement_position_id,
+          email: staffForm.values.email,
+          phone_number: staffForm.values.phone_number,
+          password: hash.values.password,
+          picture: staffForm.values.picture,
+          is_admin: staffForm.values.is_admin,
+          departement_id: staffForm.values.departement_id,
+          organization_id: staffForm.values.organization_id,
+        }
+      });
     });
+
     setStaffForm(defaultState);
   }
   useEffect(() => {
@@ -174,19 +186,31 @@ export default function StaffAddForm(props) {
   const hasError = field =>
     staffForm.touched[field] && staffForm.errors[field] ? true : false;
 
+  const isDepartementNull = props.departements.length === 0 ? true : false;
+  const isDepartementPositionsNull = props.departementPositions.length === 0 ? true : false;
+
+  console.log(staffForm.values)
   return (
     <Dialog
       fullScreen={fullScreen}
       onClose={props.close}
       aria-labelledby="customized-dialog-title"
       open={props.open}
-      fullWidth={true}
-      maxWidth={'xs'}
+      maxWidth={false}
     >
       <DialogTitle title="Add New Staff" onClose={props.close} />
-      <DialogContent dividers >
-        <form noValidate >
-          <div >
+      <DialogContent style={fullScreen ? {} : { width: 700 }}>
+        <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }}>
+          <FormControl style={fullScreen ?
+            { width: '100%', padding: 17 } :
+            { width: '50%', padding: 17, display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+            <EditAvatarForm
+              uploadImage={uploadImage}
+              picture={staffForm.values.picture}
+              size={200}
+            />
+          </FormControl>
+          <div className={classes.form} style={fullScreen ? {} : { width: "50%" }} >
             <FormControl className={classes.formControl}>
               <TextField
 
@@ -200,38 +224,25 @@ export default function StaffAddForm(props) {
               />
             </FormControl>
             <FormControl className={classes.formControl}>
-              {
-                props.departement_id === "all" ?
-                  <TextField
-                    name="departement_id"
-                    select
-                    size="small"
-                    margin="dense"
-                    label="Departement"
-                    value={staffForm.values.departement_id}
-                    onChange={handleChange}
-                    // helperText="Please select your currency"
-                    variant="outlined"
-                  >
-                    {/* <MenuItem aria-label="None" value="" /> */}
-                    {props.departements.map((departement) => (
-                      <MenuItem key={departement.departement_name} value={departement._id}>
-                        {departement.departement_name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  :
-                  <TextField
-                    margin="dense"
-                    // id="departement"
-                    label="Departement Name"
-                    type="text"
-                    variant="outlined"
-                    disabled
-                    value={props.departement_name[0].departement_name}
-                  // onChange={handleInputChange}
-                  />
-              }
+
+              <TextField
+                name="departement_id"
+                select
+                size="small"
+                margin="dense"
+                label="Departement"
+                disabled={isDepartementNull}
+                value={staffForm.values.departement_id}
+                onChange={handleChange}
+                helperText={isDepartementNull ? "there is no departements yet, please add one" : ""}
+                variant="outlined"
+              >
+                {props.departements.map((departement) => (
+                  <MenuItem key={departement.departement_name} value={departement._id}>
+                    {departement.departement_name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
@@ -240,7 +251,9 @@ export default function StaffAddForm(props) {
                 label="Position Name"
                 select
                 variant="outlined"
+                disabled={isDepartementPositionsNull}
                 value={staffForm.values.departement_position_id}
+                helperText={isDepartementPositionsNull ? "there is no positions yet, please add one" : ""}
                 onChange={handleChange}
               >
                 {props.departementPositions.map((departementPosition) => (
@@ -280,6 +293,26 @@ export default function StaffAddForm(props) {
                 value={staffForm.values.phone_number}
                 onChange={handleInputChange}
               />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField
+                name="is_admin"
+                select
+                size="small"
+                margin="dense"
+                label="Admin"
+                value={staffForm.values.is_admin}
+                onChange={handleChange}
+                helperText={"Choose wheter this staff is going to be an admin or not"}
+                variant="outlined"
+              >
+                <MenuItem key={0} value={false}>
+                  No
+                  </MenuItem>
+                <MenuItem key={1} value={true}>
+                  Yes
+                  </MenuItem>
+              </TextField>
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField

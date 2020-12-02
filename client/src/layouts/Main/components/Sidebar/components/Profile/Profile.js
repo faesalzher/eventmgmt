@@ -8,7 +8,7 @@ import jwtDecode from "jwt-decode";
 import PersonIcon from "@material-ui/icons/Person";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 
-// import { ORGANIZATION_QUERY } from 'gql';
+import { AdminChip } from "components";
 
 import {
   STAFF_QUERY,
@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     textAlign: "center",
     justifyContent: "center",
+    fontWeight:500
   },
 }));
 
@@ -132,7 +133,7 @@ export default function Profile(props) {
       </div>
       <div>
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Typography variant="h6" className={classes.name}>
+          <Typography variant="subtitle1" className={classes.name}>
             {
               // decodedToken.user_type === "organization"
               // ? profileOrganization.organization_name
@@ -145,7 +146,12 @@ export default function Profile(props) {
           {decodedToken.user_type === "staff" ? (
             <PersonIcon style={{ padding: 0, fontSize: 18 }} />
           ) : (
-            <SupervisorAccountIcon style={{ padding: 0, fontSize: 18 }} />
+            <div>
+              <SupervisorAccountIcon style={{ padding: 0, fontSize: 18 }} />
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <AdminChip />
+              </div>
+            </div>
           )}
           <Typography variant="body2" className={classes.name}>
             {

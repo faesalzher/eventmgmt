@@ -24,6 +24,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 import uuid from 'uuid/v1';
 import { CHECK_STAFF, ADD_ORGANIZATION, ADD_COMMITTEE, ADD_STAFF, ADD_POSITION } from 'gql';
 
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
 
 const committeeName = [
   { committee_name: 'Panitia Inti', core: true },
@@ -37,6 +39,7 @@ const committeeName = [
 ]
 
 const positionName = [
+  { position_name: 'Penanggung Jawab', core: true, order: '0' },
   { position_name: 'Head Of Project', core: true, order: '1' },
   { position_name: 'Vice Head of Project', core: true, order: '2' },
   { position_name: 'Secretary', core: true, order: '3' },
@@ -65,7 +68,7 @@ const schema = {
     presence: { allowEmpty: false, message: 'is required' },
     length: {
       maximum: 128,
-      minimum: 4
+      minimum: 8
     }
   },
   confirm_password: {
@@ -168,7 +171,7 @@ const Register = props => {
   const { history } = props;
 
   const initialFormState = {
-    _id: uuid(), email: "", description: "", picture: ""
+    _id: uuid(), email: "", description: "", picture: "",
   }
   const classes = useStyles();
   const [loading, setLoading] = useState(false)
@@ -262,23 +265,28 @@ const Register = props => {
           variables: {
             _id: form.values._id,
             organization_name: form.values.organization_name,
+            email: "",
+            phone_number: "",
+            address: "",
             description: "",
             picture: "",
           },
         });
-        addStaff({
-          variables: {
-            _id: uuid(),
-            staff_name: "Super Admin",
-            email: form.values.email,
-            phone_number: "",
-            is_admin: true,
-            password: form.values.password,
-            picture: "",
-            position_name: "",
-            departement_id: "",
-            organization_id: form.values._id,
-          },
+        bcrypt.hash(form.values.password, saltRounds, function (err, hash) {
+          addStaff({
+            variables: {
+              _id: uuid(),
+              staff_name: "Super Admin",
+              email: form.values.email,
+              phone_number: "",
+              is_admin: true,
+              password: hash,
+              picture: "",
+              position_name: "",
+              departement_id: "",
+              organization_id: form.values._id,
+            },
+          });
         });
         committeeName.forEach((committee) => {
           addCommittee({

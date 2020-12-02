@@ -87,10 +87,10 @@ const PersonInCharges = (props) => {
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography style={{ color: 'black' }} variant='subtitle2'>
+        <Typography style={{}} variant='subtitle2'>
           List of Person In Charge
         </Typography>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', padding: '5px 0px' }}>
           <TextField
             id="select-committee-native"
             select
@@ -123,6 +123,7 @@ const PersonInCharges = (props) => {
               <StyledTableCell >Phone Number</StyledTableCell>
               <StyledTableCell >Email</StyledTableCell>
               <StyledTableCell align="left">Position</StyledTableCell>
+              <StyledTableCell >{""}</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
                   1 < parseInt(props.project_personInCharge.order) < 7 ?
@@ -150,6 +151,7 @@ const PersonInCharges = (props) => {
                         positions={props.positions}
                         committees={props.committees}
                         project_id={props.project_id}
+                        groupDepartements={props.groupDepartements}
                         project_personInCharge={props.project_personInCharge}
                         personInCharge={personInCharge}
                         staffs={props.staffs}
@@ -193,6 +195,10 @@ const Option = props => {
     return (<></>)
   }
 
+  if (committeeData.committee === null) {
+    return (<>Committee Data Not Found</>)
+  }
+
   return (
     <option key={committeeData.committee._id} value={committeeData.committee._id}>
       {committeeData.committee.committee_name}
@@ -208,6 +214,10 @@ const CommitteeName = props => {
 
   if (!committeeData) {
     return (<></>)
+  }
+
+  if (committeeData.committee === null) {
+    return (<>[ Departement Data Not Found ]</>)
   }
 
   return (

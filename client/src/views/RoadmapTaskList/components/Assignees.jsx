@@ -8,14 +8,14 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import { useQuery } from '@apollo/react-hooks';
 
 // import { Assignees } from '.';
-import { PERSON_IN_CHARGES_BY_COMMITTEE_QUERY, COMMITTEE_QUERY } from 'gql';
+import { PERSON_IN_CHARGES_BY_COMMITTEE_AND_PROJECT_QUERY, COMMITTEE_QUERY } from 'gql';
 import { Assignee } from '.';
 
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
-    maxWidth: 360,
+    // width: '100%',
+    width: 360,
     backgroundColor: theme.palette.background.paper,
   },
   title: {
@@ -31,29 +31,49 @@ export default function Assignees(props) {
   const classes = useStyles();
   const [personInCharges, setPersonInCharges] = useState([]);
 
-  const { data: personInChargesData, loading: personInChargesLoading, refetch: personInChargesRefetch } = useQuery(PERSON_IN_CHARGES_BY_COMMITTEE_QUERY, {
-    variables: { committee_id: props.roadmap.committee_id },
-    onCompleted: () => {
-      if (personInChargesData)
-        setPersonInCharges(
-          personInChargesData.person_in_charges
-        )
+  const { data: personInChargesData, loading: personInChargesLoading, refetch: personInChargesRefetch, error: personInChargesError } =
+    useQuery(PERSON_IN_CHARGES_BY_COMMITTEE_AND_PROJECT_QUERY, {
+      variables: { committee_id: props.roadmap.committee_id, project_id: props.roadmap.project_id },
+      onCompleted: () => {
+
+      }
     }
-  }
-  );
+    );
+
+  useEffect(() => {
+    const onCompleted = (data) => {
+      if (personInChargesData && personInChargesData.person_in_charges_by_committee_and_project !== null)
+        setPersonInCharges(
+          personInChargesData.person_in_charges_by_committee_and_project
+        )
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !personInChargesLoading && !personInChargesError) {
+        onCompleted(personInChargesData);
+      } else if (onError && !personInChargesLoading && personInChargesError) {
+        onError(personInChargesError);
+      }
+    }
+  }, [personInChargesLoading, personInChargesData, personInChargesError]);
 
   useEffect(() => {
     refresh();
   });
 
+
   const refresh = () => {
     personInChargesRefetch();
   };
 
-  const sortedPersonInCharges = personInCharges.sort((a, b) => parseInt(a.position_id) - parseInt(b.position_id));
+
   if (!personInChargesData) {
     return (<></>)
   }
+
+
+  const sortedPersonInCharges = personInCharges.sort((a, b) => parseInt(a.order) - parseInt(b.order));
+
 
   return (
     <div>
@@ -94,7 +114,7 @@ export default function Assignees(props) {
                   return (
                     <List component="nav" className={classes.root} key={index}>
                       <Assignee
-                      personInChargesLoading={personInChargesLoading}
+                        personInChargesLoading={personInChargesLoading}
                         project_id={props.project_id}
                         event_id={props.event_id}
                         roadmap_id={props.roadmap_id}
@@ -126,6 +146,7 @@ const CommitteeName = (props) => {
     return (<></>)
   }
 
+  if (committeeData.committee == null) return <div>[ Committee Data Not Found ] </div>
   return (
     <div>
       {committeeData.committee.committee_name}

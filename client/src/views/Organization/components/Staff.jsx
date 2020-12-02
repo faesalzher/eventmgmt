@@ -19,11 +19,12 @@ import {
   StaffEditForm
 } from '.';
 
+import { AdminChip } from 'components';
 import { useQuery } from '@apollo/react-hooks';
-import { 
+import {
   DEPARTEMENT_QUERY,
   DEPARTEMENT_POSITION_QUERY,
- } from 'gql';
+} from 'gql';
 const StyledTableCell = withStyles(theme => ({
   head: {
     backgroundColor: theme.palette.common.black,
@@ -117,6 +118,9 @@ export default function Staffs(props) {
       <StyledTableCell scope="row">
         <DepartementPositionName departement_position_id={props.staff.departement_position_id} />
       </StyledTableCell>
+      <StyledTableCell align="left">
+        {props.staff.is_admin ? <AdminChip /> : ""}
+      </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         {props.decodedToken.user_type === "organization" ?
           <Tooltip arrow title="Edit" aria-label="confirm">
@@ -136,6 +140,7 @@ export default function Staffs(props) {
           handleDeleteStaff={props.handleDeleteStaff}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}
+          decodedToken={props.decodedToken}
         />
       </StyledTableCell>
     </StyledTableRow>

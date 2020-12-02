@@ -45,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const positionName = [
+  { position_name: 'Penanggung Jawab', core: true, order: '0' },
   { position_name: 'Head Of Project', core: true, order: '1' },
   { position_name: 'Vice Head of Project', core: true, order: '2' },
   { position_name: 'Secretary', core: true, order: '3' },

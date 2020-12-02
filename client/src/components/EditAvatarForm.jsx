@@ -131,7 +131,7 @@ export default function EditAvatarForm(props) {
           <span
             className={classes.imageSrc}
             style={
-              props.picture === ' ' ?
+              props.picture === " " ?
                 {
                   backgroundColor: '#e0e0e0',
                 } :

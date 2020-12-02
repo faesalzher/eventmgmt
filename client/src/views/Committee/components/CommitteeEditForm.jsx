@@ -79,10 +79,10 @@ export default function CommitteeEditForm(props) {
   }
 
   const handleDelete = () => {
+    deleteCommittee({ variables: { _id: props.committee._id} });
     props.handleDeleteCommittee(props.committee._id, props.index);
     // setCommitteeForm(intitialFormState);
     props.close();
-    deleteCommittee({ variables: { _id: props.committee._id, } });
   }
 
   const handleClose = () => {

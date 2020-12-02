@@ -25,7 +25,6 @@ import validate from 'validate.js';
 
 import {
   EDIT_STAFF,
-  EDIT_ORGANIZATION,
   DEPARTEMENTS_QUERY,
   DEPARTEMENT_POSITIONS_QUERY,
   DEPARTEMENT_QUERY,
@@ -101,7 +100,6 @@ const ProfileEditForm = props => {
   const [openEditModal, setOpenEditModal] = useState(false);
   // const [profileForm, setProfileForm] = useState(profileForm);
   const [editStaff] = useMutation(EDIT_STAFF);
-  const [editOrganization] = useMutation(EDIT_ORGANIZATION);
 
   const [departement, setDepartement] = useState([]);
   const [departementPosition, setDepartementPosition] = useState([]);
@@ -109,6 +107,7 @@ const ProfileEditForm = props => {
   useEffect(() => {
     setProfile(props.profile)
   }, [setProfile, props.profile]);
+
   const defaultState = {
     isValid: false,
     values: profile,
@@ -118,10 +117,6 @@ const ProfileEditForm = props => {
 
   const [profileForm, setProfileForm] = useState(defaultState);
 
-  const [organizationForm, setOrganizationForm] = useState(props.organization);
-  useEffect(() => {
-    setOrganizationForm(props.organization)
-  }, [setOrganizationForm, props.organization]);
 
   const { data: departementData, refetch: departementRefetch } = useQuery(DEPARTEMENT_QUERY, {
     variables: { departement_id: profileForm.values.departement_id },
@@ -238,18 +233,10 @@ const ProfileEditForm = props => {
     }));
   };
 
-  const handleChangeOrganization = event => {
-    setOrganizationForm({
-      ...organizationForm,
-      [event.target.name]: event.target.value
-    });
-  }
-
 
   const handleCancel = () => {
     props.handleCloseEditPage();
     setProfileForm(props.profile)
-    setOrganizationForm(props.organization)
   }
 
 
@@ -257,35 +244,21 @@ const ProfileEditForm = props => {
   const uploadImage = (e) => {
     setProfileForm(profileForm => ({
       ...profileForm, values: {
-        ...profileForm.values,  picture: e
+        ...profileForm.values, picture: e
       },
     }));
- 
-    if (props.decodedToken.user_type === "organization") {
-      setOrganizationForm({
-        ...organizationForm,
-        picture: e,
-      });
-    }
   };
 
   const removeImage = (e) => {
     setProfileForm(profileForm => ({
       ...profileForm, values: {
-        ...profileForm.values,  picture: ' '
+        ...profileForm.values, picture: ' '
       },
     }));
- 
-    if (props.decodedToken.user_type === "organization") {
-      setOrganizationForm({
-        ...organizationForm,
-        picture: ' ',
-      });
-    }
   };
 
   const handleSaveEditButton = () => {
-    props.handleSaveEditButton(profileForm.values, organizationForm);
+    props.handleSaveEditButton(profileForm.values);
     // setOrganizationForm(intitialFormState);
     props.handleCloseEditPage();
     editStaff({
@@ -304,20 +277,16 @@ const ProfileEditForm = props => {
         organization_id: profileForm.values.organization_id,
       }
     });
-    if (props.decodedToken.user_type === "organization") {
-      editOrganization({
-        variables:
-        {
-          _id: organizationForm._id,
-          organization_name: organizationForm.organization_name,
-          description: organizationForm.description,
-          picture: organizationForm.picture,
-        }
-      });
-    }
   }
 
-  console.log(profileForm)
+  const handleSaveEditPasswordButton = e => {
+    setProfileForm(profileForm => ({
+      ...profileForm, values: {
+        ...profileForm.values, password: e
+      },
+    }));
+  }
+
   const hasError = field =>
     profileForm.touched[field] && profileForm.errors[field] ? true : false;
 
@@ -337,13 +306,6 @@ const ProfileEditForm = props => {
                 :
                 ""
               }
-            </Typography>
-            <Typography
-              className={[classes.organization, classes.subheader, classes.centerHeader].join(" ")}
-              color="textSecondary"
-              variant="body1"
-            >
-              {organizationForm.organization_name}
             </Typography>
           </div>
         }
@@ -376,59 +338,6 @@ const ProfileEditForm = props => {
           container
           spacing={0}
         >
-          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
-            <Typography variant="subtitle2">Organization Name</Typography>
-          </Grid>
-          <Grid item md={9} sm={9} xs={12}          >
-            {
-              props.decodedToken.user_type === "organization" ?
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  name="organization_name"
-                  onChange={handleChangeOrganization}
-                  value={organizationForm.organization_name}
-                  variant="outlined"
-                />
-                :
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  name="organization_id"
-                  onChange={handleChangeOrganization}
-                  disabled
-                  value={organizationForm.organization_name}
-                  variant="outlined"
-                />
-            }
-          </Grid>
-
-          <Grid item md={3} sm={3} xs={12} className={classes.center}          >
-            <Typography variant="subtitle2">Organization Description</Typography>
-          </Grid>
-          <Grid item md={9} sm={9} xs={12}          >
-            {
-              props.decodedToken.user_type === "organization" ?
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  name="description"
-                  onChange={handleChangeOrganization}
-                  value={organizationForm.description}
-                  variant="outlined"
-                />
-                :
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  name="description"
-                  disabled
-                  onChange={handleChangeOrganization}
-                  value={organizationForm.description}
-                  variant="outlined"
-                />
-            }
-          </Grid>
           <Grid item md={3} sm={3} xs={12} className={classes.center}          >
             <Typography variant="subtitle2">Name</Typography>
           </Grid>
@@ -492,7 +401,7 @@ const ProfileEditForm = props => {
               margin="dense"
               fullWidth
               name="departement_position_id"
-              label="Position Name"
+              label="Position"
               select
               disabled={props.decodedToken.user_type === "organization" ? false : true}
               variant="outlined"
@@ -536,7 +445,8 @@ const ProfileEditForm = props => {
       <Divider />
       <CardActions style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: 'white' }}>
         <Button
-          color="primary"
+          color="secondary"
+          variant="outlined"
           onClick={handleOpenEditModal}
         >
           Change Password
@@ -554,17 +464,21 @@ const ProfileEditForm = props => {
                 color="secondary"
                 variant="contained"
                 disabled={
-                  ((
-                    organizationForm.organization_name === ""||
-                    // organizationForm.organization_name === ""||
-                    profileForm.values.staff_name === "" ||
-                    profileForm.values.departement_id === "" ||
-                    profileForm.values.departement_position_id === "" ||
-                    profileForm.values.email === "" ||
-                    profileForm.values.phone_number === "" ) ||
-                    !profileForm.isValid ?
-                    true : false
-                  )
+                  props.decodedToken.user_type === "staff" ?
+                    (profileForm.values.staff_name === "" ||
+                      profileForm.values.email === "" ||
+                      profileForm.values.phone_number === "") ||
+                      !profileForm.isValid ? true : false
+                    :
+                    ((
+                      profileForm.values.staff_name === "" ||
+                      profileForm.values.departement_id === "" ||
+                      profileForm.values.departement_position_id === "" ||
+                      profileForm.values.email === "" ||
+                      profileForm.values.phone_number === "") ||
+                      !profileForm.isValid ?
+                      true : false
+                    )
                 }
                 onClick={() => handleSaveEditButton()}
               >
@@ -573,9 +487,11 @@ const ProfileEditForm = props => {
             </div>
           }
           <PasswordChangeForm
-          open={openEditModal}
-          close={handleCloseEditModal}
-        />
+            open={openEditModal}
+            profile={profile}
+            handleSaveEditPasswordButton={handleSaveEditPasswordButton}
+            close={handleCloseEditModal}
+          />
         </div>
       </CardActions>
     </form >

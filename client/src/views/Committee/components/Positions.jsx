@@ -161,6 +161,8 @@ export default function Positions(props) {
     setPage(0);
   };
 
+  const sortedPositions = positions.sort((a, b) => parseInt(a.order) - parseInt(b.order));
+  console.log(sortedPositions)
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
@@ -202,29 +204,40 @@ export default function Positions(props) {
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : positions
-              ).map((position, index) => {
-                return <Position
-                  key={index}
-                  position={position}
-                  coreCommittee={props.coreCommittee}
-                  project_personInCharge={props.project_personInCharge}
-                  decodedToken={props.decodedToken}
-                  handleDeletePosition={props.handleDeletePosition}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
+          {sortedPositions.length === 0 ?
+            <TableBody>
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={1} />
+                <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no positions in committees yet
+                    </Typography>
+                </TableCell>
               </TableRow>
-            )}
-          </TableBody>
+            </TableBody>
+            :
+            <TableBody>
+              {
+                (rowsPerPage > 0
+                  ? sortedPositions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : sortedPositions
+                ).map((position, index) => {
+                  return <Position
+                    key={index}
+                    position={position}
+                    coreCommittee={props.coreCommittee}
+                    project_personInCharge={props.project_personInCharge}
+                    decodedToken={props.decodedToken}
+                    handleDeletePosition={props.handleDeletePosition}
+                    handleSaveEditButton={props.handleSaveEditButton}
+                  />
+                })
+              }
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={1} />
+                </TableRow>
+              )}
+            </TableBody>}
           {/* <TableFooter>
             <TableRow>
               <TablePagination

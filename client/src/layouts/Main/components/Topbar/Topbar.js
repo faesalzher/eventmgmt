@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     flexGrow: 1,
     display: "flex",
-    marginTop: theme.spacing(0.5),
+    marginTop: theme.spacing(1),
   },
   signOutButton: {
     marginLeft: theme.spacing(1),
@@ -112,7 +112,7 @@ const Topbar = (props) => {
   return (
     <div className={classes.root}>
       <div className={classes.root}>
-        <Typography variant="h6" style={xs ? { fontSize: 14 } : {}}>
+        <Typography variant="subtitle2" style={xs ? { fontSize: 14,color:'white' } : {color:'white',fontSize:18}}>
           Event Management
           {/* {decodedToken.user_type === "organization" ? " (Admin)" : ""} */}
         </Typography>

@@ -87,14 +87,6 @@ export default function ProjectPersonInCharge(props) {
   );
 
 
-  // useEffect(() => {
-  //   refresh();
-  // });
-
-  // const refresh = () => {
-  //   committeesRefetch();
-  // };
-
   useEffect(() => {
     refresh();
   });
@@ -196,7 +188,7 @@ export default function ProjectPersonInCharge(props) {
           />
         </div>
         <Paper style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} >
-          {staffsLoading || positionsLoading ?
+          {staffsLoading || positionsLoading|| props.personInChargesLoading ?
             <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
               <CircularProgress size={100} />
             </div>
@@ -206,6 +198,7 @@ export default function ProjectPersonInCharge(props) {
               committees={committees}
               committee_id={committee_id}
               groupCommittees={groupCommittees}
+              groupDepartements={groupDepartements}
               project_personInCharge={props.project_personInCharge}
               personInCharges={personInCharges}
               decodedToken={decodedToken}

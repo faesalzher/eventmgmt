@@ -77,7 +77,6 @@ export default function DetailOverview(props) {
       variables: { staff_id: headOfProjectId.staff_id },
     });
 
-    console.log(headOfProjectId)
   useEffect(() => {
     const onCompleted = (data) => {
       if (headOfProjectData && headOfProjectData.staff !== null) {

@@ -16,6 +16,9 @@ const OrganizationType = new GraphQLObjectType({
     organization_name: { type: GraphQLString },
     password: { type: GraphQLString },
     description: { type: GraphQLString },
+    email: { type: GraphQLString },
+    phone_number: { type: GraphQLString },
+    address: { type: GraphQLString },
     picture: { type: GraphQLString },
   }),
 });
@@ -246,14 +249,10 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(StaffType),
       args: {
         organization_id: { type: GraphQLString },
-        departement_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         if (args.organization_id) {
           return Staff.find({ organization_id: args.organization_id });
-        }
-        if (args.departement_id) {
-          return Staff.find({ departement_id: args.departement_id });
         }
       },
     },
@@ -396,6 +395,19 @@ const RootQuery = new GraphQLObjectType({
         });
       },
     },
+    person_in_charges_by_committee_and_project: {
+      type: new GraphQLList(Person_in_chargeType),
+      args: {
+        committee_id: { type: GraphQLString },
+        project_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        return Person_in_charge.find({
+          committee_id: args.committee_id,
+          project_id: args.project_id,
+        });
+      },
+    },
     person_in_charge: {
       type: Person_in_chargeType,
       args: { _id: { type: GraphQLString } },
@@ -491,14 +503,20 @@ const RootQuery = new GraphQLObjectType({
       type: new GraphQLList(Task_assigned_toType),
       args: {
         task_id: { type: GraphQLString },
-        person_in_charge_id: { type: GraphQLString },
+        staff_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
         event_id: { type: GraphQLString },
         roadmap_id: { type: GraphQLString },
+        person_in_charge_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         if (args.task_id) {
           return Task_assigned_to.find({ task_id: args.task_id });
+        }
+        if (args.staff_id) {
+          return Task_assigned_to.find({
+            staff_id: args.staff_id,
+          });
         }
         if (args.person_in_charge_id) {
           return Task_assigned_to.find({
@@ -528,6 +546,9 @@ const Mutation = new GraphQLObjectType({
         _id: { type: GraphQLID },
         organization_name: { type: GraphQLString },
         description: { type: GraphQLString },
+        email: { type: GraphQLString },
+        phone_number: { type: GraphQLString },
+        address: { type: GraphQLString },
         picture: { type: GraphQLString },
       },
       resolve(parent, args) {
@@ -549,8 +570,10 @@ const Mutation = new GraphQLObjectType({
           _id: args._id,
           organization_name: args.organization_name,
           description: args.description,
+          email: args.email,
+          phone_number: args.phone_number,
+          address: args.address,
           picture: args.picture,
-          password: args.password,
         });
         return organization.save();
       },
@@ -560,16 +583,20 @@ const Mutation = new GraphQLObjectType({
       args: {
         _id: { type: GraphQLString },
         organization_name: { type: GraphQLString },
-        password: { type: GraphQLString },
         description: { type: GraphQLString },
+        email: { type: GraphQLString },
+        phone_number: { type: GraphQLString },
+        address: { type: GraphQLString },
         picture: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {
           organization_name: args.organization_name,
-          password: args.password,
           description: args.description,
           picture: args.picture,
+          email: args.email,
+          phone_number: args.phone_number,
+          address: args.address,
         };
         let organization = Organization.findByIdAndUpdate(args._id, edit, {
           new: true,
@@ -1020,6 +1047,7 @@ const Mutation = new GraphQLObjectType({
           edit,
           { new: true }
         );
+
         return person_in_charge;
       },
     },
@@ -1331,6 +1359,21 @@ const Mutation = new GraphQLObjectType({
           created_at: args.created_at,
         });
         return task_assigned_to.save();
+      },
+    },
+    editTask_assigned_to: {
+      type: Task_assigned_toType,
+      args: {
+        person_in_charge_id: { type: GraphQLString },
+        staff_id: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let task_assigned_to = Task_assigned_to.updateMany(
+          { person_in_charge_id: args.person_in_charge_id },
+          { staff_id: args.staff_id },
+          { new: true }
+        );
+        return task_assigned_to;
       },
     },
     delete_task_assigned_to: {

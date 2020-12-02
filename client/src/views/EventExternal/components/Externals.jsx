@@ -151,8 +151,8 @@ export default function Externals(props) {
 
   return (
     <div>
-      <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography style={{ color: 'white' }} variant='subtitle2'>
+      <Toolbar style={{ minHeight: 36, backgroundColor: 'white', display: 'flex', justifyContent: 'space-between' }}>
+        <Typography style={{}} variant='subtitle2'>
           List of {props.type}
         </Typography>
         <Tooltip arrow title="Add New Externals" aria-label="confirm">
@@ -184,28 +184,41 @@ export default function Externals(props) {
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? externalsByType.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : externalsByType
-              ).map((external, index) => {
-                return <External
-                  key={index}
-                  project_id={props.project_id}
-                  type={props.type}
-                  external={external}
-                  handleDelete={props.handleDelete}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
+          {
+            externalsByType.length === 0 ?
+              <TableBody>
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                    <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                      there is no person in externals yet
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+              :
+              <TableBody>
+                {
+                  (rowsPerPage > 0
+                    ? externalsByType.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    : externalsByType
+                  ).map((external, index) => {
+                    return <External
+                      key={index}
+                      project_id={props.project_id}
+                      type={props.type}
+                      external={external}
+                      handleDelete={props.handleDelete}
+                      handleSaveEditButton={props.handleSaveEditButton}
+                    />
+                  })
+                }
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+          }
           <TableFooter>
             <TableRow>
               <TablePagination

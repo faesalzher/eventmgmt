@@ -7,4 +7,8 @@
 // export { default as TotalUsers } from './TotalUsers';
 export { default as TasksAssignedToMe } from './TasksAssignedToMe.jsx';
 export { default as TasksCreatedByMe } from './TasksCreatedByMe.jsx';
+export { default as MyTasksHeader } from './MyTasksHeader.jsx';
+export { default as MyTasksBreadCrumbs } from './MyTasksBreadCrumbs.jsx';
+
+
 

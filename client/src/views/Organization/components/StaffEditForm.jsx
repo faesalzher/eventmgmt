@@ -14,9 +14,13 @@ import {
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { useMutation, useQuery } from '@apollo/react-hooks';
+import { EditAvatarForm, ConfirmationDialog } from "components";
 
 import validate from 'validate.js';
 import { DELETE_STAFF, EDIT_STAFF, CHECK_STAFF } from 'gql';
+
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -76,11 +80,11 @@ export default function StaffEditForm(props) {
   };
 
   const [staffForm, setStaffForm] = useState(defaultState);
-
+  const [staff, setStaff] = useState([])
   const [deleteStaff] = useMutation(DELETE_STAFF);
   const [editStaff] = useMutation(EDIT_STAFF);
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
 
-  const [staff, setStaff] = useState([])
   const { data: dataStaff, loading: loadingStaff, error: errorStaff, refetch: refetchStaff } = useQuery(CHECK_STAFF,
     {
       variables: { email: staffForm.values.email, },
@@ -105,26 +109,15 @@ export default function StaffEditForm(props) {
     refetchStaff();
   };
 
-  const handleSaveEditButton = () => {
-    props.handleSaveEditButton(staffForm.values)
-    // setStaffForm(intitialFormState);
-    props.close();
-    editStaff({
-      variables:
-      {
-        _id: staffForm.values._id,
-        staff_name: staffForm.values.staff_name,
-        departement_position_id: staffForm.values.departement_position_id,
-        email: staffForm.values.email,
-        phone_number: staffForm.values.phone_number,
-        password: staffForm.values.password,
-        picture: staffForm.values.picture,
-        is_admin: staffForm.values.is_admin,
-        departement_id: staffForm.values.departement_id,
-        organization_id: staffForm.values.organization_id,
-      }
-    });
+  const handleConfirmationModal = () => {
+    setOpenConfirmationModal(true);
   }
+
+  const handleCloseConfirmationModal = () => {
+    setOpenConfirmationModal(false);
+  };
+
+
 
   useEffect(() => {
     const errors = validate(staffForm.values, schema);
@@ -159,6 +152,7 @@ export default function StaffEditForm(props) {
     deleteStaff({ variables: { _id: props.staff._id, } });
   }
 
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -172,13 +166,66 @@ export default function StaffEditForm(props) {
     }));
   };
 
+  const uploadImage = (e) => {
+    setStaffForm(staffForm => ({
+      ...staffForm, values: {
+        ...staffForm.values, picture: e
+      },
+    }));
+  };
+
+
+  const removeImage = (e) => {
+    setStaffForm(staffForm => ({
+      ...staffForm, values: {
+        ...staffForm.values, picture: " "
+      },
+    }));
+  };
+
   const handleCloseModal = e => {
     props.close();
     setStaffForm(defaultState)
   }
 
+  const handleReset = e => {
+    const password = '12345678'
+    bcrypt.hash(password, saltRounds, function (err, hash) {
+      setStaffForm(staffForm => ({
+        ...staffForm, values: {
+          ...staffForm.values, password: hash
+        },
+      }));
+    });
+  }
+
+  const handleSaveEditButton = () => {
+    props.handleSaveEditButton(staffForm.values)
+    // setStaffForm(intitialFormState);
+    props.close();
+    editStaff({
+      variables:
+      {
+        _id: staffForm.values._id,
+        staff_name: staffForm.values.staff_name,
+        departement_position_id: staffForm.values.departement_position_id,
+        email: staffForm.values.email,
+        phone_number: staffForm.values.phone_number,
+        password: staffForm.values.password,
+        picture: staffForm.values.picture,
+        is_admin: staffForm.values.is_admin,
+        departement_id: staffForm.values.departement_id,
+        organization_id: staffForm.values.organization_id,
+      }
+    });
+  }
+
   const hasError = field =>
     staffForm.touched[field] && staffForm.errors[field] ? true : false;
+
+  const isDepartementNull = props.departements.length === 0 ? true : false;
+  const isDepartementPositionsNull = props.departementPositions.length === 0 ? true : false;
+  const isMeIsAdmin = staffForm.values._id === props.decodedToken.staff_id ? true : false;
 
   return (
     <Dialog
@@ -186,13 +233,22 @@ export default function StaffEditForm(props) {
       onClose={props.close}
       aria-labelledby="customized-dialog-title"
       open={props.open}
-      fullWidth={true}
-      maxWidth={'xs'}
+      maxWidth={false}
     >
       <DialogTitle title="Edit Staff" onClose={props.close} />
-      <DialogContent dividers>
-        <form noValidate >
-          <div>
+      <DialogContent dividers style={fullScreen ? {} : { width: 700 }}>
+        <form noValidate style={fullScreen ? {} : { display: "flex", flexDirection: "row" }} >
+          <FormControl style={fullScreen ?
+            { width: '100%', padding: 17 } :
+            { width: '50%', padding: 17, display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+            <EditAvatarForm
+              uploadImage={uploadImage}
+              picture={staffForm.values.picture}
+              removeImage={removeImage}
+              size={200}
+            />
+          </FormControl>
+          <div className={classes.form} style={fullScreen ? {} : { width: "50%" }} >
             <FormControl className={classes.formControl}>
               <TextField
                 style={{ backgroundColor: 'white' }}
@@ -214,8 +270,10 @@ export default function StaffEditForm(props) {
                   margin="dense"
                   style={{ backgroundColor: 'white' }}
                   label="Departement"
+                  disabled={isDepartementNull}
                   value={staffForm.values.departement_id}
                   onChange={handleChange}
+                  helperText={isDepartementNull ? "there is no departements yet, please add one" : ""}
                   variant="outlined"
                 >
 
@@ -234,7 +292,9 @@ export default function StaffEditForm(props) {
                 label="Position Name"
                 select
                 variant="outlined"
+                disabled={isDepartementPositionsNull}
                 value={staffForm.values.departement_position_id}
+                helperText={isDepartementPositionsNull ? "there is no positions yet, please add one" : ""}
                 onChange={handleChange}
               >
                 {props.departementPositions.map((departementPosition) => (
@@ -277,6 +337,27 @@ export default function StaffEditForm(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
+                name="is_admin"
+                select
+                size="small"
+                margin="dense"
+                label="Admin"
+                disabled={isMeIsAdmin}
+                value={staffForm.values.is_admin}
+                onChange={handleChange}
+                helperText={isMeIsAdmin ? "" : "Choose wheter this staff is going to be an admin or not"}
+                variant="outlined"
+              >
+                <MenuItem key={0} value={false}>
+                  No
+                  </MenuItem>
+                <MenuItem key={1} value={true}>
+                  Yes
+                  </MenuItem>
+              </TextField>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              {/* <TextField
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
                 id="password"
@@ -287,8 +368,16 @@ export default function StaffEditForm(props) {
                 onChange={handleInputChange}
                 type="password"
                 autoComplete="current-password"
+              /> */}
+              < Button size="small" variant="outlined" color="secondary" onClick={handleConfirmationModal}>Reset Password</Button>
+              <ConfirmationDialog
+                content={"Password"}
+                type="reset"
+                name={"password of " + staffForm.values.staff_name}
+                open={openConfirmationModal}
+                handleConfirm={handleReset}
+                close={handleCloseConfirmationModal}
               />
-              < Button size="small" variant="outlined" color="secondary">Reset Password</Button>
             </FormControl>
           </div>
         </form>
@@ -311,8 +400,9 @@ export default function StaffEditForm(props) {
         submit={() => handleSaveEditButton()}
         delete={() => handleDelete()}
         close={() => handleCloseModal()}
+        deleteButton={!isMeIsAdmin}
       />
-    </Dialog>
+    </Dialog >
   );
 };
 

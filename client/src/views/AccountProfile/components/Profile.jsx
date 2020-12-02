@@ -18,7 +18,7 @@ import {
 } from 'gql';
 import { useQuery } from '@apollo/react-hooks';
 import EditIcon from '@material-ui/icons/Edit';
-
+import { AdminChip } from 'components';
 const useStyles = makeStyles((theme) => ({
   root: {},
   centerHeader: {
@@ -68,9 +68,18 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
   },
+  admin: {
+    display: 'block',
+    [theme.breakpoints.down('xs')]: {
+      display: 'flex',
+      justifyContent: 'center',
+    }
+  },
   [theme.breakpoints.down('xs')]: {
     header: {
-      display: 'block'
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
     },
     avatarHeader: {
       display: 'flex',
@@ -131,8 +140,6 @@ const Profile = props => {
     departementPositionRefetch();
   }
 
-  console.log(departementPosition.departement_position_name)
-
   // useEffect(() => {
   //   setDepartement(props.departement)
   // }, [props.departement, setDepartement]);
@@ -146,6 +153,9 @@ const Profile = props => {
         className={classes.header}
         subheader={
           <div>
+            <div className={classes.admin}>
+              {props.decodedToken.user_type === "organization" ? <AdminChip /> : <></>}
+            </div>
             <Typography variant="body2" className={[classes.subheader, classes.centerHeader].join(" ")} color="textSecondary" component="p">
               {profile.departement_position_id !== "" || profile.departement_id !== "" ?
                 departementPosition.departement_position_name + " " + departement.departement_name
@@ -153,13 +163,13 @@ const Profile = props => {
                 ""
               }
             </Typography>
-            <Typography
+            {/* <Typography
               className={[classes.organization, classes.subheader, classes.centerHeader].join(" ")}
               color="textSecondary"
               variant="body1"
             >
               {props.organization.organization_name}
-            </Typography>
+            </Typography> */}
           </div>
         }
         title={
@@ -207,7 +217,7 @@ const Profile = props => {
       </CardHeader>
       <CardContent style={{ backgroundColor: 'white' }}>
         <Divider />
-        <div className={classes.row}>
+        {/* <div className={classes.row}>
           <div
             className={[classes.center, classes.column].join(" ")}
             style={sm ? { paddingBottom: 0 } : {}}
@@ -244,7 +254,7 @@ const Profile = props => {
             </Typography>
           </div>
         </div>
-        <Divider />
+        <Divider /> */}
         <div className={classes.row}>
           <div
             className={[classes.center, classes.column].join(" ")}

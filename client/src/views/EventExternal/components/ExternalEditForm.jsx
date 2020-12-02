@@ -128,8 +128,8 @@ export default function ExternalEditForm(props) {
               { width: '100%', padding: 17 } :
               { width: '50%', padding: '0px 17px', display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
               <EditAvatarForm
-                uploadImage={uploadImage}
                 picture={externalForm.picture}
+                uploadImage={uploadImage}
                 removeImage={removeImage}
                 size={170}
               />

@@ -186,29 +186,42 @@ export default function Departements(props) {
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? departements.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : departements
-              ).map((departement, index) => {
-                return <Departement
-                  key={index}
-                  decodedToken={props.decodedToken}
-                  handleDeleteDepartement={props.handleDeleteDepartement}
-                  departement={departement}
-                  index={index}
-                  organization_id={props.organization_id}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
+          {
+            departements.length === 0 ?
+              <TableBody>
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                    <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                      there is no departements yet
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+              :
+              <TableBody>
+                {
+                  (rowsPerPage > 0
+                    ? departements.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    : departements
+                  ).map((departement, index) => {
+                    return <Departement
+                      key={index}
+                      decodedToken={props.decodedToken}
+                      staffs={props.staffs}
+                      handleDeleteDepartement={props.handleDeleteDepartement}
+                      departement={departement}
+                      index={index}
+                      organization_id={props.organization_id}
+                      handleSaveEditButton={props.handleSaveEditButton}
+                    />
+                  })
+                }
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>}
           <TableFooter>
             <TableRow>
               <TablePagination

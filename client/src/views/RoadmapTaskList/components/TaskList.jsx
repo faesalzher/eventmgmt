@@ -72,7 +72,7 @@ export default function TaskList(props) {
     due_date: "",
     completed_date: "",
     created_at: new Date().toString(),
-    created_by: (decodedToken.user_type === "organization") ? decodedToken.organization_id : decodedToken.staff_id,
+    created_by: decodedToken.staff_id,
     event_id: props.event_id,
     project_id: props.project_id,
   };
@@ -215,7 +215,12 @@ export default function TaskList(props) {
   const user_access = (props.roadmap.committee_id === props.project_personInCharge.committee_id) ?
     (
       props.project_personInCharge.order === '6' ||
-      props.project_personInCharge.order === '7') ?
+      props.project_personInCharge.order === '7' ||
+      decodedToken.user_type === "organization" ||
+      props.project_personInCharge.order === '1' ||
+      props.project_personInCharge.order === '2' ||
+      props.project_personInCharge.order === '3'
+    ) ?
       true
       :
       false
@@ -225,6 +230,8 @@ export default function TaskList(props) {
       props.project_personInCharge.order === '2' ||
       props.project_personInCharge.order === '3' ? true : false
 
+  console.log(props.roadmap.committee_id === props.project_personInCharge.committee_id)
+  console.log(user_access)
   return (
     <Card className={classes.root} elevation={0} >
       <div>

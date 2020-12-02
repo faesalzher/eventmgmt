@@ -3,12 +3,13 @@ import { makeStyles } from '@material-ui/styles';
 import {
   Avatar,
   Chip,
-  CircularProgress
+  CircularProgress,
+  Tooltip,
 } from "@material-ui/core";
 
-import { useQuery, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import { ConfirmationDialog } from 'components';
-import { STAFF_QUERY,PERSON_IN_CHARGE_QUERY } from 'gql';
+import { STAFF_QUERY } from 'gql';
 
 
 const useStyles = makeStyles(theme => ({
@@ -23,21 +24,30 @@ const useStyles = makeStyles(theme => ({
 
 export default function StatusBox(props) {
   const classes = useStyles();
-  const [staff, setStaff] = useState([]);
-  const [personInCharge, setPersonInCharge] = useState([]);
+
+  const initialStaffState = {
+    staff_name: "",
+    picture: "",
+  }
+  const [staff, setStaff] = useState(initialStaffState);
   const deleteButton = props.deleteButton === true ? true : false;
+  // const [taskAssignedTo, setTaskAssignedTo] useState([]);
 
-  const [staffFetch, { data: staffData, loading: staffLoading }] = useLazyQuery(STAFF_QUERY,
+  // React.useState(() => {
+  //   setTaskAssignedTo(props.)
+  // })
+
+
+  const { data: staffData, loading: staffLoading } = useQuery(STAFF_QUERY,
     {
-      variables: { staff_id: personInCharge.staff_id },
-      onCompleted: () => { setStaff(staffData.staff) }
-    });
-
-  const { data: personInChargeData } = useQuery(PERSON_IN_CHARGE_QUERY,
-    {
-      variables: { _id: props.taskAssignedTo.person_in_charge_id },
-      onCompleted: () => { setPersonInCharge(personInChargeData.person_in_charge); staffFetch(); }
-
+      variables: { staff_id: props.taskAssignedTo.staff_id },
+      onCompleted: () => {
+        if (staffData && staffData.staff !== null) {
+          setStaff(staffData.staff);
+        } else {
+          setStaff({ staff_name: "[ Staff Data Not Found ]", picture: "" })
+        }
+      }
     });
 
   const handleDelete = () => {
@@ -60,7 +70,7 @@ export default function StatusBox(props) {
   }
 
   if (props.type === "avatar") {
-    return <Avatar alt={staff.staff_name} src={staff.picture === " " ? "/static/images/avatar/1.jpg" : staff.picture} className={classes.small} />
+    return <Tooltip title={staff.staff_name} arrow ><Avatar alt={staff.staff_name} src={staff.picture === " " ? "/static/images/avatar/1.jpg" : staff.picture} className={classes.small} /></Tooltip>
   }
 
   if (props.type === "chip") {

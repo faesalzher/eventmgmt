@@ -4,8 +4,10 @@ const Schema = mongo.Schema;
 const Organization = new Schema({
   _id: String,
   organization_name: String,
-  password: String,
   description: String,
+  email: String,
+  phone_number: String,
+  address: String,
   picture: String,
 })
 

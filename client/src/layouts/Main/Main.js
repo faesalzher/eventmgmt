@@ -132,21 +132,25 @@ const Main = (props) => {
       {({ headerStyles, sidebarStyles, collapsed, opened }) => (
         <>
           <CssBaseline />
-            <Header className={classes.header}>
+          <Header className={classes.header}>
+            <ThemeProvider theme={theme}>
               <Toolbar>
                 <SidebarTrigger className={headerStyles.leftTrigger}>
                   {opened ? <ChevronLeftIcon /> : <MenuIcon />}
                 </SidebarTrigger>
                 <Topbar />
               </Toolbar>
-            </Header>
+            </ThemeProvider>
+          </Header>
           <Sidebar>
-            <div className={sidebarStyles.container}>
-              <SidebarContent collapsed={collapsed ? "true" : undefined} />
-            </div>
-            <CollapseBtn className={sidebarStyles.collapseBtn}>
-              {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </CollapseBtn>
+            <ThemeProvider theme={theme}>
+              <div className={sidebarStyles.container}>
+                <SidebarContent collapsed={collapsed ? "true" : undefined} />
+              </div>
+              <CollapseBtn className={sidebarStyles.collapseBtn}>
+                {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </CollapseBtn>
+            </ThemeProvider>
           </Sidebar>
           <ThemeProvider theme={theme}>
             <Content className={classes.content}>{children}</Content>

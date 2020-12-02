@@ -156,7 +156,7 @@ export default function Committees(props) {
           List of Committee
         </Typography>
         {
-            props.decodedToken.user_type === "organization"
+          props.decodedToken.user_type === "organization"
             ?
             <Tooltip arrow title="Add New Committees" aria-label="confirm">
               <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
@@ -181,7 +181,7 @@ export default function Committees(props) {
               <StyledTableCell style={{ width: 100 }}>Type</StyledTableCell>
               <StyledTableCell style={{ width: 10 }} align="center">
                 {
-                    props.decodedToken.user_type === "organization"
+                  props.decodedToken.user_type === "organization"
                     ?
                     "Action" : ""
                 }
@@ -189,28 +189,39 @@ export default function Committees(props) {
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? committees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : committees
-              ).map((committee, index) => {
-                return <Committee
-                  key={index}
-                  project_personInCharge={props.project_personInCharge}
-                  decodedToken={props.decodedToken}
-                  handleDeleteCommittee={props.handleDeleteCommittee}
-                  committee={committee}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
+          {committees.length === 0 ?
+            <TableBody>
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={1} />
+                <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no committees yet
+                    </Typography>
+                </TableCell>
               </TableRow>
-            )}
-          </TableBody>
+            </TableBody>
+            :
+            <TableBody>
+              {
+                (rowsPerPage > 0
+                  ? committees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : committees
+                ).map((committee, index) => {
+                  return <Committee
+                    key={index}
+                    project_personInCharge={props.project_personInCharge}
+                    decodedToken={props.decodedToken}
+                    handleDeleteCommittee={props.handleDeleteCommittee}
+                    committee={committee}
+                    handleSaveEditButton={props.handleSaveEditButton}
+                  />
+                })
+              }
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={1} />
+                </TableRow>
+              )}
+            </TableBody>}
           {/* <TableFooter>
             <TableRow>
               <TablePagination

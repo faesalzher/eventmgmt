@@ -186,28 +186,39 @@ export default function DepartementPositions(props) {
               </StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? departementPositions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : departementPositions
-              ).map((departementPosition, index) => {
-                return <DepartementPosition
-                  key={index}
-                  decodedToken={props.decodedToken}
-                  handleDeleteDepartementPosition={props.handleDeleteDepartementPosition}
-                  departementPosition={departementPosition}
-                  index={index}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
+          {departementPositions.length === 0 ?
+            <TableBody>
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no position in this departements yet
+                    </Typography>
+                </TableCell>
               </TableRow>
-            )}
-          </TableBody>
+            </TableBody>
+            :
+            <TableBody>
+              {
+                (rowsPerPage > 0
+                  ? departementPositions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : departementPositions
+                ).map((departementPosition, index) => {
+                  return <DepartementPosition
+                    key={index}
+                    decodedToken={props.decodedToken}
+                    handleDeleteDepartementPosition={props.handleDeleteDepartementPosition}
+                    departementPosition={departementPosition}
+                    index={index}
+                    handleSaveEditButton={props.handleSaveEditButton}
+                  />
+                })
+              }
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>}
           <TableFooter>
             <TableRow>
               <TablePagination

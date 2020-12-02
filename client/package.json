@@ -19,6 +19,7 @@
     "apollo-boost": "^0.4.7",
     "apollo-cache-inmemory": "^1.6.5",
     "axios": "^0.19.2",
+    "bcryptjs": "^2.4.3",
     "chart.js": "^2.9.4",
     "date-fns": "^2.0.0-beta.5",
     "graphql": "^14.6.0",

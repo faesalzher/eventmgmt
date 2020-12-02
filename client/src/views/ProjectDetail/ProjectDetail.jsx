@@ -156,7 +156,7 @@ export default function ProjectDetail() {
 
   useEffect(() => {
     const onCompleted = (personInChargeData) => {
-      if (personInChargeData  && personInChargeData.person_in_charges_by_staff_and_project !== null) {
+      if (personInChargeData && personInChargeData.person_in_charges_by_staff_and_project !== null) {
         setProject_personInCharge(personInChargeData.person_in_charges_by_staff_and_project)
       }
     };
@@ -191,7 +191,6 @@ export default function ProjectDetail() {
     personInChargesRefetch();
     eventsRefetch();
   };
-  console.log(project_personInCharge)
 
   const { data: organizationData } =
     useQuery(ORGANIZATION_QUERY, {
@@ -345,6 +344,7 @@ export default function ProjectDetail() {
           <ProjectPersonInCharge
             project_id={project_id}
             personInCharges={personInCharges}
+            personInChargesLoading={personInChargesLoading}
             project_personInCharge={project_personInCharge}
             handleSavePersonInChargeButton={handleSavePersonInChargeButton}
             handleSaveEditPersonInChargeButton={handleSaveEditPersonInChargeButton}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 // import Button from '@material-ui/core/Button';
 import {
@@ -17,8 +17,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import {
   PersonInChargeEditForm
 } from '.';
-
-import { STAFF_QUERY } from 'gql';
+import { AdminChip } from 'components';
+import { STAFF_QUERY, POSITION_QUERY } from 'gql';
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -43,9 +43,13 @@ export default function PersonInCharge(props) {
   // const classes = useStyles();
   // console.log(props.personInCharges.imageUrl)
 
-
+  const initialStaffState = {
+    staff_name: "",
+    email: "",
+    picture: "",
+  }
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [staff, setStaff] = useState([]);
+  const [staff, setStaff] = useState(initialStaffState);
 
   const handleOpenEditModal = () => {
     setOpenEditModal(true);
@@ -59,11 +63,25 @@ export default function PersonInCharge(props) {
   //   // setPersonInChargess([...personInChargess, e])
   // }
 
-  const { data } = useQuery(STAFF_QUERY,
+  const { data: staffData, refetch } = useQuery(STAFF_QUERY,
     {
       variables: { staff_id: props.personInCharge.staff_id },
-      onCompleted: () => { setStaff(data.staff) }
+      onCompleted: () => {
+        if (staffData && staffData.staff !== null) {
+          setStaff(staffData.staff);
+        } else {
+          setStaff({ staff_name: "[ Staff Data Not Found ]", email: "[ Staff Data Not Found ]", phone_number: "[ Staff Data Not Found ]", picure: "" })
+        }
+      }
     });
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    refetch();
+  };
 
   return (
     <StyledTableRow style={
@@ -81,13 +99,10 @@ export default function PersonInCharge(props) {
         {staff.email}
       </StyledTableCell>
       <StyledTableCell align="left">
-        {props.positions.map((position, index) => {
-          if (position._id === props.personInCharge.position_id) {
-            return <div key={index}>{position.position_name}</div>
-          }
-          return null;
-        })
-        }
+        <PositionName position_id={props.personInCharge.position_id} />
+      </StyledTableCell>
+      <StyledTableCell align="left">
+        {staff.is_admin ? <AdminChip /> : ""}
       </StyledTableCell>
       <StyledTableCell style={{ width: 36 }} align="center">
         {
@@ -138,11 +153,31 @@ export default function PersonInCharge(props) {
           project_personInCharge={props.project_personInCharge}
           decodedToken={props.decodedToken}
           open={openEditModal}
+          groupDepartements={props.groupDepartements}
           handleDeletePersonInCharge={props.handleDeletePersonInCharge}
           handleSaveEditButton={props.handleSaveEditButton}
           close={handleCloseEditModal}
         />
       </StyledTableCell>
     </StyledTableRow>
+  );
+}
+
+const PositionName = props => {
+  const { data: positionData } = useQuery(POSITION_QUERY, {
+    variables: { _id: props.position_id },
+  },
+  );
+
+  if (!positionData) {
+    return (<></>)
+  }
+
+  if (positionData.position === null) {
+    return (<>[ Position Data Not Found ]</>)
+  }
+
+  return (
+    <>      {positionData.position.position_name}    </>
   );
 }

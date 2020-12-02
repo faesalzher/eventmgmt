@@ -173,40 +173,44 @@ export default function Staffs(props) {
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography style={{ color: 'black' }} variant='subtitle2'>
+        <Typography style={{}} variant='subtitle2'>
           List of Staff
         </Typography>
         <div style={{ display: 'flex' }}>
-          <TextField
-            id="select-departement-native"
-            select
-            size="small"
-            margin="dense"
-            style={{ margin: '4px 10px' }}
-            label="Departement"
-            value={departement_id}
-            onChange={handleChange}
-            SelectProps={{
-              native: true,
-            }}
-            // helperText="Please select your currency"
-            variant="outlined"
-          >
-            <option key={'All'} value={'all'}>
-              All
+          <div style={{ padding: '0px 35px' }}>
+            <TextField
+              id="select-departement-native"
+              select
+              size="small"
+              margin="dense"
+
+              label="Departement"
+              value={departement_id}
+              onChange={handleChange}
+              SelectProps={{
+                native: true,
+              }}
+              // helperText="Please select your currency"
+              variant="outlined"
+            >
+              <option key={'All'} value={'all'}>
+                All
               </option>
-            {departements.map((departement) => (
-              <option key={departement.departement_name} value={departement._id}>
-                {departement.departement_name}
-              </option>
-            ))}
-          </TextField>
+              {departements.map((departement) => (
+                <option key={departement.departement_name} value={departement._id}>
+                  {departement.departement_name}
+                </option>
+              ))}
+            </TextField>
+          </div>
           {props.decodedToken.user_type === "organization" ?
-            <Tooltip arrow title="Add New Staffs" aria-label="confirm">
-              <IconButton onClick={handleOpenAddModal} style={{ padding: 0, margin: '10px 0px 10px 0px' }}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
+            <div style={{ display: 'flex' }}>
+              <Tooltip arrow title="Add New Staffs" aria-label="confirm">
+                <IconButton onClick={handleOpenAddModal} style={{ padding: 0 }}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
             :
             <div></div>
           }
@@ -234,6 +238,7 @@ export default function Staffs(props) {
               <StyledTableCell align="left">Phone Number</StyledTableCell>
               <StyledTableCell >Departement</StyledTableCell>
               <StyledTableCell >Position</StyledTableCell>
+              <StyledTableCell ></StyledTableCell>
               <StyledTableCell>
                 {props.decodedToken.user_type === "organization" ?
                   "Action"
@@ -243,30 +248,41 @@ export default function Staffs(props) {
 
             </TableRow>
           </TableHead>
-          <TableBody>
-            {
-              (rowsPerPage > 0
-                ? staffsByDepartement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : staffsByDepartement
-              ).map((staff) => {
-                return <Staff
-                  decodedToken={props.decodedToken}
-                  departementPositions={props.departementPositions}
-                  key={staff._id}
-                  handleDeleteStaff={props.handleDeleteStaff}
-                  staff={staff}
-                  organization_id={props.organization_id}
-                  departements={departements}
-                  handleSaveEditButton={props.handleSaveEditButton}
-                />
-              })
-            }
-            {emptyRows > 0 && (
+          {staffsByDepartement.length === 0 ?
+            <TableBody>
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={7} style={{ textAlign: 'center' }}>
+                  <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                    there is no departements yet
+                    </Typography>
+                </TableCell>
               </TableRow>
-            )}
-          </TableBody>
+            </TableBody>
+            :
+            <TableBody>
+              {
+                (rowsPerPage > 0
+                  ? staffsByDepartement.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : staffsByDepartement
+                ).map((staff) => {
+                  return <Staff
+                    decodedToken={props.decodedToken}
+                    departementPositions={props.departementPositions}
+                    key={staff._id}
+                    handleDeleteStaff={props.handleDeleteStaff}
+                    staff={staff}
+                    organization_id={props.organization_id}
+                    departements={departements}
+                    handleSaveEditButton={props.handleSaveEditButton}
+                  />
+                })
+              }
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>}
           <TableFooter>
             <TableRow>
               <TablePagination
