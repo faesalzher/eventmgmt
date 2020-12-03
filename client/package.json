@@ -27,6 +27,7 @@
     "jwt-decode": "^3.0.0",
     "material-auto-rotating-carousel": "^3.0.2",
     "material-table": "^1.57.2",
+    "mkcert": "^1.4.0",
     "node-sass": "^4.13.1",
     "prop-types": "^15.7.2",
     "randomcolor": "^0.5.4",

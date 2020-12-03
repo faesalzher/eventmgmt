@@ -266,14 +266,12 @@ const LogIn = props => {
   };
 
 
-  const handleLogIn = (event) => {
-    let isPasswordCorrect = false;
-    bcrypt.compare(formState.values.password, staff[0].password, function (err, result) {
-      isPasswordCorrect = result;
-    });
-    event.preventDefault();
-    setLoading(true);
+  console.log(dataStaff);
 
+  const handleLogIn = (event) => {
+
+    // event.preventDefault();
+    setLoading(true);
     setTimeout(() => {
       // if (organization.length === 0) {
       if (staff.length === 0) {
@@ -284,33 +282,36 @@ const LogIn = props => {
           } || {}
         }));
         handleError();
-      }
-      else if (!isPasswordCorrect) {
-        setFormState(formState => ({
-          ...formState,
-          errors: {
-            ...formState.errors, password: ["The password you entered is incorrect"]
-          } || {}
-        }));
-        handleError();
       } else {
-        if (staff[0].is_admin) {
-          const token = generateTokenOrganization(staff[0])
-          setAuthTokens(token);
-          setLoadingSucces(true);
-          setTimeout(() => {
-            history.push('/');
-            setLoadingSucces(false);
-          }, 500);
-        } else {
-          const token = generateTokenStaff(staff[0])
-          setAuthTokens(token);
-          setLoadingSucces(true);
-          setTimeout(() => {
-            history.push('/');
-            setLoadingSucces(false);
-          }, 500);
-        }
+        bcrypt.compare(formState.values.password, staff[0].password, function (err, result) {
+          if (!result) {
+            setFormState(formState => ({
+              ...formState,
+              errors: {
+                ...formState.errors, password: ["The password you entered is incorrect"]
+              } || {}
+            }));
+            handleError();
+          } else {
+            if (staff[0].is_admin) {
+              const token = generateTokenOrganization(staff[0])
+              setAuthTokens(token);
+              setLoadingSucces(true);
+              setTimeout(() => {
+                history.push('/');
+                setLoadingSucces(false);
+              }, 500);
+            } else {
+              const token = generateTokenStaff(staff[0])
+              setAuthTokens(token);
+              setLoadingSucces(true);
+              setTimeout(() => {
+                history.push('/');
+                setLoadingSucces(false);
+              }, 500);
+            }
+          }
+        });
       }
       // } else if (organization[0].password !== formState.values.password) {
       //   setFormState(formState => ({
@@ -451,20 +452,20 @@ const LogIn = props => {
                     <div className={classes.contentBody}>
                       <form
                         className={classes.form}
-                        onSubmit={handleLogIn}
+                      // onSubmit={handleLogIn}
                       >
                         <Typography
                           className={classes.title}
                           variant="h2"
                         >
                           Login
-                </Typography>
+                        </Typography>
                         <Typography
                           color="textSecondary"
                           gutterBottom
                         >
                           Login using email address
-                </Typography>
+                       </Typography>
                         <TextField
                           className={classes.textField}
                           error={hasError('email')}
@@ -497,6 +498,7 @@ const LogIn = props => {
                           className={classes.signInButton}
                           color="primary"
                           disabled={!formState.isValid}
+                          onClick={() => handleLogIn()}
                           fullWidth
                           size="large"
                           type="submit"
