@@ -291,6 +291,7 @@ export default function TasksAssignedToMe(props) {
       :
       groupProjects.map((groupProject, index) => {
         return (
+          
           <div style={{ paddingBottom: 10 }} key={index}>
             <MyTasksHeader
               project_id={groupProject.project_id}

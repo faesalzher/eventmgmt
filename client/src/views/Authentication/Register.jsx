@@ -258,20 +258,7 @@ const Register = props => {
         setLoading(false)
         handleError();
       } else {
-        register({
-          // update(proxy, result) {
-          //   // console.log(result)
-          // },
-          variables: {
-            _id: form.values._id,
-            organization_name: form.values.organization_name,
-            email: "",
-            phone_number: "",
-            address: "",
-            description: "",
-            picture: "",
-          },
-        });
+
         bcrypt.hash(form.values.password, saltRounds, function (err, hash) {
           addStaff({
             variables: {
@@ -284,36 +271,52 @@ const Register = props => {
               picture: "",
               position_name: "",
               departement_id: "",
+              departement_position_id: "",
               organization_id: form.values._id,
             },
           });
+          register({
+            // update(proxy, result) {
+            //   // console.log(result)
+            // },
+            variables: {
+              _id: form.values._id,
+              organization_name: form.values.organization_name,
+              email: "",
+              phone_number: "",
+              address: "",
+              description: "",
+              picture: "",
+            },
+          });
+          committeeName.forEach((committee) => {
+            addCommittee({
+              variables: {
+                _id: uuid(),
+                committee_name: committee.committee_name,
+                core: committee.core,
+                organization_id: form.values._id
+              }
+            })
+          })
+          positionName.forEach((position) => {
+            addPosition({
+              variables: {
+                _id: uuid(),
+                position_name: position.position_name,
+                core: position.core,
+                order: position.order,
+                organization_id: form.values._id
+              }
+            })
+          })
+          setLoading(false)
+          setForm(form => ({
+            values: initialFormState, touched: {}, errors: {}, isValid: false
+          }));
+          handleSucces();
         });
-        committeeName.forEach((committee) => {
-          addCommittee({
-            variables: {
-              _id: uuid(),
-              committee_name: committee.committee_name,
-              core: committee.core,
-              organization_id: form.values._id
-            }
-          })
-        })
-        positionName.forEach((position) => {
-          addPosition({
-            variables: {
-              _id: uuid(),
-              position_name: position.position_name,
-              core: position.core,
-              order: position.order,
-              organization_id: form.values._id
-            }
-          })
-        })
-        setLoading(false)
-        setForm(form => ({
-          values: initialFormState, touched: {}, errors: {}, isValid: false
-        }));
-        handleSucces();
+
         // history.push('/');
       }
 
