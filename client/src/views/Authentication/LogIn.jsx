@@ -266,8 +266,6 @@ const LogIn = props => {
   };
 
 
-  console.log(dataStaff);
-
   const handleLogIn = (event) => {
 
     // event.preventDefault();

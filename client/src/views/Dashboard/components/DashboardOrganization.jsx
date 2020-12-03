@@ -13,7 +13,11 @@ import {
     ProjectDoughnutChart,
     RecentlyAddedProject,
     RecentlyAddedTask,
+    RecentlyAssignedTask,
+    AssignedToMeDoughnutChart,
+    CreatedByMeDoughnutChart
 } from '.';
+
 // const useStyles = makeStyles(theme => ({
 //     root: {
 //         padding: theme.spacing(4)
@@ -104,47 +108,10 @@ export default function DashboardOrganization(props) {
             container
             spacing={1}
         >
-            {/* <Grid
-                item
-                lg={3}
-                md={3}
-                xl={12}
-                xs={12}
-            >
-                <PreparingProjectCard projects={projects} countPreparingProject={countPreparingProject} />
-            </Grid>
             <Grid
                 item
-                lg={3}
-                md={3}
-                xl={12}
-                xs={12}
-            >
-                <ActiveProjectCard projects={projects} countActiveProject={countActiveProject} />
-            </Grid>
-            <Grid
-                item
-                lg={3}
-                md={3}
-                xl={12}
-                xs={12}
-            >
-                <CompletedProjectCard projects={projects} countCompletedProject={countCompletedProject} />
-            </Grid>
-            <Grid
-                item
-                lg={3}
-                md={3}
-                xl={12}
-                xs={12}
-            >
-                <CancelledProjectCard projects={projects} countCancelledProject={countCancelledProject} />
-            </Grid>
-           */}
-            <Grid
-                item
-                lg={6}
-                md={6}
+                lg={4}
+                md={4}
                 xl={12}
                 xs={12}
             >
@@ -157,34 +124,50 @@ export default function DashboardOrganization(props) {
             </Grid>
             <Grid
                 item
-                lg={6}
-                md={6}
+                lg={4}
+                md={4}
                 xl={12}
                 xs={12}
             >
-                <Grid
-                    container
-                    spacing={1}
-                >
-                    <Grid
-                        item
-                        lg={12}
-                        md={12}
-                        xl={12}
-                        xs={12}
-                    >
-                        <RecentlyAddedProject projects={projects} />
-                    </Grid >
-                    <Grid
-                        item
-                        lg={12}
-                        md={12}
-                        xl={12}
-                        xs={12}
-                    >
-                        <RecentlyAddedTask decodedToken={props.decodedToken} />
-                    </Grid>
-                </Grid>
+                <CreatedByMeDoughnutChart />
+            </Grid>
+            <Grid
+                item
+                lg={4}
+                md={4}
+                xl={12}
+                xs={12}
+            >
+                <AssignedToMeDoughnutChart />
+            </Grid>
+            <Grid
+                item
+                lg={4}
+                md={4}
+                xl={12}
+                xs={12}
+            >
+                <RecentlyAddedProject projects={projects} />
+            </Grid >
+            <Grid
+                item
+                lg={4}
+                md={4}
+                xl={12}
+                xs={12}
+            >
+
+                <RecentlyAddedTask decodedToken={props.decodedToken} />
+            </Grid>
+            <Grid
+                item
+                lg={4}
+                md={4}
+                xl={12}
+                xs={12}
+            >
+
+                <RecentlyAssignedTask decodedToken={props.decodedToken} />
             </Grid>
         </Grid>
     );

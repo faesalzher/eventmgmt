@@ -10,15 +10,12 @@ import {
   Button,
   // IconButton,
 } from '@material-ui/core';
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { NavLink as RouterLink } from 'react-router-dom';
-
+import Carousel from 'react-material-ui-carousel'
 import ProjectCard from 'views/ProjectList/components/ProjectCard';
 const useStyles = makeStyles(theme => ({
   root: {
-    // height: '100%'
+    height: '100%'
   },
 }));
 const CustomRouterLink = forwardRef((props, ref) => (
@@ -39,15 +36,7 @@ export default function RecentlyAddedProject(props) {
   }
 
   const sortedProjects = (props.projects.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    // nextArrow: <SampleNextArrow />,
-    // prevArrow: <SamplePrevArrow />
-  };
+
   return (
     <Card
       {...rest}
@@ -68,10 +57,13 @@ export default function RecentlyAddedProject(props) {
         }
       />
       <Divider />
-      <CardContent style={{ padding: '10px 50px 25px', backgroundColor: "#e7e7e7" }}>
-        <Slider
+      <CardContent style={{padding:"5px 0px"}} >
+        {/* <Slider
           {...settings}
           style={{ padding: '0px 25px', display: 'flex', justifyContent: 'center' }}
+        > */}
+        <Carousel
+          animation="slide"
         >
           {
             sortedProjects.slice(0, 3).map((project, index) => {
@@ -80,12 +72,12 @@ export default function RecentlyAddedProject(props) {
                   container
                   key={project._id}
                   spacing={1}
-                  style={{ backgroundColor: '#d6d6d6', display: 'flex', justifyContent: 'center', flexDirection: 'column' }}
+                  style={{ display: 'flex', justifyContent: 'center' }}
                 >
                   <Grid
                     item
-                    lg={12}
-                    sm={12}
+                    lg={11}
+                    sm={11}
                     xl={12}
                     xs={12}
                   >
@@ -98,7 +90,9 @@ export default function RecentlyAddedProject(props) {
               )
             })
           }
-        </Slider>
+        </Carousel>
+
+        {/* </Slider> */}
       </CardContent>
     </Card >
   );

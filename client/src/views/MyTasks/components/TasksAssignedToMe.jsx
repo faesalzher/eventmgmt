@@ -4,6 +4,7 @@ import {
   List,
   CircularProgress,
   Typography,
+  Paper,
 } from '@material-ui/core';
 import { MyTasksBreadCrumbs, MyTasksHeader } from '.';
 
@@ -272,32 +273,47 @@ export default function TasksAssignedToMe(props) {
       </div>
     )
 
+  const sortedTasksAssignedTo = (tasksAssignedTo.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+
   return (
-    groupProjects.map((groupProject, index) => {
-      return (
-        <div style={{ paddingBottom: 10 }}>
-          <MyTasksHeader
-            project_id={groupProject.project_id}
-            staff_id={props.decodedToken.staff_id}
+    props.slice ?
+      sortedTasksAssignedTo.slice(0, props.slice).map((taskAssignedTo, index) => {
+        return (
+          <AssignedToMe
+            key={index}
+            taskAssignedTo={taskAssignedTo}
+            handleDelete={handleDelete}
+            handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
             decodedToken={props.decodedToken}
           />
-          {
-            (groupProject.tasksAssignedTo).map((taskAssignedTo, index) => {
-              return (
-                <List key={index} style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
-                  <AssignedToMe
-                    taskAssignedTo={taskAssignedTo}
-                    handleDelete={handleDelete}
-                    handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
-                    decodedToken={props.decodedToken}
-                  />
-                </List>
-              )
-            })
-          }
-        </div>
-      )
-    })
+        )
+      })
+      :
+      groupProjects.map((groupProject, index) => {
+        return (
+          <div style={{ paddingBottom: 10 }} key={index}>
+            <MyTasksHeader
+              project_id={groupProject.project_id}
+              staff_id={props.decodedToken.staff_id}
+              decodedToken={props.decodedToken}
+            />
+            {
+              (groupProject.tasksAssignedTo).map((taskAssignedTo, index) => {
+                return (
+                  <List key={index} style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
+                    <AssignedToMe
+                      taskAssignedTo={taskAssignedTo}
+                      handleDelete={handleDelete}
+                      handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+                      decodedToken={props.decodedToken}
+                    />
+                  </List>
+                )
+              })
+            }
+          </div>
+        )
+      })
   );
 }
 

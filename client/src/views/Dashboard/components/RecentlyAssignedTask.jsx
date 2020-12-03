@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { NavLink as RouterLink } from 'react-router-dom';
 
-import TaskCreatedByMe from 'views/MyTasks/components/TasksCreatedByMe'
+import TasksAssignedToMe from 'views/MyTasks/components/TasksAssignedToMe';
 const CustomRouterLink = forwardRef((props, ref) => (
   <div
     ref={ref}
@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function RecentlyAddedTask(props) {
+export default function RecentlyAssignedTask(props) {
   const { className, decodedToken, ...rest } = props;
 
   const classes = useStyles();
@@ -38,7 +38,7 @@ export default function RecentlyAddedTask(props) {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title="Recently Created Task By Me "
+        title="Recently Assigned Task To Me "
         action={
           <Button
             size="small"
@@ -52,7 +52,7 @@ export default function RecentlyAddedTask(props) {
         }
       />
       <Divider />
-      <CardContent style={{ padding:0 }}>
+      <CardContent style={{ padding: 0 }}>
         <Grid
           container
           spacing={1}
@@ -65,7 +65,7 @@ export default function RecentlyAddedTask(props) {
             xl={12}
             xs={12}
           >
-            <TaskCreatedByMe decodedToken={props.decodedToken} slice={3} />
+            <TasksAssignedToMe decodedToken={props.decodedToken} slice={3}/>
           </Grid>
         </Grid>
       </CardContent>

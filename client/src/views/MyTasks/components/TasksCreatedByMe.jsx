@@ -62,16 +62,23 @@ const CreatedByMe = (props) => {
   if (!roadmapData || roadmapData.roadmap === null) return <></>
 
   const user_access = (roadmapData.roadmap.committee_id === project_personInCharge.committee_id) ?
-    (project_personInCharge.order === '1' ||
-      project_personInCharge.order === '2' ||
-      project_personInCharge.order === '3' ||
+    (
       project_personInCharge.order === '6' ||
-      project_personInCharge.order === '7') ?
+      project_personInCharge.order === '7' ||
+      props.decodedToken.user_type === "organization" ||
+      project_personInCharge.order === '1' ||
+      project_personInCharge.order === '2' ||
+      project_personInCharge.order === '3'
+    ) ?
       true
       :
       false
     :
-    props.decodedToken.user_type === "organization" ? true : false
+    props.decodedToken.user_type === "organization" ||
+      project_personInCharge.order === '1' ||
+      project_personInCharge.order === '2' ||
+      project_personInCharge.order === '3' ? true : false
+
 
   return (
     <div>

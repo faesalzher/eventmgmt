@@ -8,12 +8,12 @@
 // export { default as UsersByDevice } from './UsersByDevice';
 export { default as DashboardStaff } from './DashboardStaff';
 export { default as DashboardOrganization } from './DashboardOrganization';
-export { default as PreparingProjectCard } from './PreparingProjectCard';
-export { default as ActiveProjectCard } from './ActiveProjectCard';
-export { default as CompletedProjectCard } from './CompletedProjectCard';
 export { default as ProjectDoughnutChart } from './ProjectDoughnutChart';
 export { default as RecentlyAddedProject } from './RecentlyAddedProject';
+export { default as RecentlyAssignedTask } from './RecentlyAssignedTask';
 export { default as RecentlyAddedTask } from './RecentlyAddedTask';
+export { default as CreatedByMeDoughnutChart } from './CreatedByMeDoughnutChart';
+export { default as AssignedToMeDoughnutChart } from './AssignedToMeDoughnutChart';
 
 
 

@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React, { } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 
@@ -12,6 +12,8 @@ import {
   Box,
   Tabs,
   Tab,
+  Card,
+  CardContent,
 } from '@material-ui/core';
 
 
@@ -94,10 +96,16 @@ export default function MyTasks(props) {
         <div style={{ backgroundColor: "#d8dce3", height: 10 }} />
 
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={0}>
-          <TasksAssignedToMe decodedToken={decodedToken} />
+          <Card elevation={0} >
+            <CardContent style={{ padding: 0, backgroundColor: "#d8dce3" }}>
+              <TasksAssignedToMe decodedToken={decodedToken} />
+            </CardContent>
+          </Card>
         </TabPanel>
         <TabPanel style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} value={value} index={1}>
+
           <TasksCreatedByMe decodedToken={decodedToken} />
+
         </TabPanel>
       </div>
     </div >

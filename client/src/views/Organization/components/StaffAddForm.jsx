@@ -189,7 +189,6 @@ export default function StaffAddForm(props) {
   const isDepartementNull = props.departements.length === 0 ? true : false;
   const isDepartementPositionsNull = props.departementPositions.length === 0 ? true : false;
 
-  console.log(staffForm.values)
   return (
     <Dialog
       fullScreen={fullScreen}

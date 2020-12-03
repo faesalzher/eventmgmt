@@ -111,8 +111,6 @@ export default function Profile(props) {
     // refetchOrganization();
     refetchStaff();
   };
-  console.log(dataStaff);
-  console.log(profileStaff);
 
   const classes = useStyles();
   return (
