@@ -17,7 +17,6 @@ import {
 
 import { TASK_ASSIGNED_TOS_QUERY } from 'gql';
 
-
 const useStyles = makeStyles(theme => ({
   list: {
     display: 'flex',
