@@ -47,12 +47,7 @@ function AssignedToMe(props) {
   // if(!taskData) return <></>
   useEffect(() => {
     const onCompleted = (taskData) => {
-      if (taskData !== undefined) {
-        setTask(
-          taskData.task
-        )
-        // props.handleCompletedTask(props.index)
-      }
+      if (taskData) { setTask(taskData.task) }
     };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
@@ -122,6 +117,7 @@ function AssignedToMe(props) {
         roadmap_id: e.roadmap_id,
         event_id: e.event_id,
         project_id: e.project_id,
+        organization_id: props.decodedToken.organization_id,
       }
     });
   };
@@ -223,15 +219,13 @@ export default function TasksAssignedToMe(props) {
     tasksAssignedToRefetch();
   };
 
-
-
-  const handleDeleteTaskAssignedTo = (e, person_in_charge_id) => {
-    if (person_in_charge_id === props.personInCharge._id) {
+  const handleDeleteTaskAssignedTo = (person_in_charge_id, staff_id) => {
+    if (props.decodedToken.staff_id === staff_id) {
       const temp = [...tasksAssignedTo];
       const index = temp.map(function (item) {
         // console.log(item._id)
         return (item._id)
-      }).indexOf(e);
+      }).indexOf(person_in_charge_id);
       temp.splice(index, 1);
       setTasksAssignedTo(temp);
     }
@@ -281,7 +275,6 @@ export default function TasksAssignedToMe(props) {
 
   const sortedTasksAssignedTo = (tasksAssignedTo.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
 
-
   return (
     props.slice ?
       sortedTasksAssignedTo.slice(0, props.slice).map((taskAssignedTo, index) => {
@@ -310,8 +303,6 @@ export default function TasksAssignedToMe(props) {
                 return (
                   <List key={index} style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
                     <AssignedToMe
-                      index={index}
-                      // handleCompletedTask={handleCompletedTask}
                       taskAssignedTo={taskAssignedTo}
                       handleDelete={handleDelete}
                       handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}

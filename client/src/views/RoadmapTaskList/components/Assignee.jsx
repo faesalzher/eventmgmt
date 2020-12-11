@@ -117,7 +117,7 @@ export default function Assignee(props) {
 
   const handleDelete = () => {
     setSelected(false)
-    props.handleDeleteTaskAssignedTo(assignedPersonInChargeId, props.personInCharge._id)
+    props.handleDeleteTaskAssignedTo(assignedPersonInChargeId, props.personInCharge.staff_id)
   }
   const [openConfirmationDialog, setOpenConfirmationDialog] = React.useState(false)
 

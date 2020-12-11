@@ -5,7 +5,7 @@ import Link from "@material-ui/core/Link";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import { NavLink as RouterLink } from "react-router-dom";
 import { useQuery } from '@apollo/react-hooks';
-import { EVENT_QUERY,ROADMAP_QUERY,PROJECT_QUERY } from 'gql';
+import { EVENT_QUERY, ROADMAP_QUERY, PROJECT_QUERY } from 'gql';
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > * + *": {
@@ -62,14 +62,14 @@ export default function MyTasksBreadCrumbs(props) {
       }
     });
 
-    useEffect(() => {
-      refresh();
-    });
-    const refresh = () => {
-      roadmapRefetch();
-      projectRefetch();
-      eventRefetch();
-    };
+  useEffect(() => {
+    refresh();
+  });
+  const refresh = () => {
+    roadmapRefetch();
+    projectRefetch();
+    eventRefetch();
+  };
 
   const breadcrumb_item = [
     { name: project.project_name, link: `/project/${project._id}` },

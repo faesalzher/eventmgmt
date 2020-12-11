@@ -15,6 +15,27 @@ query tasks($roadmap_id:String!){
       roadmap_id
       project_id
       event_id
+      organization_id
+  }
+}
+`;
+
+export const TASKS_QUERY_BY_ORGANIZATION = gql`
+query tasks($organization_id:String!){
+  tasks(organization_id: $organization_id){
+      _id
+      task_name
+      priority
+      completed
+      task_description
+      due_date
+      completed_date
+      created_at
+      created_by
+      roadmap_id
+      project_id
+      event_id
+      organization_id
   }
 }
 `;
@@ -34,6 +55,7 @@ export const TASKS_QUERY_BY_CREATOR = gql`
         roadmap_id,
         event_id,
         project_id,
+        organization_id
     }
   }
 `;
@@ -46,6 +68,16 @@ query tasks($project_id:String!){
   }
 }
 `;
+
+export const TASKS_QUERY_BY_EVENT = gql`
+query tasks($event_id:String!){
+  tasks(event_id: $event_id){
+      _id
+      event_id
+  }
+}
+`;
+
 
 export const TASK_QUERY = gql`
   query task($task_id: String!){
@@ -62,6 +94,7 @@ export const TASK_QUERY = gql`
         roadmap_id,
         event_id,
         project_id,
+        organization_id
     }
   }
 `;
@@ -80,6 +113,7 @@ export const ADD_TASK = gql`
     $roadmap_id: String!,
     $event_id: String!,
     $project_id: String!,
+    $organization_id: String!,
     ){
     addTask(
       _id: $_id,
@@ -94,6 +128,7 @@ export const ADD_TASK = gql`
       roadmap_id:$roadmap_id,
       event_id:$event_id,
       project_id:$project_id,
+      organization_id:$organization_id
     ){
       _id
       task_name
@@ -107,6 +142,7 @@ export const ADD_TASK = gql`
       roadmap_id
       event_id
       project_id
+      organization_id
     }
   }
 `;
@@ -125,6 +161,7 @@ export const EDIT_TASK = gql`
     $roadmap_id: String!,
     $event_id: String!,
     $project_id: String!,
+    $organization_id: String!,
     ){
     editTask(
       _id: $_id,
@@ -139,6 +176,7 @@ export const EDIT_TASK = gql`
       roadmap_id:$roadmap_id,
       event_id:$event_id,
       project_id:$project_id,
+      organization_id:$organization_id,
     ){
       _id
       task_name
@@ -152,6 +190,7 @@ export const EDIT_TASK = gql`
       roadmap_id
       event_id
       project_id
+      organization_id
     }
   }
 `;

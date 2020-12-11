@@ -187,6 +187,7 @@ export default function RoadamapTaskList() {
             project_personInCharge={project_personInCharge}
             handleSaveEditButton={handleSaveEditRoadmapButton}
             roadmap={roadmap}
+            roadmap_id={roadmap_id}
           />
         </div>
       </Paper>

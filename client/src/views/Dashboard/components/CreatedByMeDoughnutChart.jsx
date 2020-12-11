@@ -44,6 +44,7 @@ export default function CreatedByMeDoughnutChart(props) {
     // countPreparingProject, 
     // countActiveProject,
     //  countCompletedProject,
+    decodedToken,
     ...rest
   } = props;
 
@@ -54,7 +55,7 @@ export default function CreatedByMeDoughnutChart(props) {
   const [tasks, setTasks] = useState([]);
   const { data: tasksData, loading: tasksLoading, error: tasksError, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_CREATOR,
     {
-      variables: { created_by: props.decodedToken.staff_id }
+      variables: { created_by: decodedToken.staff_id }
     }
   );
 

@@ -27,7 +27,6 @@ import { PROJECTS_QUERY } from 'gql';
 
 
 export default function DashboardOrganization(props) {
-    const today = new Date()
 
     const [projects, setProjects] = useState([]);
 
@@ -58,51 +57,7 @@ export default function DashboardOrganization(props) {
     };
 
 
-    let countCompletedProject = [];
-    projects.forEach((project) => {
-        const start_date = new Date(project.project_start_date);
-        const end_date = new Date(project.project_end_date);
 
-        const isToday = (someDate) => {
-            return someDate.getDate() === today.getDate() &&
-                someDate.getMonth() === today.getMonth() &&
-                someDate.getFullYear() === today.getFullYear()
-        }
-
-        const preparingDays = today < start_date;
-        const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-        if (!preparingDays && !activeDays) {
-            countCompletedProject.push(project)
-        }
-    }
-    )
-
-    let countPreparingProject = [];
-    projects.forEach((project) => {
-        if (today < new Date(project.project_start_date)) {
-            countPreparingProject.push(project)
-        }
-    }
-    );
-
-    let countActiveProject = [];
-    projects.forEach((project) => {
-        const start_date = new Date(project.project_start_date);
-        const end_date = new Date(project.project_end_date);
-
-        const isToday = (someDate) => {
-            return someDate.getDate() === today.getDate() &&
-                someDate.getMonth() === today.getMonth() &&
-                someDate.getFullYear() === today.getFullYear()
-        }
-
-        const preparingDays = today < start_date;
-        const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-        if (!preparingDays && activeDays) {
-            countActiveProject.push(project)
-        }
-    }
-    )
     return (
         <Grid
             container
@@ -115,12 +70,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <ProjectDoughnutChart
-                    countPreparingProject={countPreparingProject}
-                    countActiveProject={countActiveProject}
-                    countCompletedProject={countCompletedProject}
-                    projects={projects}
-                />
+                <ProjectDoughnutChart title={"Total Project : " + projects.length} projects={projects} />
             </Grid>
             <Grid
                 item
@@ -129,7 +79,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <CreatedByMeDoughnutChart decodedToken={props.decodedToken}/>
+                <CreatedByMeDoughnutChart decodedToken={props.decodedToken} />
             </Grid>
             <Grid
                 item
@@ -138,7 +88,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <AssignedToMeDoughnutChart  decodedToken={props.decodedToken} />
+                <AssignedToMeDoughnutChart decodedToken={props.decodedToken} />
             </Grid>
             <Grid
                 item
@@ -147,7 +97,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <RecentlyAddedProject projects={projects} />
+                <RecentlyAddedProject title="Recently Added Project" projects={projects} />
             </Grid >
             <Grid
                 item

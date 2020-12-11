@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-// import { Doughnut } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import {
   makeStyles,
-  // useTheme
+  useTheme
 } from '@material-ui/styles';
 import {
   Card,
   CardHeader,
   CardContent,
   Divider,
-  // Typography
+  Typography
 } from '@material-ui/core';
-// import AdjustIcon from '@material-ui/icons/Adjust';
-// import FolderIcon from '@material-ui/icons/Folder';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useQuery } from '@apollo/react-hooks';
 import {
   // TASK_QUERY,
   TASK_ASSIGNED_TOS_BY_STAFF_QUERY,
+  TASKS_QUERY_BY_ORGANIZATION,
 } from 'gql';
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,114 +47,122 @@ export default function AssignedToMeDoughnutChart(props) {
     //  countPreparingProject,
     //   countActiveProject,
     //    countCompletedProject,
+    decodedToken,
     ...rest } = props;
 
   const classes = useStyles();
-  // const theme = useTheme();
-  // const preparing = ((props.countPreparingProject.length / props.projects.length).toFixed(2) * 100);
-  // const active = (props.countActiveProject.length / props.projects.length).toFixed(2) * 100;
-  // const completed = (props.countCompletedProject.length / props.projects.length).toFixed(2) * 100;
+  const theme = useTheme();
+
 
   const [tasksAssignedTo, setTasksAssignedTo] = useState([]);
+  // const [tasks, setTasks] = useState([]);
 
-  const {
-    data: tasksAssignedToData,
-    loading: tasksAssignedToLoading,
-    error: tasksAssignedToError,
-    refetch: tasksAssignedToRefetch } =
-    useQuery(
-      TASK_ASSIGNED_TOS_BY_STAFF_QUERY, {
-      variables: { staff_id: props.decodedToken.staff_id }
-    }
-    );
+  const { data: tasksAssignedToData, refetch: tasksAssignedToRefetch } = useQuery(
+    TASK_ASSIGNED_TOS_BY_STAFF_QUERY, {
+    variables: { staff_id: decodedToken.staff_id }
+  }
+  );
+
+  const { data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_ORGANIZATION,
+    {
+      variables: { organization_id: decodedToken.organization_id },
+    });
 
   useEffect(() => {
     refresh();
   });
 
-  useEffect(() => {
-    const onCompleted = (tasksAssignedToData) => {
-      setTasksAssignedTo(
-        tasksAssignedToData.task_assigned_tos
-      )
-    };
-    const onError = (error) => { /* magic */ };
-    if (onCompleted || onError) {
-      if (onCompleted && !tasksAssignedToLoading && !tasksAssignedToError) {
-        onCompleted(tasksAssignedToData);
-      } else if (onError && !tasksAssignedToLoading && tasksAssignedToError) {
-        onError(tasksAssignedToError);
-      }
-    }
-  }, [tasksAssignedToLoading, tasksAssignedToData, tasksAssignedToError]);
+
 
   const refresh = () => {
     tasksAssignedToRefetch();
+    tasksRefetch();
   };
-  console.log(tasksAssignedTo)
-  // const data = {
-  //   datasets: [
-  //     {
-  //       data: [preparing, active, completed],
-  //       backgroundColor: [
-  //         theme.palette.warning.main,
-  //         theme.palette.info.main,
-  //         theme.palette.success.main,
-  //         theme.palette.error.main
-  //       ],
-  //       borderWidth: 8,
-  //       borderColor: theme.palette.white,
-  //       hoverBorderColor: theme.palette.white
-  //     }
-  //   ],
-  //   labels: ['Preparing', 'Active', 'Completed']
-  // };
+  if (!tasksAssignedToData || !tasksData) return <></>
+  if (tasksAssignedToData.task_assigned_tos === null || tasksData.tasks === null) return <></>
+  let tasksAssignedToMe = []
+  tasksAssignedToData.task_assigned_tos.forEach((tasksAssignedTo) => {
+    tasksData.tasks.forEach((task) => {
+      if (task._id === tasksAssignedTo.task_id) {
+        tasksAssignedToMe.push(task)
+      }
+    })
+  })
 
-  // const options = {
-  //   legend: {
-  //     display: false
-  //   },
-  //   responsive: true,
-  //   maintainAspectRatio: false,
-  //   animation: false,
-  //   cutoutPercentage: 80,
-  //   layout: { padding: 0 },
-  //   tooltips: {
-  //     enabled: true,
-  //     mode: 'index',
-  //     intersect: false,
-  //     borderWidth: 1,
-  //     borderColor: theme.palette.divider,
-  //     backgroundColor: theme.palette.white,
-  //     titleFontColor: theme.palette.text.primary,
-  //     bodyFontColor: theme.palette.text.secondary,
-  //     footerFontColor: theme.palette.text.secondary
-  //   }
-  // };
 
-  // const devices = [
-  //   {
-  //     title: 'Preparing',
-  //     value: props.countPreparingProject.length,
-  //     percentage: preparing,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.warning.main
-  //   },
-  //   {
-  //     title: 'Active',
-  //     value: props.countActiveProject.length,
-  //     percentage: active,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.info.main
-  //   },
-  //   {
-  //     title: 'Completed',
-  //     value: props.countCompletedProject.length,
-  //     percentage: completed,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.success.main
-  //   },
-  // ];
+  let countUncompletedTask = [];
+  tasksAssignedToMe.forEach((task) => {
+    if (task.completed === false) {
+      countUncompletedTask.push(task)
+    }
+  }
+  );
+
+  let countCompletedTask = [];
+  tasksAssignedToMe.forEach((task) => {
+    if (task.completed === true) {
+      countCompletedTask.push(task)
+    }
+  }
+  );
+  const uncompleted = ((countUncompletedTask.length / tasksAssignedToMe.length).toFixed(2) * 100);
+  const completed = (countCompletedTask.length / tasksAssignedToMe.length).toFixed(2) * 100;
+
+  const data = {
+    datasets: [
+      {
+        data: [uncompleted, completed],
+        backgroundColor: [
+          theme.palette.grey.main,
+          theme.palette.success.main,
+        ],
+        borderWidth: 8,
+        borderColor: theme.palette.white,
+        hoverBorderColor: theme.palette.white
+      }
+    ],
+    labels: ['Uncompleted', 'Completed']
+  };
+
+  const options = {
+    legend: {
+      display: false
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    cutoutPercentage: 80,
+    layout: { padding: 0 },
+    tooltips: {
+      enabled: true,
+      mode: 'index',
+      intersect: false,
+      borderWidth: 1,
+      borderColor: theme.palette.divider,
+      backgroundColor: theme.palette.white,
+      titleFontColor: theme.palette.text.primary,
+      bodyFontColor: theme.palette.text.secondary,
+      footerFontColor: theme.palette.text.secondary
+    }
+  };
+
+
+  const devices = [
+    {
+      title: 'Uncompleted',
+      value: countUncompletedTask.length,
+      percentage: uncompleted,
+      icon: <AssignmentIcon />,
+      color: theme.palette.grey.main
+    },
+    {
+      title: 'Completed',
+      value: countCompletedTask.length,
+      percentage: completed,
+      icon: <AssignmentIcon />,
+      color: theme.palette.success.main
+    },
+  ];
 
   return (
     <Card
@@ -162,11 +170,11 @@ export default function AssignedToMeDoughnutChart(props) {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title={"Task Assigned To Me : "}
+        title={"Task Assigned To Me : " + tasksAssignedToMe.length}
       />
       <Divider />
       <CardContent style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-        {/* <div>
+        <div>
           <div className={classes.chartContainer}>
             <Doughnut
               data={data}
@@ -197,8 +205,7 @@ export default function AssignedToMeDoughnutChart(props) {
               </div>
             ))}
           </div>
-        </div> */}
-
+        </div>
       </CardContent>
     </Card>
   );

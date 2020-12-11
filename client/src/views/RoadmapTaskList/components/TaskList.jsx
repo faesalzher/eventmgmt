@@ -75,6 +75,7 @@ export default function TaskList(props) {
     created_by: decodedToken.staff_id,
     event_id: props.event_id,
     project_id: props.project_id,
+    organization_id: props.organization_id,
   };
 
   const [countUncompleted, setCountUncompleted] = React.useState(0);
@@ -138,6 +139,7 @@ export default function TaskList(props) {
         roadmap_id: e.roadmap_id,
         event_id: e.event_id,
         project_id: e.project_id,
+        organization_id: decodedToken.organization_id,
       }
     });
   };
@@ -160,6 +162,7 @@ export default function TaskList(props) {
         roadmap_id: taskForm.roadmap_id,
         project_id: taskForm.project_id,
         event_id: taskForm.event_id,
+        organization_id: taskForm.organization_id,
       }
     });
   }
@@ -230,8 +233,7 @@ export default function TaskList(props) {
       props.project_personInCharge.order === '2' ||
       props.project_personInCharge.order === '3' ? true : false
 
-  console.log(props.roadmap.committee_id === props.project_personInCharge.committee_id)
-  console.log(user_access)
+
   return (
     <Card className={classes.root} elevation={0} >
       <div>

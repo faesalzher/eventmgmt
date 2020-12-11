@@ -24,6 +24,23 @@ query task_assigned_tos($project_id:String!){
 }
 `;
 
+export const TASK_ASSIGNED_TOS_QUERY_BY_EVENT = gql`
+query task_assigned_tos($event_id:String!){
+  task_assigned_tos(event_id: $event_id){
+      _id
+      event_id
+  }
+}
+`;
+
+export const TASK_ASSIGNED_TOS_QUERY_BY_ROADMAP = gql`
+query task_assigned_tos($roadmap_id:String!){
+  task_assigned_tos(roadmap_id: $roadmap_id){
+      _id
+      roadmap_id
+  }
+}
+`;
 
 export const TASK_ASSIGNED_TOS_BY_STAFF_QUERY = gql`
 query task_assigned_tos($staff_id:String!){

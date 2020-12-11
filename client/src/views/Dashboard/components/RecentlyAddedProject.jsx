@@ -43,7 +43,7 @@ export default function RecentlyAddedProject(props) {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title="Recently Added Project "
+        title={props.title}
         action={
           <Button
             size="small"

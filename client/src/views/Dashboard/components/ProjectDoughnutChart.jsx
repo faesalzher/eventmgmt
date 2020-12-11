@@ -35,13 +35,61 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ProjectDoughnutChart(props) {
-  const { className, countPreparingProject, countActiveProject, countCompletedProject, ...rest } = props;
+  const { className,  ...rest } = props;
 
   const classes = useStyles();
   const theme = useTheme();
-  const preparing = ((props.countPreparingProject.length / props.projects.length).toFixed(2) * 100);
-  const active = (props.countActiveProject.length / props.projects.length).toFixed(2) * 100;
-  const completed = (props.countCompletedProject.length / props.projects.length).toFixed(2) * 100;
+  const today = new Date()
+
+  let countCompletedProject = [];
+  props.projects.forEach((project) => {
+      const start_date = new Date(project.project_start_date);
+      const end_date = new Date(project.project_end_date);
+
+      const isToday = (someDate) => {
+          return someDate.getDate() === today.getDate() &&
+              someDate.getMonth() === today.getMonth() &&
+              someDate.getFullYear() === today.getFullYear()
+      }
+
+      const preparingDays = today < start_date;
+      const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
+      if (!preparingDays && !activeDays) {
+          countCompletedProject.push(project)
+      }
+  }
+  )
+
+  let countPreparingProject = [];
+  props.projects.forEach((project) => {
+      if (today < new Date(project.project_start_date)) {
+          countPreparingProject.push(project)
+      }
+  }
+  );
+
+  let countActiveProject = [];
+  props.projects.forEach((project) => {
+      const start_date = new Date(project.project_start_date);
+      const end_date = new Date(project.project_end_date);
+
+      const isToday = (someDate) => {
+          return someDate.getDate() === today.getDate() &&
+              someDate.getMonth() === today.getMonth() &&
+              someDate.getFullYear() === today.getFullYear()
+      }
+
+      const preparingDays = today < start_date;
+      const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
+      if (!preparingDays && activeDays) {
+          countActiveProject.push(project)
+      }
+  }
+  )
+
+  const preparing = ((countPreparingProject.length / props.projects.length).toFixed(2) * 100);
+  const active = (countActiveProject.length / props.projects.length).toFixed(2) * 100;
+  const completed = (countCompletedProject.length / props.projects.length).toFixed(2) * 100;
 
 
   const data = {
@@ -87,21 +135,21 @@ export default function ProjectDoughnutChart(props) {
   const devices = [
     {
       title: 'Preparing',
-      value: props.countPreparingProject.length,
+      value: countPreparingProject.length,
       percentage: preparing,
       icon: <FolderIcon />,
       color: theme.palette.warning.main
     },
     {
       title: 'Active',
-      value: props.countActiveProject.length,
+      value: countActiveProject.length,
       percentage: active,
       icon: <FolderIcon />,
       color: theme.palette.info.main
     },
     {
       title: 'Completed',
-      value: props.countCompletedProject.length,
+      value: countCompletedProject.length,
       percentage: completed,
       icon: <FolderIcon />,
       color: theme.palette.success.main
@@ -114,7 +162,7 @@ export default function ProjectDoughnutChart(props) {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title={"Total Projects : " + props.projects.length}
+        title={props.title}
       />
       <Divider />
       <CardContent style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>

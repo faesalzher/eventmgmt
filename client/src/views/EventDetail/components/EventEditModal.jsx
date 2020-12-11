@@ -8,7 +8,7 @@ import {
   // Button,
   Dialog,
 } from '@material-ui/core';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 
 import FormControl from '@material-ui/core/FormControl';
 
@@ -25,7 +25,20 @@ import {
   StatusBox,
   EditImageForm,
 } from 'components';
-import { EDIT_EVENT, DELETE_EVENT } from 'gql';
+import {
+  EDIT_EVENT,
+  DELETE_EVENT,
+  EXTERNALS_QUERY,
+  AGENDAS_QUERY,
+  ROADMAPS_QUERY,
+  TASKS_QUERY_BY_EVENT,
+  TASK_ASSIGNED_TOS_QUERY_BY_EVENT,
+  DELETE_ROADMAP,
+  DELETE_EXTERNAL,
+  DELETE_AGENDA,
+  DELETE_TASK,
+  DELETE_TASK_ASSIGNED_TO,
+} from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -99,7 +112,47 @@ export default function EventEditModal(props) {
 
   const [editEvent] = useMutation(EDIT_EVENT);
   const [deleteEvent] = useMutation(DELETE_EVENT);
+  const [deleteRoadmap] = useMutation(DELETE_ROADMAP);
+  const [deleteExternal] = useMutation(DELETE_EXTERNAL);
+  const [deleteAgenda] = useMutation(DELETE_AGENDA);
+  const [deleteTask] = useMutation(DELETE_TASK);
+  const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
+  const { data: roadmapsData, refetch: roadmapsRefetch } = useQuery(ROADMAPS_QUERY,
+    { variables: { event_id: props.event._id }, }
+  )
+  const { data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
+    { variables: { event_id: props.event._id }, }
+  )
+  const { data: agendasData, refetch: agendasRefetch } = useQuery(AGENDAS_QUERY,
+    { variables: { event_id: props.event._id }, }
+  )
+
+  const { data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_EVENT,
+    { variables: { event_id: props.event._id }, }
+  )
+
+  const { data: taskAssignedTosData, refetch: taskAssignedTosRefetch } = useQuery(TASK_ASSIGNED_TOS_QUERY_BY_EVENT,
+    { variables: { event_id: props.event._id }, }
+  )
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    roadmapsRefetch();
+    externalsRefetch();
+    agendasRefetch();
+    tasksRefetch();
+    taskAssignedTosRefetch();
+  };
+
+  console.log(roadmapsData)
+  console.log(externalsData)
+  console.log(agendasData)
+  console.log(tasksData)
+  console.log(taskAssignedTosData)
 
   const handleSaveEditButton = e => {
     props.handleSaveEditButton(eventForm);
@@ -126,6 +179,32 @@ export default function EventEditModal(props) {
 
 
   const handleDelete = () => {
+    
+    //delete task_assogned_to
+    taskAssignedTosData.task_assigned_tos.forEach((taskAssignedTo) => {
+      deleteTaskAssignedTo({ variables: { _id: taskAssignedTo._id } })
+    })
+
+    //delete task
+    tasksData.tasks.forEach((task) => {
+      deleteTask({ variables: { _id: task._id } })
+    })
+
+    //delete agenda
+    agendasData.agendas.forEach((agenda) => {
+      deleteAgenda({ variables: { _id: agenda._id } })
+    })
+    //delete external
+    externalsData.externals.forEach((external) => {
+      deleteExternal({ variables: { _id: external._id } })
+    })
+
+    //delete roadmaps
+    roadmapsData.roadmaps.forEach((roadmap) => {
+      deleteRoadmap({ variables: { _id: roadmap._id } })
+    })
+
+    //deleteEvent
     deleteEvent({ variables: { _id: props.event._id, } });
     setNavigate(true)
   }

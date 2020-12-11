@@ -178,12 +178,6 @@ export default function TaskDetailModal(props) {
     props.closeDialogDetail();
   }
 
-  const handleDeleteTaskAssignedTo = (e, id) => {
-    props.handleDeleteTaskAssignedTo(e, id)
-  }
-
-
-
   return (
     <div>
       <Dialog
@@ -303,7 +297,7 @@ export default function TaskDetailModal(props) {
             roadmap={props.roadmap}
             user_access={props.user_access}
             handleAddTaskAssignedTo={props.handleAddTaskAssignedTo}
-            handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
+            handleDeleteTaskAssignedTo={props.handleDeleteTaskAssignedTo}
             handleCompletedChange={props.handleCompletedChange}
             tasksAssignedTo={props.tasksAssignedTo}
             project_personInCharge={props.project_personInCharge}

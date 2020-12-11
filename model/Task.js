@@ -13,7 +13,8 @@ const Task = new Schema({
   created_by: String,
   roadmap_id: String,
   project_id:String,
-  event_id: String
+  event_id: String,
+  organization_id: String,
 });
 
 module.exports = mongo.model("Task", Task);

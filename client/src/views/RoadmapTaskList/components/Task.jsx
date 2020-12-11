@@ -126,14 +126,14 @@ export default function Task(props) {
     setTasksAssignedTo([...tasksAssignedTo, e]);
   }
 
-  const handleDeleteTaskAssignedTo = (e, id) => {
+  const handleDeleteTaskAssignedTo = (e, staff_id) => {
     const temp = [...tasksAssignedTo];
     const index = temp.map(function (item) {
       return item._id
     }).indexOf(e);
     temp.splice(index, 1);
     setTasksAssignedTo(temp);
-    props.handleDeleteTaskAssignedTo(e, id);
+    props.handleDeleteTaskAssignedTo(e, staff_id);
   }
 
   let isAssignedToMe = false;

@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { DialogTitle, DialogContent, DialogActionsEdit } from 'components/Dialog';
 import TextField from '@material-ui/core/TextField';
@@ -18,7 +18,17 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useParams } from "react-router-dom";
 import { Redirect } from 'react-router';
-import { EVENT_QUERY, EDIT_ROADMAP, DELETE_ROADMAP,COMMITTEE_QUERY,PERSON_IN_CHARGES_BY_PROJECT_QUERY } from 'gql';
+import {
+  EVENT_QUERY,
+  EDIT_ROADMAP,
+  COMMITTEE_QUERY,
+  PERSON_IN_CHARGES_BY_PROJECT_QUERY,
+  TASKS_QUERY,
+  TASK_ASSIGNED_TOS_QUERY_BY_ROADMAP,
+  DELETE_ROADMAP,
+  DELETE_TASK,
+  DELETE_TASK_ASSIGNED_TO,
+} from 'gql';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -98,6 +108,26 @@ export default function RoadmapEditForm(props) {
 
   const [editRoadmap] = useMutation(EDIT_ROADMAP);
   const [deleteRoadmap] = useMutation(DELETE_ROADMAP);
+  const [deleteTask] = useMutation(DELETE_TASK);
+  const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
+
+  const { data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY,
+    { variables: { roadmap_id: props.roadmap_id }, }
+  )
+
+  const { data: taskAssignedTosData, refetch: taskAssignedTosRefetch } = useQuery(TASK_ASSIGNED_TOS_QUERY_BY_ROADMAP,
+    { variables: { roadmap_id: props.roadmap_id }, }
+  )
+
+
+  useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    tasksRefetch();
+    taskAssignedTosRefetch();
+  };
 
   const handleSaveEditButton = () => {
     // roadmapForm.color = roadmapForm.color
@@ -123,13 +153,13 @@ export default function RoadmapEditForm(props) {
     props.close();
   }
   const { data: personInChargesData } =
-  useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
-    variables: { project_id: props.project_id },
+    useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
+      variables: { project_id: props.project_id },
+    }
+    );
+  if (!personInChargesData) {
+    return (<></>)
   }
-  );
-if (!personInChargesData) {
-  return (<></>)
-}
 
   //group cmmittee from person_in_charges
   const groupCommitteesObject = personInChargesData.person_in_charges.reduce((committees, personInCharge) => {
@@ -157,6 +187,17 @@ if (!personInChargesData) {
   };
 
   const handleDelete = () => {
+    //delete task_assogned_to
+    taskAssignedTosData.task_assigned_tos.forEach((taskAssignedTo) => {
+      deleteTaskAssignedTo({ variables: { _id: taskAssignedTo._id } })
+    })
+
+    //delete task
+    tasksData.tasks.forEach((task) => {
+      deleteTask({ variables: { _id: task._id } })
+    })
+
+    //deleteRoadmap
     deleteRoadmap({ variables: { _id: roadmapForm._id } });
     setNavigate(true);
   };
@@ -213,13 +254,13 @@ if (!personInChargesData) {
                   variant="outlined"
                 >
                   {groupCommittees.map((groupCommittee) => {
-                      return (
-                        <MenuItem key={groupCommittee.committee_id}
-                          value={groupCommittee.committee_id}
-                        >
-                          <MenuItemSelect groupCommittee={groupCommittee} />
-                        </MenuItem>
-                      )
+                    return (
+                      <MenuItem key={groupCommittee.committee_id}
+                        value={groupCommittee.committee_id}
+                      >
+                        <MenuItemSelect groupCommittee={groupCommittee} />
+                      </MenuItem>
+                    )
                   })}
                 </TextField>
               }

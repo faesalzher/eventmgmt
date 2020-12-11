@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { NavLink as RouterLink } from 'react-router-dom';
 
-import TasksAssignedToMe from 'views/MyTasks/components/TasksAssignedToMe';
+import { TasksAssignedToMe } from 'views/MyTasks/components';
 const CustomRouterLink = forwardRef((props, ref) => (
   <div
     ref={ref}
@@ -65,7 +65,7 @@ export default function RecentlyAssignedTask(props) {
             xl={12}
             xs={12}
           >
-            <TasksAssignedToMe decodedToken={props.decodedToken} slice={3}/>
+            <TasksAssignedToMe decodedToken={props.decodedToken} slice={3} />
           </Grid>
         </Grid>
       </CardContent>

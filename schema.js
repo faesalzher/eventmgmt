@@ -189,6 +189,7 @@ const TaskType = new GraphQLObjectType({
     roadmap_id: { type: GraphQLString },
     project_id: { type: GraphQLString },
     event_id: { type: GraphQLString },
+    organization_id: { type: GraphQLString },
   }),
 });
 
@@ -483,6 +484,7 @@ const RootQuery = new GraphQLObjectType({
         created_by: { type: GraphQLString },
         event_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         if (args.roadmap_id) {
@@ -496,6 +498,9 @@ const RootQuery = new GraphQLObjectType({
         }
         if (args.event_id) {
           return Task.find({ event_id: args.event_id });
+        }
+        if (args.organization_id) {
+          return Task.find({ organization_id: args.organization_id });
         }
       },
     },
@@ -1273,6 +1278,7 @@ const Mutation = new GraphQLObjectType({
         event_id: { type: GraphQLString },
         roadmap_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let task = new Task({
@@ -1288,6 +1294,7 @@ const Mutation = new GraphQLObjectType({
           event_id: args.event_id,
           roadmap_id: args.roadmap_id,
           project_id: args.project_id,
+          organization_id: args.organization_id,
         });
         return task.save();
       },
@@ -1307,6 +1314,7 @@ const Mutation = new GraphQLObjectType({
         event_id: { type: GraphQLString },
         roadmap_id: { type: GraphQLString },
         project_id: { type: GraphQLString },
+        organization_id: { type: GraphQLString },
       },
       resolve(parent, args) {
         let edit = {
@@ -1321,6 +1329,7 @@ const Mutation = new GraphQLObjectType({
           event_id: args.event_id,
           roadmap_id: args.roadmap_id,
           project_id: args.project_id,
+          organization_id: args.organization_id,
         };
         let task = Task.findByIdAndUpdate(args._id, edit, { new: true });
         return task;
