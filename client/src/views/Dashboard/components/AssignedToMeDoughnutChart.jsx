@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import {
@@ -14,7 +14,11 @@ import {
 } from '@material-ui/core';
 // import AdjustIcon from '@material-ui/icons/Adjust';
 // import FolderIcon from '@material-ui/icons/Folder';
-
+import { useQuery } from '@apollo/react-hooks';
+import {
+  // TASK_QUERY,
+  TASK_ASSIGNED_TOS_BY_STAFF_QUERY,
+} from 'gql';
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%'
@@ -37,7 +41,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CreatedByMeDoughnutChart(props) {
+export default function AssignedToMeDoughnutChart(props) {
   const {
     className,
     //  countPreparingProject,
@@ -51,7 +55,43 @@ export default function CreatedByMeDoughnutChart(props) {
   // const active = (props.countActiveProject.length / props.projects.length).toFixed(2) * 100;
   // const completed = (props.countCompletedProject.length / props.projects.length).toFixed(2) * 100;
 
+  const [tasksAssignedTo, setTasksAssignedTo] = useState([]);
 
+  const {
+    data: tasksAssignedToData,
+    loading: tasksAssignedToLoading,
+    error: tasksAssignedToError,
+    refetch: tasksAssignedToRefetch } =
+    useQuery(
+      TASK_ASSIGNED_TOS_BY_STAFF_QUERY, {
+      variables: { staff_id: props.decodedToken.staff_id }
+    }
+    );
+
+  useEffect(() => {
+    refresh();
+  });
+
+  useEffect(() => {
+    const onCompleted = (tasksAssignedToData) => {
+      setTasksAssignedTo(
+        tasksAssignedToData.task_assigned_tos
+      )
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !tasksAssignedToLoading && !tasksAssignedToError) {
+        onCompleted(tasksAssignedToData);
+      } else if (onError && !tasksAssignedToLoading && tasksAssignedToError) {
+        onError(tasksAssignedToError);
+      }
+    }
+  }, [tasksAssignedToLoading, tasksAssignedToData, tasksAssignedToError]);
+
+  const refresh = () => {
+    tasksAssignedToRefetch();
+  };
+  console.log(tasksAssignedTo)
   // const data = {
   //   datasets: [
   //     {

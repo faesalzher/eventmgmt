@@ -129,7 +129,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <CreatedByMeDoughnutChart />
+                <CreatedByMeDoughnutChart decodedToken={props.decodedToken}/>
             </Grid>
             <Grid
                 item
@@ -138,7 +138,7 @@ export default function DashboardOrganization(props) {
                 xl={12}
                 xs={12}
             >
-                <AssignedToMeDoughnutChart />
+                <AssignedToMeDoughnutChart  decodedToken={props.decodedToken} />
             </Grid>
             <Grid
                 item

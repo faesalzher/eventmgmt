@@ -142,7 +142,6 @@ export default function TasksCreatedByMe(props) {
     tasksRefetch();
 
   };
-  console.log(tasks)
   const [editTask] = useMutation(EDIT_TASK);
 
   const handleCompletedChange = (e) => {

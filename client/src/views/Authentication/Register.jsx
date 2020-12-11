@@ -263,7 +263,7 @@ const Register = props => {
           addStaff({
             variables: {
               _id: uuid(),
-              staff_name: "Super Admin",
+              staff_name: form.values.staff_name,
               email: form.values.email,
               phone_number: "",
               is_admin: true,
@@ -460,12 +460,26 @@ const Register = props => {
                     />
                     <TextField
                       className={classes.textField}
+                      error={hasError('staff_name')}
+                      fullWidth
+                      helperText={
+                        hasError('staff_name') ? form.errors.staff_name[0] : null
+                      }
+                      label="Admin Name"
+                      name="staff_name"
+                      onChange={handleChange}
+                      type="text"
+                      value={form.values.staff_name || ''}
+                      variant="outlined"
+                    />
+                    <TextField
+                      className={classes.textField}
                       error={hasError('email')}
                       fullWidth
                       helperText={
                         hasError('email') ? form.errors.email[0] : null
                       }
-                      label="Email address"
+                      label="Admin Email address"
                       name="email"
                       onChange={handleChange}
                       type="text"

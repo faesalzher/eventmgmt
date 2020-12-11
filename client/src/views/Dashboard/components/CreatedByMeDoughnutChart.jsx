@@ -1,19 +1,21 @@
-import React from 'react';
-// import { Doughnut } from 'react-chartjs-2';
+import React, { useState, useEffect } from 'react';
+import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import {
   makeStyles,
-  // useTheme
+  useTheme
 } from '@material-ui/styles';
 import {
   Card,
   CardHeader,
   CardContent,
   Divider,
-  // Typography
+  Typography
 } from '@material-ui/core';
-// import AdjustIcon from '@material-ui/icons/Adjust';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FolderIcon from '@material-ui/icons/Folder';
+import { useQuery } from '@apollo/react-hooks';
+import { TASKS_QUERY_BY_CREATOR } from 'gql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -45,88 +47,128 @@ export default function CreatedByMeDoughnutChart(props) {
     ...rest
   } = props;
 
+
   const classes = useStyles();
-  // const theme = useTheme();
-  // const preparing = ((props.countPreparingProject.length / props.projects.length).toFixed(2) * 100);
-  // const active = (props.countActiveProject.length / props.projects.length).toFixed(2) * 100;
-  // const completed = (props.countCompletedProject.length / props.projects.length).toFixed(2) * 100;
+  const theme = useTheme();
 
+  const [tasks, setTasks] = useState([]);
+  const { data: tasksData, loading: tasksLoading, error: tasksError, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_CREATOR,
+    {
+      variables: { created_by: props.decodedToken.staff_id }
+    }
+  );
 
-  // const data = {
-  //   datasets: [
-  //     {
-  //       data: [preparing, active, completed],
-  //       backgroundColor: [
-  //         theme.palette.warning.main,
-  //         theme.palette.info.main,
-  //         theme.palette.success.main,
-  //         theme.palette.error.main
-  //       ],
-  //       borderWidth: 8,
-  //       borderColor: theme.palette.white,
-  //       hoverBorderColor: theme.palette.white
-  //     }
-  //   ],
-  //   labels: ['Preparing', 'Active', 'Completed']
-  // };
+  useEffect(() => {
+    const onCompleted = (tasksData) => {
+      if (tasksData) {
+        setTasks(
+          tasksData.tasks
+        )
+      }
+    };
+    const onError = (error) => { /* magic */ };
+    if (onCompleted || onError) {
+      if (onCompleted && !tasksLoading && !tasksError) {
+        onCompleted(tasksData);
+      } else if (onError && !tasksLoading && tasksError) {
+        onError(tasksError);
+      }
+    }
+  }, [tasksLoading, tasksData, tasksError]);
 
-  // const options = {
-  //   legend: {
-  //     display: false
-  //   },
-  //   responsive: true,
-  //   maintainAspectRatio: false,
-  //   animation: false,
-  //   cutoutPercentage: 80,
-  //   layout: { padding: 0 },
-  //   tooltips: {
-  //     enabled: true,
-  //     mode: 'index',
-  //     intersect: false,
-  //     borderWidth: 1,
-  //     borderColor: theme.palette.divider,
-  //     backgroundColor: theme.palette.white,
-  //     titleFontColor: theme.palette.text.primary,
-  //     bodyFontColor: theme.palette.text.secondary,
-  //     footerFontColor: theme.palette.text.secondary
-  //   }
-  // };
+  useEffect(() => {
+    refresh();
+  });
+  const refresh = () => {
+    tasksRefetch();
 
-  // const devices = [
-  //   {
-  //     title: 'Preparing',
-  //     value: props.countPreparingProject.length,
-  //     percentage: preparing,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.warning.main
-  //   },
-  //   {
-  //     title: 'Active',
-  //     value: props.countActiveProject.length,
-  //     percentage: active,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.info.main
-  //   },
-  //   {
-  //     title: 'Completed',
-  //     value: props.countCompletedProject.length,
-  //     percentage: completed,
-  //     icon: <FolderIcon />,
-  //     color: theme.palette.success.main
-  //   },
-  // ];
+  };
 
+  let countCompletedTask = [];
+  tasks.forEach((task) => {
+    if (task.completed === true) {
+      countCompletedTask.push(task)
+    }
+  }
+  )
+
+  let countUncompletedTask = [];
+  tasks.forEach((task) => {
+    if (task.completed === false) {
+      countUncompletedTask.push(task)
+    }
+  }
+  )
+  const uncompleted = ((countUncompletedTask.length / tasks.length).toFixed(2) * 100);
+  const completed = (countCompletedTask.length / tasks.length).toFixed(2) * 100;
+
+  const data = {
+    datasets: [
+      {
+        data: [uncompleted, completed],
+        backgroundColor: [
+          // theme.palette.warning.main,
+          theme.palette.grey.main,
+          theme.palette.success.main,
+          // theme.palette.error.main
+        ],
+        borderWidth: 8,
+        borderColor: theme.palette.white,
+        hoverBorderColor: theme.palette.white
+      }
+    ],
+    labels: ['Uncompleted', 'Completed']
+  };
+
+  const options = {
+    legend: {
+      display: false
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
+    cutoutPercentage: 80,
+    layout: { padding: 0 },
+    tooltips: {
+      enabled: true,
+      mode: 'index',
+      intersect: false,
+      borderWidth: 1,
+      borderColor: theme.palette.divider,
+      backgroundColor: theme.palette.white,
+      titleFontColor: theme.palette.text.primary,
+      bodyFontColor: theme.palette.text.secondary,
+      footerFontColor: theme.palette.text.secondary
+    }
+  };
+
+  const devices = [
+    {
+      title: 'Uncompleted',
+      value: countUncompletedTask.length,
+      percentage: uncompleted,
+      icon: <AssignmentIcon />,
+      color: theme.palette.grey.main
+    },
+    {
+      title: 'Completed',
+      value: countCompletedTask.length,
+      percentage: completed,
+      icon: <AssignmentIcon />,
+      color: theme.palette.success.main
+    },
+  ];
   return (
     <Card
       {...rest}
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title={"Task Created By Me : "}
+        title={"Task Created By Me : " + tasks.length}
       />
       <Divider />
       <CardContent style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-        {/* <div>
+        <div>
           <div className={classes.chartContainer}>
             <Doughnut
               data={data}
@@ -157,7 +199,7 @@ export default function CreatedByMeDoughnutChart(props) {
               </div>
             ))}
           </div>
-        </div> */}
+        </div>
 
       </CardContent>
     </Card>

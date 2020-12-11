@@ -4,7 +4,7 @@ import {
   List,
   CircularProgress,
   Typography,
-  Paper,
+  // Paper,
 } from '@material-ui/core';
 import { MyTasksBreadCrumbs, MyTasksHeader } from '.';
 
@@ -38,7 +38,6 @@ function AssignedToMe(props) {
     event_id: "",
     project_id: "",
   };
-  console.log(props.taskAssignedTo.project_id)
 
   const [task, setTask] = useState(initialFormState);
   const { data: taskData, loading: taskLoading, error: taskError, refetch: taskRefetch } = useQuery(TASK_QUERY, {
@@ -52,6 +51,7 @@ function AssignedToMe(props) {
         setTask(
           taskData.task
         )
+        // props.handleCompletedTask(props.index)
       }
     };
     const onError = (error) => { /* magic */ };
@@ -62,7 +62,7 @@ function AssignedToMe(props) {
         onError(taskError);
       }
     }
-  }, [taskLoading, taskData, taskError]);
+  }, [taskLoading, taskData, taskError, props]);
 
 
   const [project_personInCharge, setProject_personInCharge] = useState([])
@@ -129,6 +129,10 @@ function AssignedToMe(props) {
   // const handleDelete = (e) => {
   //   setTasks(e);
   // }
+
+  // useEffect(() => {
+  //   props.handleCompletedTask(task)
+  // }, [props.handleCompletedTask, task])
   if (!roadmapData || roadmapData.roadmap === null) return <></>
 
   const user_access = (roadmapData.roadmap.committee_id === project_personInCharge.committee_id) ?
@@ -219,6 +223,8 @@ export default function TasksAssignedToMe(props) {
     tasksAssignedToRefetch();
   };
 
+
+
   const handleDeleteTaskAssignedTo = (e, person_in_charge_id) => {
     if (person_in_charge_id === props.personInCharge._id) {
       const temp = [...tasksAssignedTo];
@@ -275,6 +281,7 @@ export default function TasksAssignedToMe(props) {
 
   const sortedTasksAssignedTo = (tasksAssignedTo.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
 
+
   return (
     props.slice ?
       sortedTasksAssignedTo.slice(0, props.slice).map((taskAssignedTo, index) => {
@@ -291,7 +298,7 @@ export default function TasksAssignedToMe(props) {
       :
       groupProjects.map((groupProject, index) => {
         return (
-          
+
           <div style={{ paddingBottom: 10 }} key={index}>
             <MyTasksHeader
               project_id={groupProject.project_id}
@@ -303,6 +310,8 @@ export default function TasksAssignedToMe(props) {
                 return (
                   <List key={index} style={{ backgroundColor: "#d8dce3", padding: 0 }} component="nav" aria-label="main mailbox folders" >
                     <AssignedToMe
+                      index={index}
+                      // handleCompletedTask={handleCompletedTask}
                       taskAssignedTo={taskAssignedTo}
                       handleDelete={handleDelete}
                       handleDeleteTaskAssignedTo={handleDeleteTaskAssignedTo}
