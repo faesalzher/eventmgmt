@@ -70,6 +70,7 @@ export default function Volunteer(props) {
         }
         <DepartementEditForm
           organization_id={props.organization_id}
+          departements={props.departements}
           departement={props.departement}
           staffs={props.staffs}
           event_id={props.event_id}

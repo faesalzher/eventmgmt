@@ -78,6 +78,7 @@ export default function Volunteer(props) {
                     </IconButton>
                   </Tooltip>
                   <PositionEditForm
+                    positions={props.positions}
                     position={props.position}
                     event_id={props.event_id}
                     coreCommittee={props.coreCommittee}

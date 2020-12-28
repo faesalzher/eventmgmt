@@ -8,6 +8,7 @@ import {
   Divider,
   Grid,
   Button,
+  Typography
   // IconButton,
 } from '@material-ui/core';
 import { NavLink as RouterLink } from 'react-router-dom';
@@ -57,41 +58,49 @@ export default function RecentlyAddedProject(props) {
         }
       />
       <Divider />
-      <CardContent style={{padding:"5px 0px"}} >
+      <CardContent style={{ padding: "5px 0px" }} >
         {/* <Slider
           {...settings}
           style={{ padding: '0px 25px', display: 'flex', justifyContent: 'center' }}
         > */}
-        <Carousel
-          animation="slide"
-        >
-          {
-            sortedProjects.slice(0, 3).map((project, index) => {
-              return (
-                <Grid
-                  container
-                  key={project._id}
-                  spacing={1}
-                  style={{ display: 'flex', justifyContent: 'center' }}
-                >
-                  <Grid
-                    item
-                    lg={11}
-                    sm={11}
-                    xl={12}
-                    xs={12}
-                  >
-                    <ProjectCard
-                      project={project}
-                      handleDelete={handleDelete}
-                    />
-                  </Grid>
-                </Grid>
-              )
-            })
-          }
-        </Carousel>
-
+        {
+          sortedProjects.length === 0 ?
+            <div style={{ height: 180, backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                there is no project yet
+          </Typography>
+            </div>
+            :
+            <Carousel
+              animation="slide"
+            >
+              {
+                sortedProjects.slice(0, 3).map((project, index) => {
+                  return (
+                    <Grid
+                      container
+                      key={project._id}
+                      spacing={1}
+                      style={{ display: 'flex', justifyContent: 'center' }}
+                    >
+                      <Grid
+                        item
+                        lg={11}
+                        sm={11}
+                        xl={12}
+                        xs={12}
+                      >
+                        <ProjectCard
+                          project={project}
+                          handleDelete={handleDelete}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                })
+              }
+            </Carousel>
+        }
         {/* </Slider> */}
       </CardContent>
     </Card >

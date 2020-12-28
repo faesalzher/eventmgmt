@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const positionName = [
-  { position_name: 'Penanggung Jawab', core: true, order: '0' },
+  { position_name: 'Responsible Person', core: true, order: '0' },
   { position_name: 'Head Of Project', core: true, order: '1' },
   { position_name: 'Vice Head of Project', core: true, order: '2' },
   { position_name: 'Secretary', core: true, order: '3' },
@@ -112,6 +112,16 @@ export default function PositionEditForm(props) {
       helperTemplatePosition.push(position.position_name)
   })
 
+  let error = false;
+  props.positions.forEach((position) => {
+    if (position.position_name === positionForm.position_name) {
+      error = true;
+    }
+    if (props.position.position_name === positionForm.position_name) {
+      error = false;
+    }
+  })
+
   return (
     <div>
       <Dialog
@@ -128,6 +138,8 @@ export default function PositionEditForm(props) {
             <div >
               <FormControl className={classes.formControl}>
                 <TextField
+                  error={error}
+                  helperText={error ? "Position already created" : ""}
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
                   name="position_name"
@@ -166,7 +178,9 @@ export default function PositionEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              positionForm.position_name === ""
+              positionForm.position_name === "" ||
+              positionForm.core === "" ||
+              error
             ) ?
               ("invalid") : ("valid")
           }

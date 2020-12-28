@@ -41,7 +41,7 @@ export default function DepartementEditForm(props) {
     departement_name: props.departement.departement_name,
     organization_id: props.organization_id
   }
-  
+
   const [departementForm, setDepartementForm] = useState(intitialFormState);
   const [deleteDepartement] = useMutation(DELETE_DEPARTEMENT);
   const [editDepartement] = useMutation(EDIT_DEPARTEMENT);
@@ -78,6 +78,16 @@ export default function DepartementEditForm(props) {
     setDepartementForm(intitialFormState)
   }
 
+  let error = false;
+  props.departements.forEach((departement) => {
+    if (departement.departement_name === departementForm.departement_name) {
+      error = true;
+    }
+    if (props.departement.departement_name === departementForm.departement_name) {
+      error = false;
+    }
+  })
+
   return (
     <div>
       <Dialog
@@ -94,6 +104,8 @@ export default function DepartementEditForm(props) {
             <div >
               <FormControl className={classes.formControl}>
                 <TextField
+                  error={error}
+                  helperText={error ? "Departement already created" : ""}
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
                   id="departement_name"
@@ -110,7 +122,8 @@ export default function DepartementEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              departementForm.departement_name === ""
+              departementForm.departement_name === "" ||
+              error
             ) ?
               ("invalid") : ("valid")
           }

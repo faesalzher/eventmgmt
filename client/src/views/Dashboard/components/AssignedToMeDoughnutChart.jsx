@@ -191,7 +191,7 @@ export default function AssignedToMeDoughnutChart(props) {
                   style={{ color: device.color }}
                   variant="subtitle2"
                 >
-                  {device.percentage} %
+                  {tasksAssignedTo.length === 0 ? "" : device.percentage + " %"}
                 </Typography>
                 <span className={classes.deviceIcon} style={{ color: device.color }} >{device.icon}</span>
                 <Typography variant="body1">{device.title}</Typography>
@@ -201,7 +201,6 @@ export default function AssignedToMeDoughnutChart(props) {
                 >
                   {device.value}
                 </Typography>
-
               </div>
             ))}
           </div>

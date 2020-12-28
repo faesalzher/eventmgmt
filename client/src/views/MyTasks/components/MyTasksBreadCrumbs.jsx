@@ -23,7 +23,7 @@ const CustomRouterLink = forwardRef((props, ref) => (
 export default function MyTasksBreadCrumbs(props) {
   const classes = useStyles();
 
-  const [roadmap, setRoadmap] = React.useState({ event_id: "" });
+  const [roadmap, setRoadmap] = React.useState({ _id:"",oadmap_name: "" });
   const { data: roadmapData, refetch: roadmapRefetch } = useQuery(ROADMAP_QUERY,
     {
       variables: { roadmap_id: props.roadmap_id },
@@ -31,12 +31,12 @@ export default function MyTasksBreadCrumbs(props) {
         if (roadmapData !== undefined && roadmapData.roadmap !== null) {
           setRoadmap(roadmapData.roadmap)
         } else {
-          setRoadmap({ event_id: "" })
+          // setRoadmap({ _id: "" })
         }
       }
     });
 
-  const [project, setProject] = React.useState({ project_name: "" });
+  const [project, setProject] = React.useState({ _id:"",project_name: "" });
   const { data: projectData, refetch: projectRefetch } = useQuery(PROJECT_QUERY,
     {
       variables: { project_id: props.project_id },
@@ -44,12 +44,12 @@ export default function MyTasksBreadCrumbs(props) {
         if (projectData !== undefined && projectData.project !== null) {
           setProject(projectData.project)
         } else {
-          setProject({ event_id: "" })
+          // setProject({ event_id: "" })
         }
       }
     });
 
-  const [event, setEvent] = React.useState({ event_name: "" });
+  const [event, setEvent] = React.useState({ _id:"",event_name: "" });
   const { data: eventData, refetch: eventRefetch } = useQuery(EVENT_QUERY,
     {
       variables: { event_id: props.event_id },
@@ -57,7 +57,7 @@ export default function MyTasksBreadCrumbs(props) {
         if (eventData !== undefined && eventData.event !== null) {
           setEvent(eventData.event)
         } else {
-          setEvent({ event_id: "" })
+          // setEvent({ event_id: "" })
         }
       }
     });
@@ -70,6 +70,9 @@ export default function MyTasksBreadCrumbs(props) {
     projectRefetch();
     eventRefetch();
   };
+
+  console.log(props.event_id)
+  console.log(event);
 
   const breadcrumb_item = [
     { name: project.project_name, link: `/project/${project._id}` },

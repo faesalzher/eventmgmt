@@ -215,6 +215,7 @@ if (!organizationData) return (<></>)
                   project_id={project_id}
                   close={handleCloseEditModal}
                   handleSaveEditButton={handleSaveEditEventButton}
+                  event_id={event_id}
                   event={event}
                 />
               </>

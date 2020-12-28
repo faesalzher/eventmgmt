@@ -76,6 +76,12 @@ export default function DepartementAddForm(props) {
     setDepartementForm(intitialFormState)
   }
 
+  let error = false;
+  props.departements.forEach((departement) => {
+    if (departement.departement_name === departementForm.departement_name) {
+      error = true;
+    }
+  })
 
   return (
     <Dialog
@@ -92,6 +98,8 @@ export default function DepartementAddForm(props) {
           <div >
             <FormControl className={classes.formControl}>
               <TextField
+                error={error}
+                helperText={error ? "Departement already created" : ""}
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
                 id="departement_name"
@@ -108,7 +116,8 @@ export default function DepartementAddForm(props) {
       <DialogActionsAdd
         validation={
           (
-            departementForm.departement_name === ""
+            departementForm.departement_name === "" ||
+            error
           ) ?
             ("invalid") : ("valid")
         }

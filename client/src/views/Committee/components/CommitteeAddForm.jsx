@@ -70,6 +70,13 @@ export default function CommitteeAddForm(props) {
     setCommitteeForm({ ...committeeForm, [id]: value })
   }
 
+  let error = false;
+  props.committees.forEach((committee) => {
+    if (committee.committee_name === committeeForm.committee_name) {
+      error = true;
+    }
+  })
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -86,6 +93,8 @@ export default function CommitteeAddForm(props) {
             <FormControl className={classes.formControl}>
               <TextField
                 style={{ backgroundColor: 'white' }}
+                error={error}
+                helperText={error ? "Committee already created" : ""}
                 margin="dense"
                 id="committee_name"
                 label="Committee Name"
@@ -102,7 +111,8 @@ export default function CommitteeAddForm(props) {
         close={props.close}
         validation={
           (
-            committeeForm.committee_name === ""
+            committeeForm.committee_name === "" ||
+            error
           ) ?
             ("invalid") : ("valid")
         }

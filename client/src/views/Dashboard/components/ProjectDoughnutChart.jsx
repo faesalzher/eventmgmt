@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ProjectDoughnutChart(props) {
-  const { className,  ...rest } = props;
+  const { className, ...rest } = props;
 
   const classes = useStyles();
   const theme = useTheme();
@@ -43,47 +43,47 @@ export default function ProjectDoughnutChart(props) {
 
   let countCompletedProject = [];
   props.projects.forEach((project) => {
-      const start_date = new Date(project.project_start_date);
-      const end_date = new Date(project.project_end_date);
+    const start_date = new Date(project.project_start_date);
+    const end_date = new Date(project.project_end_date);
 
-      const isToday = (someDate) => {
-          return someDate.getDate() === today.getDate() &&
-              someDate.getMonth() === today.getMonth() &&
-              someDate.getFullYear() === today.getFullYear()
-      }
+    const isToday = (someDate) => {
+      return someDate.getDate() === today.getDate() &&
+        someDate.getMonth() === today.getMonth() &&
+        someDate.getFullYear() === today.getFullYear()
+    }
 
-      const preparingDays = today < start_date;
-      const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-      if (!preparingDays && !activeDays) {
-          countCompletedProject.push(project)
-      }
+    const preparingDays = today < start_date;
+    const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
+    if (!preparingDays && !activeDays) {
+      countCompletedProject.push(project)
+    }
   }
   )
 
   let countPreparingProject = [];
   props.projects.forEach((project) => {
-      if (today < new Date(project.project_start_date)) {
-          countPreparingProject.push(project)
-      }
+    if (today < new Date(project.project_start_date)) {
+      countPreparingProject.push(project)
+    }
   }
   );
 
   let countActiveProject = [];
   props.projects.forEach((project) => {
-      const start_date = new Date(project.project_start_date);
-      const end_date = new Date(project.project_end_date);
+    const start_date = new Date(project.project_start_date);
+    const end_date = new Date(project.project_end_date);
 
-      const isToday = (someDate) => {
-          return someDate.getDate() === today.getDate() &&
-              someDate.getMonth() === today.getMonth() &&
-              someDate.getFullYear() === today.getFullYear()
-      }
+    const isToday = (someDate) => {
+      return someDate.getDate() === today.getDate() &&
+        someDate.getMonth() === today.getMonth() &&
+        someDate.getFullYear() === today.getFullYear()
+    }
 
-      const preparingDays = today < start_date;
-      const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
-      if (!preparingDays && activeDays) {
-          countActiveProject.push(project)
-      }
+    const preparingDays = today < start_date;
+    const activeDays = (today < end_date) || isToday(start_date) || isToday(end_date)
+    if (!preparingDays && activeDays) {
+      countActiveProject.push(project)
+    }
   }
   )
 
@@ -183,7 +183,7 @@ export default function ProjectDoughnutChart(props) {
                   style={{ color: device.color }}
                   variant="subtitle2"
                 >
-                  {device.percentage} %
+                  {props.projects.length === 0 ? "" : device.percentage + " %"}
                 </Typography>
                 <span className={classes.deviceIcon} style={{ color: device.color }} >{device.icon}</span>
                 <Typography variant="body1">{device.title}</Typography>

@@ -29,25 +29,25 @@ const saltRounds = 10;
 
 const committeeName = [
   { committee_name: 'Panitia Inti', core: true },
-  { committee_name: 'Program Subcommittee', core: false },
-  { committee_name: 'Secretariat Subcommittee', core: false },
-  { committee_name: 'Funding Subcommittee', core: false },
-  { committee_name: 'Food Subcommittee', core: false },
-  { committee_name: 'Security Subcommittee', core: false },
-  { committee_name: 'Publication and Documentation Subcommittee', core: false },
-  { committee_name: 'Equipment and Transportation Subcommittee', core: false },
+  { committee_name: 'Sie Acara dan Lomba', core: false },
+  { committee_name: 'Sie Perlengkapan dan Transportasi', core: false },
+  { committee_name: 'Sie Konsumsi dan Penerima Tamu ', core: false },
+  { committee_name: 'Sie Keuangan', core: false },
+  { committee_name: 'Sie Keamanan', core: false },
+  { committee_name: 'Sie Humas, Dokumentasi & Publikasi', core: false },
+  { committee_name: 'Sie Sponsorship dan Kerjasama', core: false },
 ]
 
 const positionName = [
   { position_name: 'Penanggung Jawab', core: true, order: '0' },
-  { position_name: 'Head Of Project', core: true, order: '1' },
-  { position_name: 'Vice Head of Project', core: true, order: '2' },
-  { position_name: 'Secretary', core: true, order: '3' },
-  { position_name: 'Treasurer', core: true, order: '4' },
-  { position_name: 'Vice Treasurer', core: true, order: '5' },
-  { position_name: 'Coordinator', core: false, order: '6' },
-  { position_name: 'Vice Coordinator', core: false, order: '7' },
-  { position_name: 'Member', core: false, order: '8' },
+  { position_name: 'Ketua', core: true, order: '1' },
+  { position_name: 'Wakil Ketua', core: true, order: '2' },
+  { position_name: 'Sekertaris', core: true, order: '3' },
+  { position_name: 'Bendahara', core: true, order: '4' },
+  { position_name: 'Wakil Bendahara', core: true, order: '5' },
+  { position_name: 'Koordinator', core: false, order: '6' },
+  { position_name: 'Wakil Koordinator', core: false, order: '7' },
+  { position_name: 'Anggota', core: false, order: '8' },
 ]
 
 const schema = {

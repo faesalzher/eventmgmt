@@ -119,21 +119,21 @@ export default function EventEditModal(props) {
   const [deleteTaskAssignedTo] = useMutation(DELETE_TASK_ASSIGNED_TO);
 
   const { data: roadmapsData, refetch: roadmapsRefetch } = useQuery(ROADMAPS_QUERY,
-    { variables: { event_id: props.event._id }, }
+    { variables: { event_id: props.event_id }, }
   )
   const { data: externalsData, refetch: externalsRefetch } = useQuery(EXTERNALS_QUERY,
-    { variables: { event_id: props.event._id }, }
+    { variables: { event_id: props.event_id }, }
   )
   const { data: agendasData, refetch: agendasRefetch } = useQuery(AGENDAS_QUERY,
-    { variables: { event_id: props.event._id }, }
+    { variables: { event_id: props.event_id }, }
   )
 
   const { data: tasksData, refetch: tasksRefetch } = useQuery(TASKS_QUERY_BY_EVENT,
-    { variables: { event_id: props.event._id }, }
+    { variables: { event_id: props.event_id }, }
   )
 
   const { data: taskAssignedTosData, refetch: taskAssignedTosRefetch } = useQuery(TASK_ASSIGNED_TOS_QUERY_BY_EVENT,
-    { variables: { event_id: props.event._id }, }
+    { variables: { event_id: props.event_id }, }
   )
 
   useEffect(() => {
@@ -148,11 +148,11 @@ export default function EventEditModal(props) {
     taskAssignedTosRefetch();
   };
 
-  console.log(roadmapsData)
-  console.log(externalsData)
-  console.log(agendasData)
-  console.log(tasksData)
-  console.log(taskAssignedTosData)
+  // console.log(roadmapsData)
+  // console.log(externalsData)
+  // console.log(agendasData)
+  // console.log(tasksData)
+  // console.log(taskAssignedTosData)
 
   const handleSaveEditButton = e => {
     props.handleSaveEditButton(eventForm);

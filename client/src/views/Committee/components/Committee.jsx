@@ -74,6 +74,7 @@ export default function Volunteer(props) {
                     </IconButton>
                   </Tooltip>
                   <CommitteeEditForm
+                    committees={props.committees}
                     committee={props.committee}
                     event_id={props.event_id}
                     open={openEditModal}

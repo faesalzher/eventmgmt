@@ -79,7 +79,7 @@ export default function CommitteeEditForm(props) {
   }
 
   const handleDelete = () => {
-    deleteCommittee({ variables: { _id: props.committee._id} });
+    deleteCommittee({ variables: { _id: props.committee._id } });
     props.handleDeleteCommittee(props.committee._id, props.index);
     // setCommitteeForm(intitialFormState);
     props.close();
@@ -89,6 +89,16 @@ export default function CommitteeEditForm(props) {
     setCommitteeForm(props.committee)
     props.close();
   }
+
+  let error = false;
+  props.committees.forEach((committee) => {
+    if (committee.committee_name === committeeForm.committee_name) {
+      error = true;
+    }
+    if (props.committee.committee_name === committeeForm.committee_name) {
+      error = false;
+    }
+  })
 
   return (
     <div>
@@ -106,6 +116,8 @@ export default function CommitteeEditForm(props) {
             <div >
               <FormControl className={classes.formControl}>
                 <TextField
+                  error={error}
+                  helperText={error ? "Committee already created" : ""}
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
                   id="committee_name"
@@ -122,7 +134,8 @@ export default function CommitteeEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              committeeForm.committee_name === ""
+              committeeForm.committee_name === "" ||
+              error
             ) ?
               ("invalid") : ("valid")
           }

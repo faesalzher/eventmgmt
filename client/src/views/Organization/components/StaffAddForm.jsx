@@ -315,7 +315,6 @@ export default function StaffAddForm(props) {
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField
-
                 margin="dense"
                 id="password"
                 disabled

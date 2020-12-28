@@ -166,6 +166,7 @@ export default function Departements(props) {
         }
         <DepartementAddForm
           // guests={guests}
+          departements={departements}
           organization_id={props.organization_id}
           event_id={props.event_id}
           open={openAddModal}
@@ -206,6 +207,7 @@ export default function Departements(props) {
                   ).map((departement, index) => {
                     return <Departement
                       key={index}
+                      departements={departements}
                       decodedToken={props.decodedToken}
                       staffs={props.staffs}
                       handleDeleteDepartement={props.handleDeleteDepartement}

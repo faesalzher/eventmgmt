@@ -77,6 +77,16 @@ export default function DepartementPositionEditForm(props) {
     setDepartementPositionForm(intitialFormState)
   }
 
+  let error = false;
+  props.departementPositions.forEach((departementPosition) => {
+    if (departementPosition.departement_position_name === departementPositionForm.departement_position_name) {
+      error = true;
+    }
+    if (props.departementPosition.departement_position_name === departementPositionForm.departement_position_name) {
+      error = false;
+    }
+  })
+  
   return (
     <div>
       <Dialog
@@ -93,6 +103,8 @@ export default function DepartementPositionEditForm(props) {
             <div >
               <FormControl className={classes.formControl}>
                 <TextField
+                   error={error}
+                   helperText={error ? "Position already created" : ""}
                   style={{ backgroundColor: 'white' }}
                   margin="dense"
                   id="departement_position_name"
@@ -109,7 +121,8 @@ export default function DepartementPositionEditForm(props) {
         <DialogActionsEdit
           validation={
             (
-              departementPositionForm.departementPosition_name === ""
+              departementPositionForm.departementPosition_name === "" ||
+              error
             ) ?
               ("invalid") : ("valid")
           }

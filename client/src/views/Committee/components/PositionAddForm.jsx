@@ -72,7 +72,14 @@ export default function PositionAddForm(props) {
     const { name, value } = e.target;
     setPositionForm({ ...positionForm, [name]: value })
   }
-  console.log(positionForm)
+
+  let error = false;
+  props.positions.forEach((position) => {
+    if (position.position_name === positionForm.position_name) {
+      error = true;
+    }
+  })
+
 
   return (
     <Dialog
@@ -89,6 +96,8 @@ export default function PositionAddForm(props) {
           <div >
             <FormControl className={classes.formControl}>
               <TextField
+                error={error}
+                helperText={error ? "Position already created" : ""}
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
                 name="position_name"
@@ -126,7 +135,9 @@ export default function PositionAddForm(props) {
         close={props.close}
         validation={
           (
-            positionForm.position_name === ""
+            positionForm.position_name === "" ||
+            positionForm.core === "" ||
+            error
           ) ?
             ("invalid") : ("valid")
         }

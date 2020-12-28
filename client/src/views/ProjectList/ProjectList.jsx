@@ -56,7 +56,6 @@ const ProjectList = () => {
 
   const { loading, error, data, refetch } = useQuery(PROJECTS_QUERY, {
     variables: { organization_id: decodedToken.organization_id },
-    // onCompleted: () => { setProjects(data.projects) }
   });
 
   useEffect(() => {
@@ -121,7 +120,6 @@ const ProjectList = () => {
   if (loading) return (
     <div className={classes.loading}><CircularProgress /></div>
   )
-  console.log(decodedToken.organization_id)
 
   return (
     <div className={classes.tabs_root}>
@@ -131,71 +129,77 @@ const ProjectList = () => {
       </Paper>
       <div className={classes.root}>
         {
-          (loading) ? <div className={classes.loading}><CircularProgress /></div> :
-            <div>
-              <Grid
-                container
-                spacing={2}
-              >
-                <Snackbar
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={open}
-                  autoHideDuration={3000}
-                  onClose={handleClose}>
-                  <Alert onClose={handleClose} severity="success">
-                    Succes!
+          (personInCharges.length === 0 && decodedToken.user_type !== "organization"  ) ?
+            <div style={{ height: 400, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Typography variant="caption" style={{ textAlign: 'center' }} color='textSecondary'>
+                there is no project yet
+               </Typography>
+            </div> :
+            (loading) ? <div className={classes.loading}><CircularProgress /></div> :
+              <div>
+                <Grid
+                  container
+                  spacing={2}
+                >
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={open}
+                    autoHideDuration={3000}
+                    onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success">
+                      Succes!
                </Alert>
-                </Snackbar>
-                {decodedToken.user_type === "organization" ?
-                  <>
-                    <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
-                    {
-                      sortedProjects.map((project, index) => {
-                        return (
-                          <Grid
-                            item
-                            key={index}
-                            lg={3}
-                            sm={6}
-                            xl={3}
-                            xs={12}
-                          >
-                            <ProjectCard
-                              project={project}
-                            />
-                          </Grid>
-                        )
-                      })
-                    }
-                  </>
-                  :
-                  <>
-                    {
-                      personInCharges.slice().reverse().map((personInCharge, index) => {
-                        return (
-                          <Grid
-                            key={index}
-                            item
-                            lg={3}
-                            sm={6}
-                            xl={3}
-                          >
-                            <MyProject
-                              personInCharge={personInCharge}
-                            />
-                          </Grid>
-                          // <div>{console.log(personInCharge.project_id)}</div>
-                        )
-                      })
-                    }
-                  </>
-                }
+                  </Snackbar>
+                  {decodedToken.user_type === "organization" ?
+                    <>
+                      <AddProjectCard addProject={addProject} organization_id={decodedToken.organization_id} />
+                      {
+                        sortedProjects.map((project, index) => {
+                          return (
+                            <Grid
+                              item
+                              key={index}
+                              lg={3}
+                              sm={6}
+                              xl={3}
+                              xs={12}
+                            >
+                              <ProjectCard
+                                project={project}
+                              />
+                            </Grid>
+                          )
+                        })
+                      }
+                    </>
+                    :
+                    <>
+                      {
+                        personInCharges.slice().reverse().map((personInCharge, index) => {
+                          return (
+                            <Grid
+                              key={index}
+                              item
+                              lg={3}
+                              sm={6}
+                              xl={3}
+                            >
+                              <MyProject
+                                personInCharge={personInCharge}
+                              />
+                            </Grid>
+                            // <div>{console.log(personInCharge.project_id)}</div>
+                          )
+                        })
+                      }
+                    </>
+                  }
 
-              </Grid>
-            </div>
+                </Grid>
+              </div>
         }
       </div>
     </div>

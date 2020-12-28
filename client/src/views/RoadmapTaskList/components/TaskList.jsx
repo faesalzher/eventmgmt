@@ -75,7 +75,7 @@ export default function TaskList(props) {
     created_by: decodedToken.staff_id,
     event_id: props.event_id,
     project_id: props.project_id,
-    organization_id: props.organization_id,
+    organization_id: decodedToken.organization_id,
   };
 
   const [countUncompleted, setCountUncompleted] = React.useState(0);
@@ -214,6 +214,7 @@ export default function TaskList(props) {
     setCountCompleted(countCompleted);
   }, [tasks])
 
+  console.log(taskForm)
 
   const user_access = (props.roadmap.committee_id === props.project_personInCharge.committee_id) ?
     (

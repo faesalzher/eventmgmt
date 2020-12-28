@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 // import { makeStyles } from '@material-ui/styles';
 // import {
-//   Grid,
-//   Paper,
+//   // Grid,
+//   // Paper,
 //   Typography
 // } from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
@@ -59,8 +59,8 @@ export default function MyProject(props) {
 
   useEffect(() => {
     const onCompleted = (data) => {
-       setProject(data.project)
-       };
+      setProject(data.project)
+    };
     const onError = (error) => { /* magic */ };
     if (onCompleted || onError) {
       if (onCompleted && !loading && !error) {

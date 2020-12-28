@@ -70,6 +70,7 @@ export default function DepartementPosition(props) {
         }
         <DepartementPositionEditForm
           departementPosition={props.departementPosition}
+          departementPositions={props.departementPositions}
           event_id={props.event_id}
           open={openEditModal}
           index={props.index}

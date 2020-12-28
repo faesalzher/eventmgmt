@@ -167,6 +167,7 @@ export default function Committees(props) {
         }
         <CommitteeAddForm
           // guests={guests}
+          committees={committees}
           decodedToken={props.decodedToken}
           open={openAddModal}
           handleSaveButton={props.handleSaveButton}
@@ -208,6 +209,7 @@ export default function Committees(props) {
                 ).map((committee, index) => {
                   return <Committee
                     key={index}
+                    committees={committees}
                     project_personInCharge={props.project_personInCharge}
                     decodedToken={props.decodedToken}
                     handleDeleteCommittee={props.handleDeleteCommittee}

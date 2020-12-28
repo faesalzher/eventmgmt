@@ -166,6 +166,7 @@ export default function DepartementPositions(props) {
         }
         <DepartementPositionAddForm
           // guests={guests}
+          departementPositions={departementPositions}
           decodedToken={props.decodedToken}
           event_id={props.event_id}
           open={openAddModal}
@@ -205,6 +206,7 @@ export default function DepartementPositions(props) {
                 ).map((departementPosition, index) => {
                   return <DepartementPosition
                     key={index}
+                    departementPositions={departementPositions}
                     decodedToken={props.decodedToken}
                     handleDeleteDepartementPosition={props.handleDeleteDepartementPosition}
                     departementPosition={departementPosition}

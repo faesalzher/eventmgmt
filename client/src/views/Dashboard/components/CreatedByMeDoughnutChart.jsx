@@ -186,7 +186,7 @@ export default function CreatedByMeDoughnutChart(props) {
                   style={{ color: device.color }}
                   variant="subtitle2"
                 >
-                  {device.percentage} %
+                  {tasks.length === 0 ? "" : device.percentage + " %"}
                 </Typography>
                 <span className={classes.deviceIcon} style={{ color: device.color }} >{device.icon}</span>
                 <Typography variant="body1">{device.title}</Typography>

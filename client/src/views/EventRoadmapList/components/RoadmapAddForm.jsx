@@ -88,11 +88,21 @@ export default function RoadmapAddForm(props) {
   const [addRoadmap] = useMutation(ADD_ROADMAP);
 
 
-  const { data: personInChargesData } =
+  const { data: personInChargesData, refetch: personInChargesRefetch } =
     useQuery(PERSON_IN_CHARGES_BY_PROJECT_QUERY, {
       variables: { project_id: props.project_id },
+
     }
     );
+
+  React.useEffect(() => {
+    refresh();
+  });
+
+  const refresh = () => {
+    personInChargesRefetch();
+  };
+
   if (!personInChargesData) {
     return (<></>)
   }
@@ -115,7 +125,7 @@ export default function RoadmapAddForm(props) {
       personInCharges: groupCommitteesObject[committee_id]
     };
   });
-  console.log(groupCommittees)
+  console.log(personInChargesData)
 
 
   const handleChangeCommittee = (e) => {
@@ -149,7 +159,6 @@ export default function RoadmapAddForm(props) {
     props.close();
     setDaysSelected(false);
   }
-  console.log(roadmapForm)
 
 
   const handleCloseModal = () => {
@@ -255,6 +264,11 @@ const MenuItemSelect = (props) => {
 
   if (!committeeData) {
     return (<></>)
+  }
+
+  if (committeeData.committee === null) {
+    return (<></>)
+
   }
 
   return (

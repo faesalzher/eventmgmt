@@ -223,6 +223,7 @@ export default function Positions(props) {
                 ).map((position, index) => {
                   return <Position
                     key={index}
+                    positions={positions}
                     position={position}
                     coreCommittee={props.coreCommittee}
                     project_personInCharge={props.project_personInCharge}

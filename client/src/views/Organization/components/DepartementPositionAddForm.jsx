@@ -74,7 +74,13 @@ export default function DepartementPositionAddForm(props) {
     setDepartementPositionForm(intitialFormState)
   }
 
-console.log(departementPositionForm)
+  let error = false;
+  props.departementPositions.forEach((departementPosition) => {
+    if (departementPosition.departement_position_name === departementPositionForm.departement_position_name) {
+      error = true;
+    }
+  })
+  
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -84,12 +90,14 @@ console.log(departementPositionForm)
       fullWidth={true}
       maxWidth={'xs'}
     >
-      <DialogTitle title="Add New departementPosition" onClose={props.close} />
+      <DialogTitle title="Add New Position" onClose={props.close} />
       <DialogContent dividers >
         <form noValidate >
           <div >
             <FormControl className={classes.formControl}>
               <TextField
+                error={error}
+                helperText={error ? "Position already created" : ""}
                 style={{ backgroundColor: 'white' }}
                 margin="dense"
                 id="departement_position_name"
@@ -106,7 +114,8 @@ console.log(departementPositionForm)
       <DialogActionsAdd
         validation={
           (
-            departementPositionForm.departement_position_name === ""
+            departementPositionForm.departement_position_name === ""||
+            error
           ) ?
             ("invalid") : ("valid")
         }
