@@ -26,7 +26,7 @@ import {
 import { PROJECTS_QUERY, PERSON_IN_CHARGES_BY_STAFF_QUERY } from 'gql';
 
 export default function DashboardStaff(props) {
-    const today = new Date()
+ 
 
     const [projects, setProjects] = useState([]);
 

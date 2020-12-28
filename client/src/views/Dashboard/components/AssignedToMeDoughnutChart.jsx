@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {  useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import {
@@ -54,7 +54,7 @@ export default function AssignedToMeDoughnutChart(props) {
   const theme = useTheme();
 
 
-  const [tasksAssignedTo, setTasksAssignedTo] = useState([]);
+  // const [tasksAssignedTo] = useState([]);
   // const [tasks, setTasks] = useState([]);
 
   const { data: tasksAssignedToData, refetch: tasksAssignedToRefetch } = useQuery(
@@ -191,7 +191,7 @@ export default function AssignedToMeDoughnutChart(props) {
                   style={{ color: device.color }}
                   variant="subtitle2"
                 >
-                  {tasksAssignedTo.length === 0 ? "" : device.percentage + " %"}
+                  {tasksAssignedToData.task_assigned_tos.length === 0 ? "" : device.percentage + " %"}
                 </Typography>
                 <span className={classes.deviceIcon} style={{ color: device.color }} >{device.icon}</span>
                 <Typography variant="body1">{device.title}</Typography>
