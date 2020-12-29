@@ -63,7 +63,7 @@ export default function StaffAddForm(props) {
     staff_name: "",
     email: "",
     phone_number: "",
-    password: "1234",
+    password: "12345678",
     picture: " ",
     is_admin: false,
     departement_position_id: "",
@@ -112,10 +112,13 @@ export default function StaffAddForm(props) {
     });
   };
 
+  console.log(staffForm.values)
+
   const handleSaveButton = () => {
     props.handleSaveButton(staffForm.values)
     props.close();
     bcrypt.hash(staffForm.values.password, saltRounds, function (err, hash) {
+      console.log(hash)
       addStaff({
         variables:
         {
@@ -124,7 +127,7 @@ export default function StaffAddForm(props) {
           departement_position_id: staffForm.values.departement_position_id,
           email: staffForm.values.email,
           phone_number: staffForm.values.phone_number,
-          password: hash.values.password,
+          password: hash,
           picture: staffForm.values.picture,
           is_admin: staffForm.values.is_admin,
           departement_id: staffForm.values.departement_id,

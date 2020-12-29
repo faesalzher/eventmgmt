@@ -48,7 +48,7 @@ export const EDIT_COMMITTEE = gql`
       _id
       core
       committee_name
-      organizatio_id
+      organization_id
     }
   }
 `;
