@@ -152,6 +152,13 @@ export default function ProjectPersonInCharge(props) {
       staffs: groupDepartementsObject[departement_id]
     };
   });
+  console.log(parseInt(props.project_personInCharge.order))
+  // console.log( (1 < parseInt(props.project_personInCharge.order) < 8) )
+  // console.log(decodedToken.user_type === "organization")
+  const user_access = decodedToken.user_type === "organization" ?
+    true :
+    parseInt(props.project_personInCharge.order) < 8 && parseInt(props.project_personInCharge.order) > 0 ? true : false
+
   return (
     <div>
       <Paper>
@@ -162,14 +169,14 @@ export default function ProjectPersonInCharge(props) {
             PERSON IN CHARGE
           </Typography>
           {
-            1 < parseInt(props.project_personInCharge.order) < 8 || decodedToken.user_type === "organization" ?
+            user_access ?
               <Tooltip title="Add New Person In Charge" arrow>
                 <IconButton style={{ padding: 0 }} onClick={handleOpenAddModal} >
                   <AddIcon />
                 </IconButton>
               </Tooltip>
               :
-              <></>
+              <div></div>
           }
           <PersonInChargeAddForm
             staffs={staffs}
@@ -188,7 +195,7 @@ export default function ProjectPersonInCharge(props) {
           />
         </div>
         <Paper style={{ width: '-webkit-fill-available', whiteSpace: 'nowrap' }} >
-          {staffsLoading || positionsLoading|| props.personInChargesLoading ?
+          {staffsLoading || positionsLoading || props.personInChargesLoading ?
             <div style={{ justifyContent: 'center', display: 'flex', alignItems: 'center', height: 400 }}>
               <CircularProgress size={100} />
             </div>

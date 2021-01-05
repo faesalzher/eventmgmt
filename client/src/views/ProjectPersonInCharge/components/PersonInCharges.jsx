@@ -83,7 +83,6 @@ const PersonInCharges = (props) => {
 
   const emptyRows = 5 - Math.min(5, props.personInCharges.length);
 
-
   return (
     <div >
       <Toolbar style={{ minHeight: 36, display: 'flex', justifyContent: 'space-between' }}>

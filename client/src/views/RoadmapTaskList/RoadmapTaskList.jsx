@@ -155,6 +155,24 @@ export default function RoadamapTaskList() {
     { name: roadmap.roadmap_name, link: `/` }
   ]
 
+  const user_access = (roadmap.committee_id === project_personInCharge.committee_id) ?
+    (
+      project_personInCharge.order === '6' ||
+      project_personInCharge.order === '7' ||
+      decodedToken.user_type === "organization" ||
+      project_personInCharge.order === '1' ||
+      project_personInCharge.order === '2' ||
+      project_personInCharge.order === '3'
+    ) ?
+      true
+      :
+      false
+    :
+    decodedToken.user_type === "organization" ||
+      project_personInCharge.order === '1' ||
+      project_personInCharge.order === '2' ||
+      project_personInCharge.order === '3' ? true : false
+
   return (
     <div className={classes.tabs_root}>
       <Paper className={classes.tabs_root} style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -169,12 +187,7 @@ export default function RoadamapTaskList() {
         </Typography>
         <div style={{ display: "flex", flexDirection: "row" }}>
           {
-            (project_personInCharge.order === '1' ||
-              project_personInCharge.order === '2' ||
-              project_personInCharge.order === '3' ||
-              project_personInCharge.order === '6' ||
-              project_personInCharge.order === '7' ||
-              decodedToken.user_type === "organization") ?
+            (user_access) ?
               <IconButton className={classes.iconbutton} onClick={handleOpenEditModal}>
                 <SettingsIcon />
               </IconButton>
