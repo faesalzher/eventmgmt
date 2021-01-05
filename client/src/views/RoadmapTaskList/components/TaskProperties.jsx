@@ -435,9 +435,9 @@ export default function TaskProperties(props) {
                   <Button onClick={() => handleChangePriority('medium')} className={classes.priorityBtn}>Medium</Button>
                 }
                 {taskForm.priority === "high" ?
-                  <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.high].join(" ")}>High</Button>
+                  <Button onClick={() => handleChangePriority('')} className={[classes.priorityBtn, classes.high].join(" ")} style={{color:'white'}}>High</Button>
                   :
-                  <Button onClick={() => handleChangePriority('high')} className={classes.priorityBtn} style={{color:'white'}}>High</Button>
+                  <Button onClick={() => handleChangePriority('high')} className={classes.priorityBtn}>High</Button>
                 }
               </ButtonGroup>
               :
