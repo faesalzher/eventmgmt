@@ -122,7 +122,7 @@ export default function PersonInChargeEditForm(props) {
       }
     });
   }
-console.log(personInChargeForm._id)
+
   const handleDelete = () => {
     props.handleDeletePersonInCharge(props.personInCharge._id);
     props.close();
@@ -155,9 +155,14 @@ console.log(personInChargeForm._id)
     })
   };
 
+
   const handleCloseModal = () => {
     props.close();
-    setPersonInChargeForm(personInCharge);
+    console.log(props.personInCharge)
+    // console.log(personInChargeForm.committee_id);
+    // console.log(personInChargeForm.position_id);
+
+    setPersonInChargeForm(props.personInCharge);
     setCommittee_id(props.personInCharge.committee_id);
     setPosition_id(props.personInCharge.position_id);
     setStaff_id(props.personInCharge.staff_id);
@@ -174,23 +179,44 @@ console.log(personInChargeForm._id)
   }
   );
 
-  let checkPersonInChargePositionId = [];
-  props.personInCharges.forEach((personInCharge) => {
-    props.positions.forEach((position) => {
-      if (position._id === personInCharge.position_id
-        && props.project_id === personInCharge.project_id
-        && committee_id === personInCharge.committee_id
-        && 0 < parseInt(position.order) < 7
-      ) {
-        checkPersonInChargePositionId.push(position._id)
-      } else {
-        return null
-      }
-      return null;
-    })
-    return null;
-  }
-  );
+  // let checkPersonInChargePositionId = [];
+  // props.personInCharges.forEach((personInCharge) => {
+  //   props.positions.forEach((position) => {
+  //     if (position._id === personInCharge.position_id
+  //       && props.project_id === personInCharge.project_id
+  //       && committee_id === personInCharge.committee_id
+  //       && 0 < parseInt(position.order) < 7
+  //     ) {
+  //       checkPersonInChargePositionId.push(position._id)
+  //     } else {
+  //       return null
+  //     }
+  //     return null;
+  //   })
+  //   return null;
+  // }
+  // );
+
+   //checking wheter position is taken
+   let checkPersonInChargePositionId = [];
+   props.personInCharges.forEach((personInCharge) => {
+     props.positions.forEach((position) => {
+       if (position._id === personInCharge.position_id
+         // && props.project_id === personInCharge.project_id
+         && committee_id === personInCharge.committee_id
+         && parseInt(position.order) !== 8
+         && parseInt(position.order) !== 9
+       ) {
+         checkPersonInChargePositionId.push(position._id)
+       } else {
+         return null
+       }
+       return null;
+     })
+     return null;
+   }
+   );
+ 
 
   let checkCommitteeCore = [];
   props.committees.map((committee) => {
